@@ -1,0 +1,63 @@
+---
+title: "CO Turtles Exploratory Analyses"
+explanation: "Exploratory analysis of spatial-capture-recapture data recorded summer 2018"
+author: "Natalie Haydt"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+
+
+```{r, checking working directory}
+getwd()
+```
+
+```{r, read in scr data}
+scr.data <- read.csv(file = "canalscr_9_1_18.csv")
+head(scr.data)
+```
+
+```{r, data summary}
+summary(scr.data)
+```
+
+```{r, subsetting by species}
+scr_cpic <- subset(scr.data, species == "CPIC")
+scr_sodo <- subset(scr.data, species == "SODO")
+scr_cser <- subset(scr.data, species == "CSER")
+scr_prub <- subset(scr.data, species == "PRUB")
+scr_gins <- subset(scr.data, species == "GINS")
+scr_tscr <- subset(scr.data, species == "TSCR")
+```
+
+```{r, species summaries}
+summary(scr_cpic)
+summary(scr_sodo)
+summary(scr_cser)
+summary(scr_prub)
+summary(scr_gins)
+## only 1 tsc caught, so did not create summary
+```
+```{r, species and site}
+
+```
+
+```{r, size and site per species}
+
+```
+
+```{r, sex and site}
+
+```
+
+```{r, leeches and site}
+
+```
+
+```{r, leeches and species}
+
+```
+
+
+
