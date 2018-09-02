@@ -21,6 +21,19 @@ head(scr.data)
 ```{r, data summary}
 summary(scr.data)
 ```
+```{r, histograms}
+hist(scr.data$carapace, main = "Carapace Sizes", xlab = "Carapace Size Per Turtle (mm)")
+hist(scr.data$leeches, main = "Distribution of Leeches Found", xlab = "Number of Leeches Per Turtle" )
+
+```
+
+```{r, recap rate histogram}
+
+recaps <- read.csv(file = "recaprates_9_1_18.csv")
+hist(recaps$prop_recap, breaks = 10, xlab = "Proportion of Recaps", main = "Proportion of Recaptures Across C&O Sites")
+
+
+```
 
 ```{r, subsetting by species}
 scr_cpic <- subset(scr.data, species == "CPIC")
@@ -37,25 +50,117 @@ summary(scr_sodo)
 summary(scr_cser)
 summary(scr_prub)
 summary(scr_gins)
-## only 1 tsc caught, so did not create summary
+## only 1 tscr caught, so did not create summary
 ```
-```{r, species and site}
+```{r, histograms per species}
+hist(scr_cpic$carapace)
+hist(scr_sodo$carapace)
+hist(scr_cser$carapace)
+hist(scr_prub$carapace)
 
+hist(scr_cpic$leeches)
+hist(scr_sodo$leeches)
+hist(scr_cser$leeches)
+hist(scr_prub$leeches)
 ```
+
 
 ```{r, size and site per species}
 
-```
+cpic_size_site <- aov(data = scr_cpic, carapace ~ site)
+cpic_size_summary <- summary(cpic_size_site)
+cpic_size_summary
+cpic_posthoc <- TukeyHSD(cpic_size_site, 'site', conf.level = 0.95)
+cpic_posthoc
 
-```{r, sex and site}
+sodo_size_site <- aov(data = scr_sodo, carapace ~ site)
+sodo_size_summary <- summary(sodo_size_site)
+sodo_size_summary
+sodo_posthoc <- TukeyHSD(sodo_size_site, 'site', conf.level = 0.95)
+sodo_posthoc
+
+cser_size_site <- aov(data = scr_cser, carapace ~ site)
+cser_size_summary <- summary(cser_size_site)
+cser_size_summary
+cser_posthoc <- TukeyHSD(cser_size_site, 'site', conf.level = 0.95)
+cser_posthoc
+
+prub_size_site <- aov(data = scr_prub, carapace ~ site)
+prub_size_summary <- summary(prub_size_site)
+prub_size_summary
+prub_posthoc <- TukeyHSD(prub_size_site, 'site', conf.level = 0.95)
+prub_posthoc
 
 ```
 
 ```{r, leeches and site}
 
+cpic_leeches_site <- aov(data = scr_cpic, leeches ~ site)
+cpic_leeches_summary <- summary(cpic_leeches_site)
+cpic_leeches_summary
+cpic_leeches_posthoc <- TukeyHSD(cpic_leeches_site, 'site', conf.level = 0.95)
+cpic_leeches_posthoc
+
+sodo_leeches_site <- aov(data = scr_sodo, leeches ~ site)
+sodo_leeches_summary <- summary(sodo_leeches_site)
+sodo_leeches_summary
+sodo_leeches_posthoc <- TukeyHSD(sodo_leeches_site, 'site', conf.level = 0.95)
+sodo_leeches_posthoc
+
+cser_leeches_site <- aov(data = scr_cser, leeches ~ site)
+cser_leeches_summary <- summary(cser_leeches_site)
+cser_leeches_summary
+cser_leeches_posthoc <- TukeyHSD(cser_leeches_site, 'site', conf.level = 0.95)
+cser_leeches_posthoc
+
+prub_leeches_site <- aov(data = scr_prub, leeches ~ site)
+prub_leeches_summary <- summary(prub_leeches_site)
+prub_leeches_summary
+prub_leeches_posthoc <- TukeyHSD(prub_leeches_site, 'site', conf.level = 0.95)
+prub_leeches_posthoc
+
 ```
 
 ```{r, leeches and species}
+
+leeches_species <- aov(data = scr.data, leeches ~ species)
+leeches_species_summary <- summary(leeches_species)
+leeches_species_summary
+##leeches_species_posthoc <- TukeyHSD(leeches_species, 'leeches', conf.level = 0.95)
+##NaNs produced
+##leeches_species_posthoc
+
+```
+
+```{r, leeches and size - regression}
+
+leeches_size <- aov(data = scr.data, leeches ~ carapace)
+leeches_size_summary <- summary(leeches_size)
+leeches_size_summary
+
+cpic_leeches_size <- aov(data = scr_cpic, leeches ~ carapace)
+cpic_leeches_size_summary <- summary(cpic_leeches_size)
+cpic_leeches_size_summary
+##cpic_leeches_size_posthoc <- TukeyHSD(cpic_leeches_size, 'carapace', conf.level = 0.95)
+##cpic_leeches_size_posthoc
+
+##sodo_leeches_size <- aov(data = scr_sodo, leeches ~ carapace)
+##sodo_leeches_size_summary <- summary(sodo_leeches_size)
+##sodo_leeches_size_summary
+##sodo_leeches_size_posthoc <- TukeyHSD(sodo_leeches_size, 'carapace', conf.level = 0.95)
+##sodo_leeches_size_posthoc
+
+##cser_leeches_size <- aov(data = scr_cser, leeches ~ carapace)
+##cser_leeches_size_summary <- summary(cser_leeches_size)
+##cser_leeches_size_summary
+##cser_leeches_size_posthoc <- TukeyHSD(cser_leeches_size, 'carapace', conf.level = 0.95)
+##cser_leeches_size_posthoc
+
+##prub_leeches_size <- aov(data = scr_prub, leeches ~ carapace)
+##prub_leeches_size_summary <- summary(prub_leeches_size)
+##prub_leeches_size_summary
+##prub_leeches_size_posthoc <- TukeyHSD(prub_leeches_size, 'carapace', conf.level = 0.95)
+##prub_leeches_size_posthoc
 
 ```
 
