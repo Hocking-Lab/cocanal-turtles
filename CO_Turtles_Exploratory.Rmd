@@ -137,7 +137,8 @@ all_leeches_posthoc
 
 ```
 
-```{r, leeches and species, #add in site as random effect}
+```{r, leeches and species}
+ #add in site as random effect
 
 leeches_species <- aov(data = scr.data, leeches ~ species)
 leeches_species_summary <- summary(leeches_species)
@@ -148,7 +149,8 @@ leeches_species_summary
 
 ```
 
-```{r, leeches and size - regression, #add in site as random effect}
+```{r, leeches and size - regression}
+#add in site as random effect
 
 leeches_size <- aov(data = scr.data, leeches ~ carapace)
 leeches_size_summary <- summary(leeches_size)
