@@ -10,25 +10,33 @@ output:
 
 
 ```{r, checking working directory}
-getwd()
+# getwd()
 library(lme4)
+library(ggplot2)
 ```
 
 ```{r, read in scr data}
-scr.data <- read.csv(file = "canalscr_9_1_18.csv")
+scr.data <- read.csv(file = "Data/canalscr_9_1_18.csv", stringsAsFactors = FALSE)
 head(scr.data)
 ```
 
 ```{r, data summary}
 summary(scr.data)
 ```
+
 ```{r, histograms}
 # need to separate by site?
 
 par(mfrow = c(1,2))
 sizes <- hist(scr.data$carapace, main = "Carapace Size Distribution", xlab = "Carapace Size Per Turtle (mm)")
 leeches <- hist(scr.data$leeches, main = "Leech Count Distribution", xlab = "Number of Leeches Per Turtle" )
+par(mfrow = c(1,1))
+```
 
+```{r}
+scr.mf <- scr.data[which(scr.data$sex != "U" & !is.na(scr.data$sex)), ]
+ggplot(data = scr.mf, aes(carapace)) + geom_histogram(aes(fill = species)) + facet_wrap(~sex) + theme_bw()
+ggplot(data = scr.mf, aes(carapace)) + geom_histogram(aes(fill = sex)) + facet_wrap(~species)
 ```
 
 ```{r, recap rate histogram}
@@ -103,6 +111,8 @@ all_size_posthoc
 
 ```
 
+## Exploration of leech data
+
 ```{r, leeches and site; per species and ##overall}
 
 cpic_leeches_site <- aov(data = scr_cpic, leeches ~ site)
@@ -137,6 +147,16 @@ all_leeches_posthoc
 
 ```
 
+### Regression of number of leeches as a function of the species
+
+Q: do different species have different numbers of leeches
+
+H0: There no diff in the number of leeches among species
+
+HA: Musk turtles (SODO) will have more leeches than basking turtles
+
+*Will eventually want to consider leeches per unit area since the turtle species are different sizes or adding size as a covariate interacting with species*
+
 ```{r, leeches and species}
  #add in site as random effect
 
@@ -147,6 +167,20 @@ leeches_species_summary
 ##NaNs produced (need to use NA.omit?)
 ##leeches_species_posthoc
 
+glmer1 <- glmer(leeches ~ species + (1|site), data = scr.data, family = poisson)
+summary(glmer1)
+
+hist(rnorm(10000, exp(0.31932), sd = 0.4694))
+
+library(dplyr)
+scr.scaled <- scr.data %>%
+  filter(species != "GINS",
+         species != "TSCR") %>%
+  mutate(mass.s = (mass - mean(mass)) / sd(mass))
+summary(scr.scaled)
+
+glmer2 <- glmer(leeches ~ species + mass.s + (1|site), data = scr.scaled, family = poisson)
+summary(glmer2)
 ```
 
 ```{r, leeches and size - regression}
