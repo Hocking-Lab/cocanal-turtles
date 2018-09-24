@@ -11,6 +11,7 @@ output:
 
 ```{r, checking working directory}
 getwd()
+library(lme4)
 ```
 
 ```{r, read in scr data}
@@ -22,8 +23,11 @@ head(scr.data)
 summary(scr.data)
 ```
 ```{r, histograms}
-hist(scr.data$carapace, main = "Carapace Sizes", xlab = "Carapace Size Per Turtle (mm)")
-hist(scr.data$leeches, main = "Distribution of Leeches Found", xlab = "Number of Leeches Per Turtle" )
+# need to separate by site?
+
+par(mfrow = c(1,2))
+sizes <- hist(scr.data$carapace, main = "Carapace Size Distribution", xlab = "Carapace Size Per Turtle (mm)")
+leeches <- hist(scr.data$leeches, main = "Leech Count Distribution", xlab = "Number of Leeches Per Turtle" )
 
 ```
 
@@ -65,7 +69,7 @@ hist(scr_prub$leeches)
 ```
 
 
-```{r, size and site per species}
+```{r, size by site per species, ## add in overall}
 
 cpic_size_site <- aov(data = scr_cpic, carapace ~ site)
 cpic_size_summary <- summary(cpic_size_site)
@@ -91,9 +95,15 @@ prub_size_summary
 prub_posthoc <- TukeyHSD(prub_size_site, 'site', conf.level = 0.95)
 prub_posthoc
 
+all_size_site <- aov(data = scr.data, carapace ~ site)
+all_size_summary <- summary(all_size_site)
+all_size_summary
+all_size_posthoc <- TukeyHSD(all_size_site, 'site', conf.level = 0.95)
+all_size_posthoc
+
 ```
 
-```{r, leeches and site}
+```{r, leeches and site; per species and ##overall}
 
 cpic_leeches_site <- aov(data = scr_cpic, leeches ~ site)
 cpic_leeches_summary <- summary(cpic_leeches_site)
@@ -119,20 +129,26 @@ prub_leeches_summary
 prub_leeches_posthoc <- TukeyHSD(prub_leeches_site, 'site', conf.level = 0.95)
 prub_leeches_posthoc
 
+all_leeches_site <- aov(data = scr.data, leeches ~ site)
+all_leeches_summary <- summary(all_leeches_site)
+all_leeches_summary
+all_leeches_posthoc <- TukeyHSD(all_leeches_site, 'site', conf.level = 0.95)
+all_leeches_posthoc
+
 ```
 
-```{r, leeches and species}
+```{r, leeches and species, #add in site as random effect}
 
 leeches_species <- aov(data = scr.data, leeches ~ species)
 leeches_species_summary <- summary(leeches_species)
 leeches_species_summary
 ##leeches_species_posthoc <- TukeyHSD(leeches_species, 'leeches', conf.level = 0.95)
-##NaNs produced
+##NaNs produced (need to use NA.omit?)
 ##leeches_species_posthoc
 
 ```
 
-```{r, leeches and size - regression}
+```{r, leeches and size - regression, #add in site as random effect}
 
 leeches_size <- aov(data = scr.data, leeches ~ carapace)
 leeches_size_summary <- summary(leeches_size)
@@ -164,5 +180,8 @@ cpic_leeches_size_summary
 
 ```
 
+Based off of Raabe et al. 2014
 
+
+Based off of Kornilev et al. 2010
 
