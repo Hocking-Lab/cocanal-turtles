@@ -21,7 +21,7 @@ ylim <- c(min(traplocs[ , 2] - buffer), max(traplocs[ , 2] + buffer))
 
 # population size
 N <- 100
-K <- 4 # number of occasions
+K <- 4 # number of occasions; number nights of effort  --- Change to time in turtle model?
 
 # simulate random activity centers
 sx <- runif(N, xlim[1], xlim[2]) 
@@ -32,19 +32,19 @@ S <- cbind(sx, sy)
 # compute distance matrix of individuals from each trap
 D <- e2dist(S, traplocs)
 
-alpha <- 0
-sigma <- 0.5
-alpha1 <- 1 / (2 * sigma * sigma)
+alpha <- 0    ## threshold for Chi-squared significance
+sigma <- 0.5 # scale parameter for half-normal
+alpha1 <- 1 / (2 * sigma * sigma) # convert to coefficient on distance
 
 # Compute Probability of Encounter
-probcap <- plogis(alpha) * exp(-1 * alpha1 * D * D)
+probcap <- plogis(alpha) * exp(-1 * alpha1 * D * D) ## add in detection probability covariates here?
 
 # Generate encounters of every individuals in every trap
 Y <- matrix(NA, nrow = N, ncol = ntraps)
 for(i in 1:nrow(Y)) {
   Y[i, ] <- rbinom(ntraps, K, probcap[i, ])
 }
-
+Y
 cbind(1:100, rowSums(Y)) # now we have data. Yay! that was easier than field work
 
 
