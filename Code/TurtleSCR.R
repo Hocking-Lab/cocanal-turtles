@@ -5,7 +5,7 @@ library(dplyr)
 library(tidyr)
 # library(AHMbook)
 # library(R2jags)  #rjags could not be loaded?
-library(jagsUI)
+# library(jagsUI)
 # library(R2WinBUGS)
 
 EDF <- read.csv(file = "Data/EDF.csv", stringsAsFactors = FALSE)
@@ -56,11 +56,14 @@ matrixA[ ,7] <- c(150,125,100,75, 50,25,0,25)
 matrixA[ ,8] <- c(175,150,125,100,75, 50,25,0)
 matrixA  # will need to use coordinates if use all sites in 1 model! or figure out distance b/w sites
 
+traplocsA <- traplocsA / 100
+matrixA <- matrixA / 100 # scale for computational purposes
+
 n_traps <- ncol(matrixA) # number of traps
 # as.character(EDFA$recap)
 N <- nrow(EDFA[which(EDFA$recap == "N"), ])
 K <- max(EDFA$day) # trap nights per session
-buffer <- 100 # check literature to make sure doesn't need to be larger
+buffer <- 1 # check literature to make sure doesn't need to be larger
 #xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
 xlimA <- c(min(matrixA)-buffer, max(matrixA) + buffer)
 xlimA
@@ -134,8 +137,8 @@ cat ("
 model {
     alpha0 ~ dnorm(0, 0.1)
     logit(p0) <- alpha0
-    alpha1 ~ dnorm(0, 0.1)
-    sigma <- pow(1/(2*alpha1), 0.5) # circular home range?
+    alpha1 ~ dgamma(0.1, 0.1) # consider appropriate prior
+    # sigma <- pow(1 / (2*alpha1), 0.5) # sd of half normal
     psi ~ dunif(0, 1)
     for(i in 1:M) {
         z[i] ~ dbern(psi)
@@ -147,8 +150,9 @@ model {
       }
     }
 
-N <- sum(z[])
-D <- N/(xlimA[2] - xlimA[1])
+# Derived parameters
+N <- sum(z[ ])
+density <- N / (xlimA[2] - xlimA[1]) # divided distances by 100 so calculates turtles per 100 m of canal
 }
 ", file = "Code/JAGS/SCRA.txt")
 
@@ -157,10 +161,57 @@ inits <- function() {
   list(alpha0=rnorm(1,-2,.4), alpha1=runif(1,1,2), s=sst, z=z)
 }
 
-parameters <- c("alpha0", "alpha1", "sigma", "N", "D")
+parameters <- c("alpha0", "alpha1", "N", "density", "p", "s") # "sigma",
 
-jinitA <- jagsUI(model.file = "Code/JAGS/SCRA.txt", parameters.to.save = parameters, data=jags_data, inits=inits, n.iter = 1000, n.chains = 3, n.adapt =500)
-# Get error parsing model file: syntax error online 11 near n
+# cpic_1_mcmc <- jagsUI(model.file = "Code/JAGS/SCRA.txt", parameters.to.save = parameters, data=jags_data, inits=inits, n.iter = 1000, n.chains = 3, n.adapt =500) # jagsUI is nice but the plotting is interactive which is obnoxious 
 
-library(R2jags)
-jinitA <- R2jags::jags(model.file = "Code/JAGS/SCRA.txt", parameters.to.save = parameters, data=jags_data, inits=inits, n.chains = 3, n.burnin = 500, n.iter = 1000)
+# plot(cpic_1_mcmc)
+# traceplot(cpic_1_mcmc)
+# cpic_1_mcmc
+
+testing <- TRUE
+if(testing) {
+  na = 500
+  ni = 500
+  nt = 1
+  nc = 3
+} else {
+  na = 100000
+  ni = 600000
+  nt = 60
+  nc = 4
+}
+
+# run in parallel explicitly
+library(rjags)
+library(parallel)
+
+cl <- makeCluster(nc)                       # Request # cores
+clusterExport(cl, c("jags_data", "inits", "parameters", "z", "sst", "ni", "na", "nt")) # Make these available
+clusterSetRNGStream(cl = cl, 54354354)
+
+system.time({ # no status bar (% complete) when run in parallel
+  out <- clusterEvalQ(cl, {
+    library(rjags)
+    jm <- jags.model("Code/JAGS/SCRA.txt", jags_data, inits, n.adapt = na, n.chains = 1) # Compile model and run burnin
+    out <- coda.samples(jm, parameters, n.iter = ni, thin = nt) # Sample from posterior distribution
+    return(as.mcmc(out))
+  })
+}) # 
+
+stopCluster(cl)
+
+# Results
+cpic_1_mcmc <- mcmc.list(out)
+plot(cpic_1_mcmc[ , c("alpha0", "alpha1", "density")]) # 
+par(mfrow = c(1,1))
+summary(cpic_1_mcmc[ , c("alpha0", "alpha1", "density")])
+# summary(cpic_1_mcmc)
+
+save(cpic_1_mcmc, file = "Results/JAGS/cpic_1_mcmc.RData")
+
+
+
+
+# library(R2jags)
+# jinitA <- R2jags::jags(model.file = "Code/JAGS/SCRA.txt", parameters.to.save = parameters, data=jags_data, inits=inits, n.chains = 3, n.burnin = 500, n.iter = 1000)
