@@ -138,7 +138,7 @@ model {
     alpha0 ~ dnorm(0, 0.1)
     logit(p0) <- alpha0
     alpha1 ~ dgamma(0.1, 0.1) # consider appropriate prior
-    # sigma <- pow(1 / (2*alpha1), 0.5) # sd of half normal
+    sigma <- pow(1 / (2*alpha1), 0.5) # sd of half normal
     psi ~ dunif(0, 1)
     for(i in 1:M) {
         z[i] ~ dbern(psi)
@@ -161,7 +161,7 @@ inits <- function() {
   list(alpha0=rnorm(1,-2,.4), alpha1=runif(1,1,2), s=sst, z=z)
 }
 
-parameters <- c("alpha0", "alpha1", "N", "density", "p", "s") # "sigma",
+parameters <- c("alpha0", "alpha1", "sigma", "N", "density", "p", "s") # 
 
 # cpic_1_mcmc <- jagsUI(model.file = "Code/JAGS/SCRA.txt", parameters.to.save = parameters, data=jags_data, inits=inits, n.iter = 1000, n.chains = 3, n.adapt =500) # jagsUI is nice but the plotting is interactive which is obnoxious 
 
