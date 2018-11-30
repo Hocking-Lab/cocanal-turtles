@@ -217,12 +217,48 @@ cat ("
   }
 ", file = "Code/JAGS/SCRA.txt")
 
+cat ("
+  model {
+     # alpha1 ~ dgamma(0.1, 0.1) # consider appropriate prior
+     alpha1 ~ dt(0, 1 / (5^2), 1)I(0, ) 	## implies half-cauchy with scale of 5
+     sigma <- pow(1 / (2*alpha1), 0.5) # sd of half normal
+     psi ~ dunif(0, 1)
+
+sigma_ind ~ dt(0, 1 / (25^2), 1)I(0, ) 	## implies half-cauchy with scale of 25
+for(i in 1:M) {
+for(k in 1:K) {
+eta[i,k] ~ dnorm(0, 1 / (sigma_ind * sigma_ind))
+}
+}
+
+     for(k in 1:K) {
+     alpha0[k] ~ dnorm(0, 0.1)
+     }
+     for(i in 1:M) {
+     z[i] ~ dbern(psi)
+     s[i] ~ dunif(xlimA[1], xlimA[2])
+     for(j in 1:n_traps) {
+     d[i,j] <- abs(s[i] - traplocsA[j])
+     for(k in 1:K) {
+logit(p0[i,j,k]) <- alpha0[k] + eta[i,k]
+     y[i,j, k] ~ dbern(p[i,j,k])
+     p[i,j, k] <- z[i]*p0[i,j,k]*exp(- alpha1 * d[i,j] * d[i,j])
+     }
+     }
+     }
+     
+     # Derived parameters
+     N <- sum(z[ ])
+     density <- N / (xlimA[2] - xlimA[1]) # divided distances by 100 so calculates turtles per 100 m of canal
+     }
+     ", file = "Code/JAGS/SCRA.txt")
+
 jags_data <- list(y = EM_array, traplocsA = traplocsA, K=K, M=M, xlimA=xlimA, n_traps = n_traps)
 inits <- function() {
   list(alpha0=rnorm(4,-2,.4), alpha1=runif(1,1,2), s=as.numeric(sst), z=z)
 }
 
-parameters <- c("alpha0", "alpha1", "sigma", "N", "density", "p0", "s") # 
+parameters <- c("alpha0", "alpha1", "sigma", "N", "density", "p0", "s", "sigma_ind") # 
 
 # cpic_1_mcmc <- jagsUI(model.file = "Code/JAGS/SCRA.txt", parameters.to.save = parameters, data=jags_data, inits=inits, n.iter = 1000, n.chains = 3, n.adapt =500) # jagsUI is nice but the plotting is interactive which is obnoxious 
 
@@ -265,6 +301,7 @@ stopCluster(cl)
 # Results
 cpic_1_mcmc <- mcmc.list(out)
 plot(cpic_1_mcmc[ , c("alpha1")])
+plot(cpic_1_mcmc[ , c("alpha1", "sigma_ind")])
 plot(cpic_1_mcmc[ , c("p0[1]", "p0[2]", "p0[3]", "p0[4]", "alpha1", "density", "N")]) # 
 par(mfrow = c(1,1))
 summary(cpic_1_mcmc[ , c("alpha0", "alpha1", "density")])
