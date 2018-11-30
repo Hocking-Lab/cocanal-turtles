@@ -220,7 +220,8 @@ cat ("
 cat ("
   model {
      # alpha1 ~ dgamma(0.1, 0.1) # consider appropriate prior
-     alpha1 ~ dt(0, 1 / (5^2), 1)I(0, ) 	## implies half-cauchy with scale of 5
+     # alpha1 ~ dt(0, 1 / (5^2), 1)I(0, ) 	## implies half-cauchy with scale of 5
+     alpha1 ~ dnorm(0, 1 / (25^2))I(0, ) 	## half normal
      sigma <- pow(1 / (2*alpha1), 0.5) # sd of half normal
      psi ~ dunif(0, 1)
 
@@ -309,8 +310,60 @@ summary(cpic_1_mcmc[ , c("alpha0", "alpha1", "density")])
 
 save(cpic_1_mcmc, file = "Results/JAGS/cpic_1_mcmc.RData")
 
+#------ Prior check on alpha1 -----
+dhalfcauchy <- function(x, scale=1, log=FALSE)
+  # probability density function of a half-Cauchy distribution
+{
+  stopifnot(scale>0)
+  result <- rep(-Inf, length(x))
+  result[x>=0] <- log(2) + dcauchy(x[x>=0], location=0, scale=scale, log=TRUE)
+  if (!log) result <- exp(result)
+  return(result)  
+}
+
+df <- data.frame(chain = 1, prob = "posterior", alpha1 = as.numeric(out[[1]][ , "alpha1"]), stringsAsFactors = FALSE)
+for(i in 2:nc) {
+  df <- bind_rows(df, data.frame(chain = i, prob = "posterior", alpha1 = as.numeric(out[[1]][ , "alpha1"]), stringsAsFactors = FALSE))
+}
+tmp <- data.frame(chain = NA_integer_, prob = "prior", alpha1 = abs(rcauchy(nrow(df), 0, 5)), stringsAsFactors = FALSE)
+df <- bind_rows(df, tmp)
+# alpha1 <- rt(ncol(df), df = 1, 1/(5^2))
+# alpha1 <- alpha1[alpha1 >= 0]
+ggplot(df) + geom_density(aes(x = alpha1, fill = as.factor(prob)), alpha = 0.2) + xlim(0, 15)
 
 
+dhalfnorm <- function(x, scale=1, log=FALSE)
+  # probability density function of a half-normal distribution
+{
+  stopifnot(scale>0)
+  result <- rep(-Inf, length(x))
+  result[x>=0] <- log(2) + dnorm(x[x>=0], mean=0, sd=scale, log=TRUE)
+  if (!log) result <- exp(result)
+  return(result)  
+}
+df <- data.frame(chain = 1, prob = "posterior", alpha1 = as.numeric(out[[1]][ , "alpha1"]), stringsAsFactors = FALSE)
+for(i in 2:nc) {
+  df <- bind_rows(df, data.frame(chain = i, prob = "posterior", alpha1 = as.numeric(out[[1]][ , "alpha1"]), stringsAsFactors = FALSE))
+}
+tmp <- data.frame(chain = NA_integer_, prob = "prior", alpha1 = dhalfnorm(seq(0, max(df$alpha1), length.out = nrow(df)), 5), stringsAsFactors = FALSE)
+df <- bind_rows(df, tmp)
+# alpha1 <- rt(ncol(df), df = 1, 1/(5^2))
+# alpha1 <- alpha1[alpha1 >= 0]
+ggplot(df) + geom_density(aes(x = alpha1, fill = as.factor(prob)), alpha = 0.2) + xlim(0, 10)
+
+
+
+df <- data.frame(chain = 1, prob = "posterior", alpha1 = as.numeric(out[[1]][ , "alpha1"]), stringsAsFactors = FALSE)
+for(i in 2:nc) {
+  df <- bind_rows(df, data.frame(chain = i, prob = "posterior", alpha1 = as.numeric(out[[1]][ , "alpha1"]), stringsAsFactors = FALSE))
+}
+tmp <- data.frame(chain = NA_integer_, prob = "prior", alpha1 = abs(rnorm(nrow(df), 0,  5)), stringsAsFactors = FALSE)
+df <- bind_rows(df, tmp)
+# alpha1 <- rt(ncol(df), df = 1, 1/(5^2))
+# alpha1 <- alpha1[alpha1 >= 0]
+ggplot(df) + geom_density(aes(x = alpha1, fill = as.factor(prob)), alpha = 0.2) + xlim(0, 5)
+
+#-----
 
 # library(R2jags)
 # jinitA <- R2jags::jags(model.file = "Code/JAGS/SCRA.txt", parameters.to.save = parameters, data=jags_data, inits=inits, n.chains = 3, n.burnin = 500, n.iter = 1000)
