@@ -89,44 +89,48 @@ EM <- EDFA %>%
 str(EM)
 EM
 
-full_df <- tidyr::expand(EM, nesting(ind, day))
+full_df <- tidyr::expand(EM, ind, day)
 
 EM <- left_join(full_df, EM)
-EM_df <- as.data.frame.array(EM)
+EM <- as.data.frame(EM, stringsAsFactors = FALSE)
+EM[is.na(EM)] <- 0
 
-EM_array <- array(NA, dim = c(n_ind, n_traps, K))
+# Data Augmentation
+M <- 200 # max population size
+# J <- n_traps
+# y <- rbind(EM[ , 2], matrix(0, nrow = M-n_ind, ncol = n_ind))
+# y <- rbind(EM, matrix(0, nrow = M - n_ind, ncol = n_traps))
+z <- c(rep(1, n_ind), rep(0, M-n_ind))
+df_aug <- as.data.frame(matrix(0, nrow = (M - n_ind), ncol = n_traps), stringsAsFactors = FALSE)
+
+# convert to 3D array (n_individuals + augmented individuals) x n_traps x n_days
+EM_array <- array(NA, dim = c(M, n_traps, K))
 for(i in 1:K){
-  foo[[i]] <- EM[](which(EM[]$day == i))
-  foo_less[[i]] <- foo[[i]][ , ], -"ind", - "day")
-  EM_array[[1:n_ind, 1:n_traps, i]] <- as.matrix(dplyr::select(foo[[i]]))
+  foo <- EM[(which(EM[]$day == i)), ]
+  foo_less <- select(foo, -ind, -day)
+  colnames(foo_less) <- colnames(df_aug)
+  foo_augment <- bind_rows(foo_less, df_aug)
+  EM_array[1:(M), 1:n_traps, i] <- as.matrix(foo_augment)
 }
-str(foo)
-foo[[1]]
-EM
-?subset
+
 # EM <- cbind(1:n_ind, rowSums(EM))
 # EM <- rowSums(EM)
 # Read in trap hour file
 traphoursA <- read.csv(file = "Data/traphoursA.csv", stringsAsFactors = FALSE)
-head(traphoursA)
-hours <- apply(traphoursA[ , 2:ncol(traphoursA)], 1, sum)
-hours
-
-# Data Augmentation
-M <- 200
-J <- n_traps
-# y <- rbind(EM[ , 2], matrix(0, nrow = M-n_ind, ncol = n_ind))
-y <- rbind(EM, matrix(0, nrow = M - n_ind, ncol = n_traps))
-z <- c(rep(1, n_ind), rep(0, M-n_ind))
-
+traphoursA
+# hours <- apply(traphoursA[ , 2:ncol(traphoursA)], 1, sum)
+# hours
 
 #Start values for s (activity centers) of augments (from random uniform constrained by state space size)
 X <- traplocsA
-sst <- c(runif(M, xlimA[1], xlimA[2])) #parameters, n, max, min
 sst # Now populated by starting positions uniformally placed within state space
 # For every individual that is not 0, change starting x point to mean of traps associated with encounters for that individual; leaves 0's there from the augmented population and also puts in activity center for augmented individuals that were randomly given an encounter history (caught at least 1 time)
-for(i in 1:n_ind) {
-  sst[i] <- mean( X[y[i, ] > 0] )
+
+sum_caps <- apply(EM_array, c(1,2), sum)
+sst <- (sum_caps %*% traplocsA) / (ifelse(rowSums(sum_caps) > 0, rowSums(sum_caps), 1))
+
+for(i in (n_ind+1):M) {
+  sst[i] <- c(runif(1, xlimA[1], xlimA[2])) #parameters, n, max, min
 }
 sst
 
@@ -156,9 +160,39 @@ sst
 
 if(!dir.exists("Code/JAGS")) dir.create("Code/JAGS", recursive = TRUE)
 
+d <- seq(xlimA[1], xlimA[2], length.out = 100)
+
+alpha1 <- rt(100, df = 1, 1/(25^2))
+den <- density(alpha1)
+hist(as.numeric(den))
+
+plot(d*100, dt(d, df = 1, 1 / (0.6^2)), type = "l")
+
+decay <- exp(-1 * alpha1 * d^2)
+plot(d*100, decay, type = "l")
+
+decay <- exp(-1 * 1 * d^2)
+plot(d*100, decay, type = "l")
+
+scale_par <- c(1, 5, 25)
+
+alpha1 <- rt(100000, df = 1, 1/(scale_par[1]^2))
+alpha1 <- alpha1[alpha1 >= 0]
+alpha1_priors <- data.frame(scale = scale_par[1], alpha1)
+for(i in 2:length(scale_par)) {
+  alpha1 <- rt(100000, df = 1, 1/(scale_par[i]^2))
+  alpha1 <- alpha1[alpha1 >= 0]
+  tmp <- data.frame(scale = scale_par[i], alpha1)
+  alpha1_priors <- bind_rows(alpha1_priors, tmp)
+}
+
+library(ggplot2)
+ggplot(alpha1_priors) + geom_density(aes(x = alpha1, fill = as.factor(scale)), alpha = 0.2) + xlim(0, 15)
+
 cat ("
-model {
-    alpha1 ~ dgamma(0.1, 0.1) # consider appropriate prior
+  model {
+    # alpha1 ~ dgamma(0.1, 0.1) # consider appropriate prior
+    alpha1 ~ dt(0, 1 / (5^2), 1)I(0, ) 	## implies half-cauchy with scale of 5
     sigma <- pow(1 / (2*alpha1), 0.5) # sd of half normal
     psi ~ dunif(0, 1)
     for(k in 1:K) {
@@ -166,29 +200,29 @@ model {
       logit(p0[k]) <- alpha0[k]
     }
     for(i in 1:M) {
-        z[i] ~ dbern(psi)
-        s[i] ~ dunif(xlimA[1], xlimA[2])
-        for(j in 1:n_traps) {
-            d[i,j] <- abs(s[i] - traplocsA[j])
+      z[i] ~ dbern(psi)
+      s[i] ~ dunif(xlimA[1], xlimA[2])
+      for(j in 1:n_traps) {
+        d[i,j] <- abs(s[i] - traplocsA[j])
         for(k in 1:K) {
-            y[i,j, k] ~ dbin(p[i,j, k], K)
-            p[i,j, k] <- z[i]*p0[k]*exp(- alpha1 * d[i,j] * d[i,j])
+          y[i,j, k] ~ dbern(p[i,j, k])
+          p[i,j, k] <- z[i]*p0[k]*exp(- alpha1 * d[i,j] * d[i,j])
         }
       }
     }
-
-# Derived parameters
-N <- sum(z[ ])
-density <- N / (xlimA[2] - xlimA[1]) # divided distances by 100 so calculates turtles per 100 m of canal
-}
+    
+    # Derived parameters
+    N <- sum(z[ ])
+    density <- N / (xlimA[2] - xlimA[1]) # divided distances by 100 so calculates turtles per 100 m of canal
+  }
 ", file = "Code/JAGS/SCRA.txt")
 
-jags_data <- list(y = y, traplocsA = traplocsA, K=K, M=M, xlimA=xlimA, n_traps = n_traps)
+jags_data <- list(y = EM_array, traplocsA = traplocsA, K=K, M=M, xlimA=xlimA, n_traps = n_traps)
 inits <- function() {
-  list(alpha0=rnorm(1,-2,.4), alpha1=runif(1,1,2), s=sst, z=z)
+  list(alpha0=rnorm(4,-2,.4), alpha1=runif(1,1,2), s=as.numeric(sst), z=z)
 }
 
-parameters <- c("alpha0", "alpha1", "sigma", "N", "density", "p", "s") # 
+parameters <- c("alpha0", "alpha1", "sigma", "N", "density", "p0", "s") # 
 
 # cpic_1_mcmc <- jagsUI(model.file = "Code/JAGS/SCRA.txt", parameters.to.save = parameters, data=jags_data, inits=inits, n.iter = 1000, n.chains = 3, n.adapt =500) # jagsUI is nice but the plotting is interactive which is obnoxious 
 
@@ -230,7 +264,8 @@ stopCluster(cl)
 
 # Results
 cpic_1_mcmc <- mcmc.list(out)
-plot(cpic_1_mcmc[ , c("alpha0", "alpha1", "density")]) # 
+plot(cpic_1_mcmc[ , c("alpha1")])
+plot(cpic_1_mcmc[ , c("p0[1]", "p0[2]", "p0[3]", "p0[4]", "alpha1", "density", "N")]) # 
 par(mfrow = c(1,1))
 summary(cpic_1_mcmc[ , c("alpha0", "alpha1", "density")])
 # summary(cpic_1_mcmc)
