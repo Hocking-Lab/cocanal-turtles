@@ -292,8 +292,6 @@ cat ("
 
      for(i in 1:M) {
      z[i] ~ dbern(psi)
-     Sex[i] ~ dbern(psi.sex)
-     Sex2[i] <- Sex[i] + 1
      s[i] ~ dunif(xlimA[1], xlimA[2])
 
      for(j in 1:n_traps) {
@@ -308,6 +306,8 @@ cat ("
      } # t
 
      for(i in 1:M) {
+     Sex[i] ~ dbern(psi.sex)
+     Sex2[i] <- Sex[i] + 1
      for (j in 1:n_traps) {
      for (k in 1:K) {
      y[i, j, k] ~ dbern(p[i,j,k])
