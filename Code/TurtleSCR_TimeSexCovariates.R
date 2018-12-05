@@ -302,12 +302,19 @@ cat ("
      for(k in 1:K) {
      for(t in 1:2) {
      logit(p0[i, j, k, t]) <- alpha0[k, t] + eta[i,k]
-     y[i, j, k] ~ dbern(p[i,j,k])
-     p[i, j, k] <- z[i]*p0[Sex2[i], j, k]*exp(- alpha1[Sex2[i]] * d[i,j] * d[i,j])
      } # i
      } # j
      } # k
      } # t
+
+     for(i in 1:M) {
+     for (j in 1:n_traps) {
+     for (k in 1:K) {
+     y[i, j, k] ~ dbern(p[i,j,k])
+     p[i, j, k] <- z[i]*p0[Sex[i], j, k]*exp(- alpha1[Sex2[i]] * d[i,j] * d[i,j])
+     } # i
+     } # j
+     } # k
 
      # Derived parameters
      N <- sum(z[ ])
