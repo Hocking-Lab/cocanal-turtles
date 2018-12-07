@@ -1,8 +1,5 @@
 
-##### SCR Analysis Data Compilation and Model Creation Using BUGS and JAGS ####
-
-#### Adding in Covariates ####
-### Adding in encoutner probability to vary by sample occasion; Will get 4 encounter probabilities in output ####
+##### SCR Analysis Data Compilation and Model For Each CO-Canal Site ####
 
 
 library(dplyr)
@@ -12,39 +9,16 @@ library(tidyr)
 # library(jagsUI)
 # library(R2WinBUGS)
 
+#### Sites: A, C, D, E, F, G, J, K, L, M, N, O
+
 EDF <- read.csv(file = "Data/EDF.csv", stringsAsFactors = FALSE)
 head(EDF)
 
-#Add a new column for integer session values (session = site)
-
+##Add a new column for integer session values (session = site)
 EDF$site_num <- as.integer(as.factor(EDF$site))
-# 
-# EDF$session <- NA
-# head(EDF)
-# EDF$session <- ifelse(EDF$site == "A", 1,
-#                   ifelse(EDF$site == "C", 2,
-#                     ifelse(EDF$site == "D", 3,
-#                       ifelse(EDF$site == "E", 4,
-#                          ifelse(EDF$site == "F", 5,
-#                            ifelse(EDF$site == "G", 6,
-#                              ifelse(EDF$site == "H", 7,
-#                                ifelse(EDF$site == "I", 8,
-#                                  ifelse(EDF$site == "J", 9,
-#                                    ifelse(EDF$site == "K", 10,
-#                                      ifelse(EDF$site == "L", 11,
-#                                        ifelse(EDF$site == "M", 12,
-#                                         ifelse(EDF$site == "N", 13,
-#                                           ifelse(EDF$site == "O", 14, NA)
-#                                         )))))))))))))
-# head(EDF)
 summary(EDF)
 
-## Creating model for 1 site first
-EDFA <- EDF %>%
-  filter(site_num == 1 & species == "CPIC")
-EDFA
-
-# Create a Trap Location Matrix (integers = distance apart in m)
+# Create a Trap Location Matrix (integers = distance apart in m); 1 Matrix per Site
 traplocsA <- c(0,25,50,75,100,125,150,175) # create trap location file
 traplocsC <- c(0,25,50,75,100,125,150,175,200,225)
 traplocsD <- c(0,25,50,75,100,125,150,175)
@@ -86,15 +60,7 @@ matrixC[ , 9] <- c(200,175,150,125,100,75,50,25,0,25)
 matrixC[ , 10] <- c(225,200,175,150,125,100,75,50,25,0)
 
 #### Matrix D
-matrixD <- matrix(NA, ncol = length(traplocsD), nrow = length(traplocsD))
-matrixD[ ,1] <- c(0,25,50,75,100,125,150,175)
-matrixD[ ,2] <- c(25,0,25,50,75,100,125,150)
-matrixD[ ,3] <- c(50,25,0,25,50,75,100,125)
-matrixD[ ,4] <- c(75, 50,25,0,25,50,75,100)
-matrixD[ ,5] <- c(100,75, 50,25,0,25,50,75)
-matrixD[ ,6] <- c(125,100,75, 50,25,0,25,50)
-matrixD[ ,7] <- c(150,125,100,75, 50,25,0,25)
-matrixD[ ,8] <- c(175,150,125,100,75, 50,25,0)
+matrixD <- matrixA
 
 #### Matrix E
 matrixE <- matrix(NA, ncol = length(traplocsE), nrow = length(traplocsE))
@@ -159,6 +125,7 @@ matrixN <- matrixC
 matrixO <- matrixC
 
 # Trap location and distance matrices / 100
+# scale for computational purposes
 traplocsA <- traplocsA / 100
 traplocsC <- traplocsC / 100
 traplocsD <- traplocsD / 100
@@ -171,7 +138,7 @@ traplocsL <- traplocsL / 100
 traplocsM <- traplocsM / 100
 traplocsN <- traplocsN / 100
 traplocsO <- traplocsO / 100
-matrixA <- matrixA / 100 # scale for computational purposes
+matrixA <- matrixA / 100
 matrixC <- matrixC / 100
 matrixD <- matrixD / 100
 matrixE <- matrixE / 100
@@ -182,6 +149,72 @@ matrixK <- matrixK / 100
 matrixL <- matrixL / 100
 matrixM <- matrixM / 100
 
+## Subset Data for Sites and Species (Density of all turtles per site)
+
+# Site A, CPIC
+EDFA <- EDF %>%
+  filter(site_num == 1 & species == "CPIC")
+EDFA
+
+# Site C, CPIC
+EDFC <- EDF %>%
+  filter(site_num == 2 & species == "CPIC")
+EDFC
+
+# Site D, CPIC
+EDFD <- EDF %>%
+  filter(site_num == 3 & species == "CPIC")
+EDFD
+
+# Site E, CPIC
+EDFE <- EDF %>%
+  filter(site_num == 4 & species == "CPIC")
+EDFE
+
+# Site F, CPIC
+EDFF <- EDF %>%
+  filter(site_num == 5 & species == "CPIC")
+EDFF
+
+# Site G, CPIC
+EDFG <- EDF %>%
+  filter(site_num == 6 & species == "CPIC")
+EDFG
+
+# Site J, CPIC
+EDFJ <- EDF %>%
+  filter(site_num == 9 & species == "CPIC")
+EDFJ
+
+# Site K, CPIC
+EDFK <- EDF %>%
+  filter(site_num == 10 & species == "CPIC")
+EDFK
+
+# Site L, CPIC
+EDFL <- EDF %>%
+  filter(site_num == 11 & species == "CPIC")
+EDFL
+
+# Site M, CPIC
+EDFM <- EDF %>%
+  filter(site_num == 12 & species == "CPIC")
+EDFM
+
+# Site N, CPIC
+EDFN <- EDF %>%
+  filter(site_num == 13 & species == "CPIC")
+EDFN
+
+# Site O, CPIC
+EDFO <- EDF %>%
+  filter(site_num == 14 & species == "CPIC")
+EDFO
+
+
+
+
+########## Site A CPIC Objects for Model ########
 n_traps <- ncol(matrixA) # number of traps
 # as.character(EDFA$recap)
 N <- nrow(EDFA[which(EDFA$recap == "N"), ])
@@ -189,8 +222,7 @@ K <- max(EDFA$day) # trap nights per session
 buffer <- 1 # check literature to make sure doesn't need to be larger
 #xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
 xlimA <- c(min(matrixA)-buffer, max(matrixA) + buffer)
-xlimA
-n_ind <- length(unique(EDFA$ind))
+n_indA <- length(unique(EDFA$ind))
 
 # Make encounter histories with number of times each individual is captured in each trap
 str(EDFA)
@@ -213,8 +245,384 @@ EM <- left_join(full_df, EM)
 EM <- as.data.frame(EM, stringsAsFactors = FALSE)
 EM[is.na(EM)] <- 0
 
-# Data Augmentation
-M <- 200 # max population size
+####################################################
+
+########## Site C CPIC Objects for Model ########
+n_traps <- ncol(matrixC) # number of traps
+# as.character(EDFA$recap)
+N <- nrow(EDFC[which(EDFC$recap == "N"), ])
+K <- max(EDFC$day) # trap nights per session
+buffer <- 1 # check literature to make sure doesn't need to be larger
+#xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
+xlimC <- c(min(matrixC)-buffer, max(matrixC) + buffer)
+n_indC <- length(unique(EDFC$ind))
+
+# Make encounter histories with number of times each individual is captured in each trap
+str(EDFC)
+EDFC
+
+EM <- EDFC %>%
+  group_by(ind, trap, day) %>%
+  select(ind, trap, day) %>%
+  mutate(count = 1) %>%
+  summarise_all(sum) %>%
+  spread(trap, count, fill = 0) %>%
+  ungroup()
+# EM <- data.frame(select(EM, -ind))
+str(EM)
+EM
+
+full_df <- tidyr::expand(EM, ind, day)
+
+EM <- left_join(full_df, EM)
+EM <- as.data.frame(EM, stringsAsFactors = FALSE)
+EM[is.na(EM)] <- 0
+
+########################################################
+
+########## Site D CPIC Objects for Model ###############
+
+n_traps <- ncol(matrixD) # number of traps
+# as.character(EDFA$recap)
+N <- nrow(EDFD[which(EDFD$recap == "N"), ])
+K <- max(EDFD$day) # trap nights per session
+buffer <- 1 # check literature to make sure doesn't need to be larger
+#xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
+xlimD <- c(min(matrixD)-buffer, max(matrixD) + buffer)
+n_indD <- length(unique(EDFD$ind))
+
+# Make encounter histories with number of times each individual is captured in each trap
+str(EDFD)
+EDFD
+
+EM <- EDFD %>%
+  group_by(ind, trap, day) %>%
+  select(ind, trap, day) %>%
+  mutate(count = 1) %>%
+  summarise_all(sum) %>%
+  spread(trap, count, fill = 0) %>%
+  ungroup()
+# EM <- data.frame(select(EM, -ind))
+str(EM)
+EM
+
+full_df <- tidyr::expand(EM, ind, day)
+
+EM <- left_join(full_df, EM)
+EM <- as.data.frame(EM, stringsAsFactors = FALSE)
+EM[is.na(EM)] <- 0
+
+#########################################################
+
+
+########## Site E CPIC Objects for Model ################
+
+n_traps <- ncol(matrixE) # number of traps
+# as.character(EDFA$recap)
+N <- nrow(EDFE[which(EDFE$recap == "N"), ])
+K <- max(EDFE$day) # trap nights per session
+buffer <- 1 # check literature to make sure doesn't need to be larger
+#xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
+xlimE <- c(min(matrixE)-buffer, max(matrixE) + buffer)
+n_indE <- length(unique(EDFE$ind))
+
+# Make encounter histories with number of times each individual is captured in each trap
+str(EDFE)
+EDFE
+
+EM <- EDFE %>%
+  group_by(ind, trap, day) %>%
+  select(ind, trap, day) %>%
+  mutate(count = 1) %>%
+  summarise_all(sum) %>%
+  spread(trap, count, fill = 0) %>%
+  ungroup()
+# EM <- data.frame(select(EM, -ind))
+str(EM)
+EM
+
+full_df <- tidyr::expand(EM, ind, day)
+
+EM <- left_join(full_df, EM)
+EM <- as.data.frame(EM, stringsAsFactors = FALSE)
+EM[is.na(EM)] <- 0
+
+###################################################
+
+########## Site F CPIC Objects for Model ################
+
+n_traps <- ncol(matrixF) # number of traps
+# as.character(EDFA$recap)
+N <- nrow(EDFF[which(EDFF$recap == "N"), ])
+K <- max(EDFF$day) # trap nights per session
+buffer <- 1 # check literature to make sure doesn't need to be larger
+#xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
+xlimF <- c(min(matrixF)-buffer, max(matrixF) + buffer)
+n_indF <- length(unique(EDFF$ind))
+
+# Make encounter histories with number of times each individual is captured in each trap
+str(EDFF)
+EDFF
+
+EM <- EDFF %>%
+  group_by(ind, trap, day) %>%
+  select(ind, trap, day) %>%
+  mutate(count = 1) %>%
+  summarise_all(sum) %>%
+  spread(trap, count, fill = 0) %>%
+  ungroup()
+# EM <- data.frame(select(EM, -ind))
+str(EM)
+EM
+
+full_df <- tidyr::expand(EM, ind, day)
+
+EM <- left_join(full_df, EM)
+EM <- as.data.frame(EM, stringsAsFactors = FALSE)
+EM[is.na(EM)] <- 0
+
+#######################################################
+
+########## Site G CPIC Objects for Model ##############
+
+n_traps <- ncol(matrixG) # number of traps
+# as.character(EDFA$recap)
+N <- nrow(EDFG[which(EDFG$recap == "N"), ])
+K <- max(EDFG$day) # trap nights per session
+buffer <- 1 # check literature to make sure doesn't need to be larger
+#xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
+xlimG <- c(min(matrixG)-buffer, max(matrixG) + buffer)
+n_indG <- length(unique(EDFG$ind))
+
+# Make encounter histories with number of times each individual is captured in each trap
+str(EDFG)
+EDFG
+
+EM <- EDFG %>%
+  group_by(ind, trap, day) %>%
+  select(ind, trap, day) %>%
+  mutate(count = 1) %>%
+  summarise_all(sum) %>%
+  spread(trap, count, fill = 0) %>%
+  ungroup()
+# EM <- data.frame(select(EM, -ind))
+str(EM)
+EM
+
+full_df <- tidyr::expand(EM, ind, day)
+
+EM <- left_join(full_df, EM)
+EM <- as.data.frame(EM, stringsAsFactors = FALSE)
+EM[is.na(EM)] <- 0
+
+###################################################
+
+########## Site J CPIC Objects for Model ###########
+
+n_traps <- ncol(matrixJ) # number of traps
+# as.character(EDFA$recap)
+N <- nrow(EDFJ[which(EDFJ$recap == "N"), ])
+K <- max(EDFJ$day) # trap nights per session
+buffer <- 1 # check literature to make sure doesn't need to be larger
+#xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
+xlimJ <- c(min(matrixJ)-buffer, max(matrixJ) + buffer)
+n_indJ <- length(unique(EDFJ$ind))
+
+# Make encounter histories with number of times each individual is captured in each trap
+str(EDFJ)
+EDFJ
+
+EM <- EDFJ %>%
+  group_by(ind, trap, day) %>%
+  select(ind, trap, day) %>%
+  mutate(count = 1) %>%
+  summarise_all(sum) %>%
+  spread(trap, count, fill = 0) %>%
+  ungroup()
+# EM <- data.frame(select(EM, -ind))
+str(EM)
+EM
+
+full_df <- tidyr::expand(EM, ind, day)
+
+EM <- left_join(full_df, EM)
+EM <- as.data.frame(EM, stringsAsFactors = FALSE)
+EM[is.na(EM)] <- 0
+
+####################################################
+
+########## Site K CPIC Objects for Model ###########
+
+n_traps <- ncol(matrixK) # number of traps
+# as.character(EDFA$recap)
+N <- nrow(EDFK[which(EDFK$recap == "N"), ])
+K <- max(EDFK$day) # trap nights per session
+buffer <- 1 # check literature to make sure doesn't need to be larger
+#xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
+xlimK <- c(min(matrixK)-buffer, max(matrixK) + buffer)
+n_indK <- length(unique(EDFK$ind))
+
+# Make encounter histories with number of times each individual is captured in each trap
+str(EDFK)
+EDFK
+
+EM <- EDFK %>%
+  group_by(ind, trap, day) %>%
+  select(ind, trap, day) %>%
+  mutate(count = 1) %>%
+  summarise_all(sum) %>%
+  spread(trap, count, fill = 0) %>%
+  ungroup()
+# EM <- data.frame(select(EM, -ind))
+str(EM)
+EM
+
+full_df <- tidyr::expand(EM, ind, day)
+
+EM <- left_join(full_df, EM)
+EM <- as.data.frame(EM, stringsAsFactors = FALSE)
+EM[is.na(EM)] <- 0
+
+####################################################
+
+########## Site L CPIC Objects for Model ###########
+
+n_traps <- ncol(matrixL) # number of traps
+# as.character(EDFA$recap)
+N <- nrow(EDFL[which(EDFL$recap == "N"), ])
+K <- max(EDFL$day) # trap nights per session
+buffer <- 1 # check literature to make sure doesn't need to be larger
+#xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
+xlimL <- c(min(matrixL)-buffer, max(matrixL) + buffer)
+n_indL <- length(unique(EDFL$ind))
+
+# Make encounter histories with number of times each individual is captured in each trap
+str(EDFL)
+EDFL
+
+EM <- EDFL %>%
+  group_by(ind, trap, day) %>%
+  select(ind, trap, day) %>%
+  mutate(count = 1) %>%
+  summarise_all(sum) %>%
+  spread(trap, count, fill = 0) %>%
+  ungroup()
+# EM <- data.frame(select(EM, -ind))
+str(EM)
+EM
+
+full_df <- tidyr::expand(EM, ind, day)
+
+EM <- left_join(full_df, EM)
+EM <- as.data.frame(EM, stringsAsFactors = FALSE)
+EM[is.na(EM)] <- 0
+
+####################################################
+
+########## Site M CPIC Objects for Model ###########
+
+n_traps <- ncol(matrixM) # number of traps
+# as.character(EDFA$recap)
+N <- nrow(EDFM[which(EDFM$recap == "N"), ])
+K <- max(EDFM$day) # trap nights per session
+buffer <- 1 # check literature to make sure doesn't need to be larger
+#xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
+xlimM <- c(min(matrixM)-buffer, max(matrixM) + buffer)
+n_indM <- length(unique(EDFM$ind))
+
+# Make encounter histories with number of times each individual is captured in each trap
+str(EDFM)
+EDFM
+
+EM <- EDFM %>%
+  group_by(ind, trap, day) %>%
+  select(ind, trap, day) %>%
+  mutate(count = 1) %>%
+  summarise_all(sum) %>%
+  spread(trap, count, fill = 0) %>%
+  ungroup()
+# EM <- data.frame(select(EM, -ind))
+str(EM)
+EM
+
+full_df <- tidyr::expand(EM, ind, day)
+
+EM <- left_join(full_df, EM)
+EM <- as.data.frame(EM, stringsAsFactors = FALSE)
+EM[is.na(EM)] <- 0
+
+####################################################
+
+########## Site N CPIC Objects for Model ###########
+
+n_traps <- ncol(matrixN) # number of traps
+# as.character(EDFA$recap)
+N <- nrow(EDFN[which(EDFN$recap == "N"), ])
+K <- max(EDFN$day) # trap nights per session
+buffer <- 1 # check literature to make sure doesn't need to be larger
+#xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
+xlimN <- c(min(matrixN)-buffer, max(matrixN) + buffer)
+n_indN <- length(unique(EDFN$ind))
+
+# Make encounter histories with number of times each individual is captured in each trap
+str(EDFN)
+EDFN
+
+EM <- EDFN %>%
+  group_by(ind, trap, day) %>%
+  select(ind, trap, day) %>%
+  mutate(count = 1) %>%
+  summarise_all(sum) %>%
+  spread(trap, count, fill = 0) %>%
+  ungroup()
+# EM <- data.frame(select(EM, -ind))
+str(EM)
+EM
+
+full_df <- tidyr::expand(EM, ind, day)
+
+EM <- left_join(full_df, EM)
+EM <- as.data.frame(EM, stringsAsFactors = FALSE)
+EM[is.na(EM)] <- 0
+
+####################################################
+
+########## Site O CPIC Objects for Model ###########
+
+n_traps <- ncol(matrixO) # number of traps
+# as.character(EDFA$recap)
+N <- nrow(EDFO[which(EDFO$recap == "N"), ])
+K <- max(EDFO$day) # trap nights per session
+buffer <- 1 # check literature to make sure doesn't need to be larger
+#xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
+xlimO <- c(min(matrixO)-buffer, max(matrixO) + buffer)
+n_indO <- length(unique(EDFO$ind))
+
+# Make encounter histories with number of times each individual is captured in each trap
+str(EDFO)
+EDFO
+
+EM <- EDFO %>%
+  group_by(ind, trap, day) %>%
+  select(ind, trap, day) %>%
+  mutate(count = 1) %>%
+  summarise_all(sum) %>%
+  spread(trap, count, fill = 0) %>%
+  ungroup()
+# EM <- data.frame(select(EM, -ind))
+str(EM)
+EM
+
+full_df <- tidyr::expand(EM, ind, day)
+
+EM <- left_join(full_df, EM)
+EM <- as.data.frame(EM, stringsAsFactors = FALSE)
+EM[is.na(EM)] <- 0
+
+####################################################
+
+##### DATA AUGMENTATION #####
+M <- 200 # max population size, change with site
 # J <- n_traps
 # y <- rbind(EM[ , 2], matrix(0, nrow = M-n_ind, ncol = n_ind))
 # y <- rbind(EM, matrix(0, nrow = M - n_ind, ncol = n_traps))
@@ -233,18 +641,38 @@ for(i in 1:K){
 
 ##### SEX VECTOR with sex (as a random variable) indicated for caught individuals and NA for augmented individuals #####
 
-sex_list <- EDFA$sex
-sex_vector <- ifelse(sex_list == "F", 1, 2)
-Sex <- c(sex_vector-1, rep(NA, length = M-n_ind))
+#sex_list <- EDFA$sex
+#sex_vector <- ifelse(sex_list == "F", 1, 2)
+#Sex <- c(sex_vector-1, rep(NA, length = M-n_ind))
 
 
 # EM <- cbind(1:n_ind, rowSums(EM))
 # EM <- rowSums(EM)
 # Read in trap hour file
-traphoursA <- read.csv(file = "Data/traphoursA.csv", stringsAsFactors = FALSE)
-traphoursA
+#traphoursA <- read.csv(file = "Data/traphoursA.csv", stringsAsFactors = FALSE)
+#traphoursA
 # hours <- apply(traphoursA[ , 2:ncol(traphoursA)], 1, sum)
 # hours
+
+###### For Loop to Go Through Each Site and Each Species with SCR Model ######
+
+Sites <- c(1:12)
+traplocs <- c(traplocsA, traplocsC, traplocsD, traplocsE, traplocsF, traplocsG, traplocsJ, traplocsK, traplocsL, traplocsM, traplocsN, traplocsO)
+M <- c(200, 200, 200, 300, 1000, 400, 500, 200, 200, 800, 800, 800)
+
+for(s in 1:length(Sites)){
+  X <- traplocs[s]
+  EM[s] <- 
+  M[s] <- M[s]
+  sum_caps[s] <- apply(EM_array[s], c(1,2), sum)
+  sst[s] <- (sum_caps[s] %*% traplocs[s]) / (ifelse(rowSums(sum_caps[s]) > 0, rowSums(sum_caps[s]), 1))
+  
+  for(i in (n_ind+1):M) {
+    sst[i] <- c(runif(1, xlimA[1], xlimA[2])) #parameters, n, max, min
+  }
+  sst
+  
+}
 
 #Start values for s (activity centers) of augments (from random uniform constrained by state space size)
 X <- traplocsA
@@ -254,7 +682,7 @@ sst # Now populated by starting positions uniformally placed within state space
 sum_caps <- apply(EM_array, c(1,2), sum)
 sst <- (sum_caps %*% traplocsA) / (ifelse(rowSums(sum_caps) > 0, rowSums(sum_caps), 1))
 
-for(i in (n_ind+1):M) {
+for(i in (n_ind+1):M[s]) {
   sst[i] <- c(runif(1, xlimA[1], xlimA[2])) #parameters, n, max, min
 }
 sst

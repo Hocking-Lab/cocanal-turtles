@@ -303,10 +303,19 @@ stopCluster(cl)
 cpic_1_mcmc <- mcmc.list(out)
 plot(cpic_1_mcmc[ , c("alpha1")])
 plot(cpic_1_mcmc[ , c("alpha1", "sigma_ind")])
-plot(cpic_1_mcmc[ , c("p0[1]", "p0[2]", "p0[3]", "p0[4]", "alpha1", "density", "N")]) # 
+plot(cpic_1_mcmc[ , c("p0[1]", "p0[2]", "p0[3]", "p0[4]", "alpha1", "density", "N")]) #
 par(mfrow = c(1,1))
 summary(cpic_1_mcmc[ , c("alpha0", "alpha1", "density")])
 # summary(cpic_1_mcmc)
+
+## Obtaining Point Process and Density from Model ##
+# plot(cpic_1_mcmc[ , c("s[1:n_ind]")])
+Sxout <- out$mcmc$s
+Dout <- out$sim.list$density
+str(cpic_1_mcmc)
+str(out)
+out
+
 
 save(cpic_1_mcmc, file = "Results/JAGS/cpic_1_mcmc.RData")
 
