@@ -215,7 +215,7 @@ EDFO
 
 
 ########## Site A CPIC Objects for Model ########
-n_traps <- ncol(matrixA) # number of traps
+n_trapsA <- ncol(matrixA) # number of traps
 # as.character(EDFA$recap)
 N <- nrow(EDFA[which(EDFA$recap == "N"), ])
 K <- max(EDFA$day) # trap nights per session
@@ -248,7 +248,7 @@ EM[is.na(EM)] <- 0
 ####################################################
 
 ########## Site C CPIC Objects for Model ########
-n_traps <- ncol(matrixC) # number of traps
+n_trapsC <- ncol(matrixC) # number of traps
 # as.character(EDFA$recap)
 N <- nrow(EDFC[which(EDFC$recap == "N"), ])
 K <- max(EDFC$day) # trap nights per session
@@ -282,7 +282,7 @@ EM[is.na(EM)] <- 0
 
 ########## Site D CPIC Objects for Model ###############
 
-n_traps <- ncol(matrixD) # number of traps
+n_trapsD <- ncol(matrixD) # number of traps
 # as.character(EDFA$recap)
 N <- nrow(EDFD[which(EDFD$recap == "N"), ])
 K <- max(EDFD$day) # trap nights per session
@@ -317,7 +317,7 @@ EM[is.na(EM)] <- 0
 
 ########## Site E CPIC Objects for Model ################
 
-n_traps <- ncol(matrixE) # number of traps
+n_trapsE <- ncol(matrixE) # number of traps
 # as.character(EDFA$recap)
 N <- nrow(EDFE[which(EDFE$recap == "N"), ])
 K <- max(EDFE$day) # trap nights per session
@@ -351,7 +351,7 @@ EM[is.na(EM)] <- 0
 
 ########## Site F CPIC Objects for Model ################
 
-n_traps <- ncol(matrixF) # number of traps
+n_trapsF <- ncol(matrixF) # number of traps
 # as.character(EDFA$recap)
 N <- nrow(EDFF[which(EDFF$recap == "N"), ])
 K <- max(EDFF$day) # trap nights per session
@@ -385,7 +385,7 @@ EM[is.na(EM)] <- 0
 
 ########## Site G CPIC Objects for Model ##############
 
-n_traps <- ncol(matrixG) # number of traps
+n_trapsG <- ncol(matrixG) # number of traps
 # as.character(EDFA$recap)
 N <- nrow(EDFG[which(EDFG$recap == "N"), ])
 K <- max(EDFG$day) # trap nights per session
@@ -419,7 +419,7 @@ EM[is.na(EM)] <- 0
 
 ########## Site J CPIC Objects for Model ###########
 
-n_traps <- ncol(matrixJ) # number of traps
+n_trapsJ <- ncol(matrixJ) # number of traps
 # as.character(EDFA$recap)
 N <- nrow(EDFJ[which(EDFJ$recap == "N"), ])
 K <- max(EDFJ$day) # trap nights per session
@@ -453,7 +453,7 @@ EM[is.na(EM)] <- 0
 
 ########## Site K CPIC Objects for Model ###########
 
-n_traps <- ncol(matrixK) # number of traps
+n_trapsK <- ncol(matrixK) # number of traps
 # as.character(EDFA$recap)
 N <- nrow(EDFK[which(EDFK$recap == "N"), ])
 K <- max(EDFK$day) # trap nights per session
@@ -487,7 +487,7 @@ EM[is.na(EM)] <- 0
 
 ########## Site L CPIC Objects for Model ###########
 
-n_traps <- ncol(matrixL) # number of traps
+n_trapsL <- ncol(matrixL) # number of traps
 # as.character(EDFA$recap)
 N <- nrow(EDFL[which(EDFL$recap == "N"), ])
 K <- max(EDFL$day) # trap nights per session
@@ -521,7 +521,7 @@ EM[is.na(EM)] <- 0
 
 ########## Site M CPIC Objects for Model ###########
 
-n_traps <- ncol(matrixM) # number of traps
+n_trapsM <- ncol(matrixM) # number of traps
 # as.character(EDFA$recap)
 N <- nrow(EDFM[which(EDFM$recap == "N"), ])
 K <- max(EDFM$day) # trap nights per session
@@ -555,7 +555,7 @@ EM[is.na(EM)] <- 0
 
 ########## Site N CPIC Objects for Model ###########
 
-n_traps <- ncol(matrixN) # number of traps
+n_trapsN <- ncol(matrixN) # number of traps
 # as.character(EDFA$recap)
 N <- nrow(EDFN[which(EDFN$recap == "N"), ])
 K <- max(EDFN$day) # trap nights per session
@@ -589,7 +589,7 @@ EM[is.na(EM)] <- 0
 
 ########## Site O CPIC Objects for Model ###########
 
-n_traps <- ncol(matrixO) # number of traps
+n_trapsO <- ncol(matrixO) # number of traps
 # as.character(EDFA$recap)
 N <- nrow(EDFO[which(EDFO$recap == "N"), ])
 K <- max(EDFO$day) # trap nights per session
@@ -657,13 +657,16 @@ for(i in 1:K){
 ###### For Loop to Go Through Each Site and Each Species with SCR Model ######
 
 Sites <- c(1:12)
+M[s] <- c(200, 200, 200, 300, 1000, 400, 500, 200, 200, 800, 800, 800)
 traplocs <- c(traplocsA, traplocsC, traplocsD, traplocsE, traplocsF, traplocsG, traplocsJ, traplocsK, traplocsL, traplocsM, traplocsN, traplocsO)
-M <- c(200, 200, 200, 300, 1000, 400, 500, 200, 200, 800, 800, 800)
+n_traps <- c(n_trapsA, n_trapsC, n_trapsD, n_trapsE, n_trapsF, n_trapsG, n_trapsJ, n_trapsK, n_trapsL, n_trapsM, n_trapsN, n_trapsO)
+n_ind <- c(n_indA, n_indC, n_indD, n_indE, n_indF, n_indG, n_indJ, n_indK, n_indL, n_indM, n_indN, n_indO)
 
 for(s in 1:length(Sites)){
-  X <- traplocs[s]
+  X[s] <- traplocs[s]
+  z[s] <- c(rep(1, n_ind[s]), rep(0, M[s]-n_ind[s]))
+  df_aug[s] <- as.data.frame(matrix(0, nrow = (M[s] - n_ind[s]), ncol = n_traps[s]), stringsAsFactors = FALSE)
   EM[s] <- 
-  M[s] <- M[s]
   sum_caps[s] <- apply(EM_array[s], c(1,2), sum)
   sst[s] <- (sum_caps[s] %*% traplocs[s]) / (ifelse(rowSums(sum_caps[s]) > 0, rowSums(sum_caps[s]), 1))
   
@@ -682,7 +685,7 @@ sst # Now populated by starting positions uniformally placed within state space
 sum_caps <- apply(EM_array, c(1,2), sum)
 sst <- (sum_caps %*% traplocsA) / (ifelse(rowSums(sum_caps) > 0, rowSums(sum_caps), 1))
 
-for(i in (n_ind+1):M[s]) {
+for(i in (n_ind+1):M) {
   sst[i] <- c(runif(1, xlimA[1], xlimA[2])) #parameters, n, max, min
 }
 sst
