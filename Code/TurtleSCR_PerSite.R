@@ -626,6 +626,10 @@ M <- 200 # max population size, change with site
 # J <- n_traps
 # y <- rbind(EM[ , 2], matrix(0, nrow = M-n_ind, ncol = n_ind))
 # y <- rbind(EM, matrix(0, nrow = M - n_ind, ncol = n_traps))
+
+n_ind <- n_indA
+n_traps <- n_trapsA
+
 z <- c(rep(1, n_ind), rep(0, M-n_ind))
 df_aug <- as.data.frame(matrix(0, nrow = (M - n_ind), ncol = n_traps), stringsAsFactors = FALSE)
 
@@ -679,7 +683,7 @@ for(s in 1:length(Sites)){
 
 #Start values for s (activity centers) of augments (from random uniform constrained by state space size)
 X <- traplocsA
-sst # Now populated by starting positions uniformally placed within state space
+# sst # Now populated by starting positions uniformally placed within state space
 # For every individual that is not 0, change starting x point to mean of traps associated with encounters for that individual; leaves 0's there from the augmented population and also puts in activity center for augmented individuals that were randomly given an encounter history (caught at least 1 time)
 
 sum_caps <- apply(EM_array, c(1,2), sum)
@@ -717,33 +721,6 @@ sst
 if(!dir.exists("Code/JAGS")) dir.create("Code/JAGS", recursive = TRUE)
 
 d <- seq(xlimA[1], xlimA[2], length.out = 100)
-
-alpha1 <- rt(100, df = 1, 1/(25^2))
-den <- density(alpha1)
-hist(as.numeric(den))
-
-plot(d*100, dt(d, df = 1, 1 / (0.6^2)), type = "l")
-
-decay <- exp(-1 * alpha1 * d^2)
-plot(d*100, decay, type = "l")
-
-decay <- exp(-1 * 1 * d^2)
-plot(d*100, decay, type = "l")
-
-scale_par <- c(1, 5, 25)
-
-alpha1 <- rt(100000, df = 1, 1/(scale_par[1]^2))
-alpha1 <- alpha1[alpha1 >= 0]
-alpha1_priors <- data.frame(scale = scale_par[1], alpha1)
-for(i in 2:length(scale_par)) {
-  alpha1 <- rt(100000, df = 1, 1/(scale_par[i]^2))
-  alpha1 <- alpha1[alpha1 >= 0]
-  tmp <- data.frame(scale = scale_par[i], alpha1)
-  alpha1_priors <- bind_rows(alpha1_priors, tmp)
-}
-
-library(ggplot2)
-ggplot(alpha1_priors) + geom_density(aes(x = alpha1, fill = as.factor(scale)), alpha = 0.2) + xlim(0, 15)
 
 cat ("
   model {
@@ -878,7 +855,7 @@ inits <- function() {
   list(alpha0=rnorm(4,-2,.4), alpha1=runif(1,1,2), s=as.numeric(sst), z=z, psi = runif(1), psi.sex = runif(1), Sex = Sex)
 }
 
-parameters <- c("alpha0", "alpha1", "sigma", "N", "density", "p0", "s", "sigma_ind", "psi", "psi.sex") # 
+parameters <- c("alpha0", "alpha1", "sigma", "N", "density", "s", "sigma_ind", "psi", "psi.sex", "z") # 
 
 # cpic_1_mcmc <- jagsUI(model.file = "Code/JAGS/SCRA.txt", parameters.to.save = parameters, data=jags_data, inits=inits, n.iter = 1000, n.chains = 3, n.adapt =500) # jagsUI is nice but the plotting is interactive which is obnoxious 
 
@@ -924,9 +901,10 @@ plot(cpic_1_mcmc[ , c("alpha1")])
 plot(cpic_1_mcmc[ , c("alpha1", "sigma_ind")])
 plot(cpic_1_mcmc[ , c("p0[1]", "p0[2]", "p0[3]", "p0[4]", "alpha1", "density", "N")]) #
 par(mfrow = c(1,1))
-summary(cpic_1_mcmc[ , c("alpha0", "alpha1", "density")])
+summary(cpic_1_mcmc[ , c("alpha0[1]", "alpha1", "density")])
 # summary(cpic_1_mcmc)
 
+if(!dir.exists("Results/JAGS")) dir.create("Results/JAGS/", recursive = TRUE)
 save(cpic_1_mcmc, file = "Results/JAGS/cpic_1_mcmc.RData")
 
 

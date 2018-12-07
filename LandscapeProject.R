@@ -1,3 +1,5 @@
+library(dplyr)
+
 
 #### Spatial Ecology Project ####
 
@@ -21,8 +23,49 @@
 
 
 #### Obtaining Activity Centers Per individual from MCMC Output ####
+load("Results/JAGS/cpic_1_mcmc.RData")
 
-ttt <- data.frame(out[[1]])
+# combine chains
+df_mcmc <- as.data.frame(cpic_1_mcmc[[1]])
+for(i in 2:length(cpic_1_mcmc)) {
+  df_mcmc <- bind_rows(df_mcmc, as.data.frame(cpic_1_mcmc[[i]]))
+}
+
+centers <- df_mcmc %>%
+  select(starts_with("s[")) %>%
+  summarise_all(mean) %>%
+  t()
+str(centers) # activity centers
+
+hist(centers[1:36, ]) # activity centers for individuals caught at least once
+# hist(centers)
+
+# animals in pop
+z <- df_mcmc %>%
+  select(starts_with("z[")) %>%
+  summarise_all(mean) %>%
+  t()
+str(z)
+
+psi <- df_mcmc %>%
+  select(starts_with("psi")) %>%
+  summarise_all(mean)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ttt <- data.frame(cpic_1_mcmc[[1]])
 ttt <- ttt[ , grep("s", names(ttt))]
 names(ttt)
 ttt <- ttt[ , -c(1,202,203)]
