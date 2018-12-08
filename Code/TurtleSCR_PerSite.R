@@ -689,10 +689,10 @@ create_site_objects <- function(traplocs, n_ind, n_traps, M, EM) {
 
 Sites <- c(1:12)
 M <- c(200, 200, 200, 300, 1000, 400, 500, 200, 200, 800, 800, 800)
-traplocs <- rep(list(traplocsA, traplocsC, traplocsD, traplocsE, traplocsF, traplocsG, traplocsJ, traplocsK, traplocsL, traplocsM, traplocsN, traplocsO), length(Sites))
+traplocs <- list(traplocsA, traplocsC, traplocsD, traplocsE, traplocsF, traplocsG, traplocsJ, traplocsK, traplocsL, traplocsM, traplocsN, traplocsO)
 n_traps <- c(n_trapsA, n_trapsC, n_trapsD, n_trapsE, n_trapsF, n_trapsG, n_trapsJ, n_trapsK, n_trapsL, n_trapsM, n_trapsN, n_trapsO)
 n_ind <- c(n_indA, n_indC, n_indD, n_indE, n_indF, n_indG, n_indJ, n_indK, n_indL, n_indM, n_indN, n_indO)
-EM <- rep(list(EMA, EMC, EMD, EME, EMF, EMG, EMJ, EMK, EML, EMM, EMN, EMO), length(Sites))
+EM <- list(EMA, EMC, EMD, EME, EMF, EMG, EMJ, EMK, EML, EMM, EMN, EMO)
 
 site_objects <- rep(list(NA), length(Sites))
 
