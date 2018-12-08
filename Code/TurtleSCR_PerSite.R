@@ -217,7 +217,7 @@ EDFO
 ########## Site A CPIC Objects for Model ########
 n_trapsA <- ncol(matrixA) # number of traps
 # as.character(EDFA$recap)
-N <- nrow(EDFA[which(EDFA$recap == "N"), ])
+N_A <- nrow(EDFA[which(EDFA$recap == "N"), ])
 K <- max(EDFA$day) # trap nights per session
 buffer <- 1 # check literature to make sure doesn't need to be larger
 #xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
@@ -228,7 +228,7 @@ n_indA <- length(unique(EDFA$ind))
 str(EDFA)
 EDFA
 
-EM <- EDFA %>%
+EMA <- EDFA %>%
   group_by(ind, trap, day) %>%
   select(ind, trap, day) %>%
   mutate(count = 1) %>%
@@ -237,20 +237,20 @@ EM <- EDFA %>%
   ungroup()
 # EM <- data.frame(select(EM, -ind))
 str(EM)
-EM
+EMA
 
-full_df <- tidyr::expand(EM, ind, day)
+full_dfA <- tidyr::expand(EMA, ind, day)
 
-EM <- left_join(full_df, EM)
-EM <- as.data.frame(EM, stringsAsFactors = FALSE)
-EM[is.na(EM)] <- 0
+EMA <- left_join(full_dfA, EMA)
+EMA <- as.data.frame(EMA, stringsAsFactors = FALSE)
+EMA[is.na(EMA)] <- 0
 
 ####################################################
 
 ########## Site C CPIC Objects for Model ########
 n_trapsC <- ncol(matrixC) # number of traps
 # as.character(EDFA$recap)
-N <- nrow(EDFC[which(EDFC$recap == "N"), ])
+N_C <- nrow(EDFC[which(EDFC$recap == "N"), ])
 K <- max(EDFC$day) # trap nights per session
 buffer <- 1 # check literature to make sure doesn't need to be larger
 #xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
@@ -261,7 +261,7 @@ n_indC <- length(unique(EDFC$ind))
 str(EDFC)
 EDFC
 
-EM <- EDFC %>%
+EMC <- EDFC %>%
   group_by(ind, trap, day) %>%
   select(ind, trap, day) %>%
   mutate(count = 1) %>%
@@ -269,14 +269,14 @@ EM <- EDFC %>%
   spread(trap, count, fill = 0) %>%
   ungroup()
 # EM <- data.frame(select(EM, -ind))
-str(EM)
-EM
+str(EMC)
+EMC
 
-full_df <- tidyr::expand(EM, ind, day)
+full_dfC <- tidyr::expand(EMC, ind, day)
 
-EM <- left_join(full_df, EM)
-EM <- as.data.frame(EM, stringsAsFactors = FALSE)
-EM[is.na(EM)] <- 0
+EMC <- left_join(full_dfC, EMC)
+EMC <- as.data.frame(EMC, stringsAsFactors = FALSE)
+EMC[is.na(EMC)] <- 0
 
 ########################################################
 
@@ -284,7 +284,7 @@ EM[is.na(EM)] <- 0
 
 n_trapsD <- ncol(matrixD) # number of traps
 # as.character(EDFA$recap)
-N <- nrow(EDFD[which(EDFD$recap == "N"), ])
+N_D<- nrow(EDFD[which(EDFD$recap == "N"), ])
 K <- max(EDFD$day) # trap nights per session
 buffer <- 1 # check literature to make sure doesn't need to be larger
 #xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
@@ -295,7 +295,7 @@ n_indD <- length(unique(EDFD$ind))
 str(EDFD)
 EDFD
 
-EM <- EDFD %>%
+EMD <- EDFD %>%
   group_by(ind, trap, day) %>%
   select(ind, trap, day) %>%
   mutate(count = 1) %>%
@@ -303,14 +303,14 @@ EM <- EDFD %>%
   spread(trap, count, fill = 0) %>%
   ungroup()
 # EM <- data.frame(select(EM, -ind))
-str(EM)
-EM
+str(EMD)
+EMD
 
-full_df <- tidyr::expand(EM, ind, day)
+full_dfD <- tidyr::expand(EMD, ind, day)
 
-EM <- left_join(full_df, EM)
-EM <- as.data.frame(EM, stringsAsFactors = FALSE)
-EM[is.na(EM)] <- 0
+EMD <- left_join(full_dfD, EM)
+EMD <- as.data.frame(EMD, stringsAsFactors = FALSE)
+EMD[is.na(EMD)] <- 0
 
 #########################################################
 
@@ -319,7 +319,7 @@ EM[is.na(EM)] <- 0
 
 n_trapsE <- ncol(matrixE) # number of traps
 # as.character(EDFA$recap)
-N <- nrow(EDFE[which(EDFE$recap == "N"), ])
+N_E <- nrow(EDFE[which(EDFE$recap == "N"), ])
 K <- max(EDFE$day) # trap nights per session
 buffer <- 1 # check literature to make sure doesn't need to be larger
 #xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
@@ -330,7 +330,7 @@ n_indE <- length(unique(EDFE$ind))
 str(EDFE)
 EDFE
 
-EM <- EDFE %>%
+EME <- EDFE %>%
   group_by(ind, trap, day) %>%
   select(ind, trap, day) %>%
   mutate(count = 1) %>%
@@ -338,14 +338,14 @@ EM <- EDFE %>%
   spread(trap, count, fill = 0) %>%
   ungroup()
 # EM <- data.frame(select(EM, -ind))
-str(EM)
-EM
+str(EME)
+EME
 
-full_df <- tidyr::expand(EM, ind, day)
+full_dfE <- tidyr::expand(EME, ind, day)
 
-EM <- left_join(full_df, EM)
-EM <- as.data.frame(EM, stringsAsFactors = FALSE)
-EM[is.na(EM)] <- 0
+EME <- left_join(full_dfE, EME)
+EME <- as.data.frame(EME, stringsAsFactors = FALSE)
+EME[is.na(EME)] <- 0
 
 ###################################################
 
@@ -353,7 +353,7 @@ EM[is.na(EM)] <- 0
 
 n_trapsF <- ncol(matrixF) # number of traps
 # as.character(EDFA$recap)
-N <- nrow(EDFF[which(EDFF$recap == "N"), ])
+N_F <- nrow(EDFF[which(EDFF$recap == "N"), ])
 K <- max(EDFF$day) # trap nights per session
 buffer <- 1 # check literature to make sure doesn't need to be larger
 #xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
@@ -364,7 +364,7 @@ n_indF <- length(unique(EDFF$ind))
 str(EDFF)
 EDFF
 
-EM <- EDFF %>%
+EMF <- EDFF %>%
   group_by(ind, trap, day) %>%
   select(ind, trap, day) %>%
   mutate(count = 1) %>%
@@ -372,14 +372,14 @@ EM <- EDFF %>%
   spread(trap, count, fill = 0) %>%
   ungroup()
 # EM <- data.frame(select(EM, -ind))
-str(EM)
-EM
+str(EMF)
+EMF
 
-full_df <- tidyr::expand(EM, ind, day)
+full_dfF <- tidyr::expand(EMF, ind, day)
 
-EM <- left_join(full_df, EM)
-EM <- as.data.frame(EM, stringsAsFactors = FALSE)
-EM[is.na(EM)] <- 0
+EMF <- left_join(full_dfF, EMF)
+EMF <- as.data.frame(EMF, stringsAsFactors = FALSE)
+EMF[is.na(EMF)] <- 0
 
 #######################################################
 
@@ -387,7 +387,7 @@ EM[is.na(EM)] <- 0
 
 n_trapsG <- ncol(matrixG) # number of traps
 # as.character(EDFA$recap)
-N <- nrow(EDFG[which(EDFG$recap == "N"), ])
+N_G <- nrow(EDFG[which(EDFG$recap == "N"), ])
 K <- max(EDFG$day) # trap nights per session
 buffer <- 1 # check literature to make sure doesn't need to be larger
 #xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
@@ -398,7 +398,7 @@ n_indG <- length(unique(EDFG$ind))
 str(EDFG)
 EDFG
 
-EM <- EDFG %>%
+EMG <- EDFG %>%
   group_by(ind, trap, day) %>%
   select(ind, trap, day) %>%
   mutate(count = 1) %>%
@@ -406,14 +406,14 @@ EM <- EDFG %>%
   spread(trap, count, fill = 0) %>%
   ungroup()
 # EM <- data.frame(select(EM, -ind))
-str(EM)
-EM
+str(EMG)
+EMG
 
-full_df <- tidyr::expand(EM, ind, day)
+full_dfG <- tidyr::expand(EMG, ind, day)
 
-EM <- left_join(full_df, EM)
-EM <- as.data.frame(EM, stringsAsFactors = FALSE)
-EM[is.na(EM)] <- 0
+EMG <- left_join(full_dfG, EMG)
+EMG <- as.data.frame(EMG, stringsAsFactors = FALSE)
+EMG[is.na(EMG)] <- 0
 
 ###################################################
 
@@ -421,7 +421,7 @@ EM[is.na(EM)] <- 0
 
 n_trapsJ <- ncol(matrixJ) # number of traps
 # as.character(EDFA$recap)
-N <- nrow(EDFJ[which(EDFJ$recap == "N"), ])
+N_J <- nrow(EDFJ[which(EDFJ$recap == "N"), ])
 K <- max(EDFJ$day) # trap nights per session
 buffer <- 1 # check literature to make sure doesn't need to be larger
 #xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
@@ -432,7 +432,7 @@ n_indJ <- length(unique(EDFJ$ind))
 str(EDFJ)
 EDFJ
 
-EM <- EDFJ %>%
+EMJ <- EDFJ %>%
   group_by(ind, trap, day) %>%
   select(ind, trap, day) %>%
   mutate(count = 1) %>%
@@ -440,14 +440,14 @@ EM <- EDFJ %>%
   spread(trap, count, fill = 0) %>%
   ungroup()
 # EM <- data.frame(select(EM, -ind))
-str(EM)
-EM
+str(EMJ)
+EMJ
 
-full_df <- tidyr::expand(EM, ind, day)
+full_dfJ <- tidyr::expand(EMJ, ind, day)
 
-EM <- left_join(full_df, EM)
-EM <- as.data.frame(EM, stringsAsFactors = FALSE)
-EM[is.na(EM)] <- 0
+EMJ <- left_join(full_dfJ, EMJ)
+EMJ <- as.data.frame(EMJ, stringsAsFactors = FALSE)
+EMJ[is.na(EMJ)] <- 0
 
 ####################################################
 
@@ -455,7 +455,7 @@ EM[is.na(EM)] <- 0
 
 n_trapsK <- ncol(matrixK) # number of traps
 # as.character(EDFA$recap)
-N <- nrow(EDFK[which(EDFK$recap == "N"), ])
+N_K <- nrow(EDFK[which(EDFK$recap == "N"), ])
 K <- max(EDFK$day) # trap nights per session
 buffer <- 1 # check literature to make sure doesn't need to be larger
 #xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
@@ -466,7 +466,7 @@ n_indK <- length(unique(EDFK$ind))
 str(EDFK)
 EDFK
 
-EM <- EDFK %>%
+EMK <- EDFK %>%
   group_by(ind, trap, day) %>%
   select(ind, trap, day) %>%
   mutate(count = 1) %>%
@@ -474,14 +474,14 @@ EM <- EDFK %>%
   spread(trap, count, fill = 0) %>%
   ungroup()
 # EM <- data.frame(select(EM, -ind))
-str(EM)
-EM
+str(EMK)
+EMK
 
-full_df <- tidyr::expand(EM, ind, day)
+full_dfK <- tidyr::expand(EMK, ind, day)
 
-EM <- left_join(full_df, EM)
-EM <- as.data.frame(EM, stringsAsFactors = FALSE)
-EM[is.na(EM)] <- 0
+EMK <- left_join(full_dfK, EMK)
+EMK <- as.data.frame(EMK, stringsAsFactors = FALSE)
+EMK[is.na(EMK)] <- 0
 
 ####################################################
 
@@ -489,7 +489,7 @@ EM[is.na(EM)] <- 0
 
 n_trapsL <- ncol(matrixL) # number of traps
 # as.character(EDFA$recap)
-N <- nrow(EDFL[which(EDFL$recap == "N"), ])
+N_L <- nrow(EDFL[which(EDFL$recap == "N"), ])
 K <- max(EDFL$day) # trap nights per session
 buffer <- 1 # check literature to make sure doesn't need to be larger
 #xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
@@ -500,7 +500,7 @@ n_indL <- length(unique(EDFL$ind))
 str(EDFL)
 EDFL
 
-EM <- EDFL %>%
+EML <- EDFL %>%
   group_by(ind, trap, day) %>%
   select(ind, trap, day) %>%
   mutate(count = 1) %>%
@@ -508,14 +508,14 @@ EM <- EDFL %>%
   spread(trap, count, fill = 0) %>%
   ungroup()
 # EM <- data.frame(select(EM, -ind))
-str(EM)
-EM
+str(EML)
+EML
 
-full_df <- tidyr::expand(EM, ind, day)
+full_dfL <- tidyr::expand(EML, ind, day)
 
-EM <- left_join(full_df, EM)
-EM <- as.data.frame(EM, stringsAsFactors = FALSE)
-EM[is.na(EM)] <- 0
+EML <- left_join(full_dfL, EML)
+EML <- as.data.frame(EML, stringsAsFactors = FALSE)
+EML[is.na(EML)] <- 0
 
 ####################################################
 
@@ -523,7 +523,7 @@ EM[is.na(EM)] <- 0
 
 n_trapsM <- ncol(matrixM) # number of traps
 # as.character(EDFA$recap)
-N <- nrow(EDFM[which(EDFM$recap == "N"), ])
+N_M <- nrow(EDFM[which(EDFM$recap == "N"), ])
 K <- max(EDFM$day) # trap nights per session
 buffer <- 1 # check literature to make sure doesn't need to be larger
 #xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
@@ -534,7 +534,7 @@ n_indM <- length(unique(EDFM$ind))
 str(EDFM)
 EDFM
 
-EM <- EDFM %>%
+EMM <- EDFM %>%
   group_by(ind, trap, day) %>%
   select(ind, trap, day) %>%
   mutate(count = 1) %>%
@@ -542,14 +542,14 @@ EM <- EDFM %>%
   spread(trap, count, fill = 0) %>%
   ungroup()
 # EM <- data.frame(select(EM, -ind))
-str(EM)
-EM
+str(EMM)
+EMM
 
-full_df <- tidyr::expand(EM, ind, day)
+full_dfM <- tidyr::expand(EMM, ind, day)
 
-EM <- left_join(full_df, EM)
-EM <- as.data.frame(EM, stringsAsFactors = FALSE)
-EM[is.na(EM)] <- 0
+EMM <- left_join(full_dfM, EMM)
+EMM <- as.data.frame(EMM, stringsAsFactors = FALSE)
+EMM[is.na(EMM)] <- 0
 
 ####################################################
 
@@ -557,7 +557,7 @@ EM[is.na(EM)] <- 0
 
 n_trapsN <- ncol(matrixN) # number of traps
 # as.character(EDFA$recap)
-N <- nrow(EDFN[which(EDFN$recap == "N"), ])
+N_N <- nrow(EDFN[which(EDFN$recap == "N"), ])
 K <- max(EDFN$day) # trap nights per session
 buffer <- 1 # check literature to make sure doesn't need to be larger
 #xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
@@ -568,7 +568,7 @@ n_indN <- length(unique(EDFN$ind))
 str(EDFN)
 EDFN
 
-EM <- EDFN %>%
+EMN <- EDFN %>%
   group_by(ind, trap, day) %>%
   select(ind, trap, day) %>%
   mutate(count = 1) %>%
@@ -576,14 +576,14 @@ EM <- EDFN %>%
   spread(trap, count, fill = 0) %>%
   ungroup()
 # EM <- data.frame(select(EM, -ind))
-str(EM)
-EM
+str(EMN)
+EMN
 
-full_df <- tidyr::expand(EM, ind, day)
+full_dfN <- tidyr::expand(EMN, ind, day)
 
-EM <- left_join(full_df, EM)
-EM <- as.data.frame(EM, stringsAsFactors = FALSE)
-EM[is.na(EM)] <- 0
+EMN <- left_join(full_dfN, EMN)
+EMN <- as.data.frame(EMN, stringsAsFactors = FALSE)
+EMN[is.na(EMN)] <- 0
 
 ####################################################
 
@@ -591,7 +591,7 @@ EM[is.na(EM)] <- 0
 
 n_trapsO <- ncol(matrixO) # number of traps
 # as.character(EDFA$recap)
-N <- nrow(EDFO[which(EDFO$recap == "N"), ])
+N_O <- nrow(EDFO[which(EDFO$recap == "N"), ])
 K <- max(EDFO$day) # trap nights per session
 buffer <- 1 # check literature to make sure doesn't need to be larger
 #xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
@@ -602,7 +602,7 @@ n_indO <- length(unique(EDFO$ind))
 str(EDFO)
 EDFO
 
-EM <- EDFO %>%
+EMO <- EDFO %>%
   group_by(ind, trap, day) %>%
   select(ind, trap, day) %>%
   mutate(count = 1) %>%
@@ -610,14 +610,14 @@ EM <- EDFO %>%
   spread(trap, count, fill = 0) %>%
   ungroup()
 # EM <- data.frame(select(EM, -ind))
-str(EM)
-EM
+str(EMO)
+EMO
 
-full_df <- tidyr::expand(EM, ind, day)
+full_dfO <- tidyr::expand(EMO, ind, day)
 
-EM <- left_join(full_df, EM)
-EM <- as.data.frame(EM, stringsAsFactors = FALSE)
-EM[is.na(EM)] <- 0
+EMO <- left_join(full_dfO, EMO)
+EMO <- as.data.frame(EMO, stringsAsFactors = FALSE)
+EMO[is.na(EMO)] <- 0
 
 ####################################################
 
@@ -633,7 +633,7 @@ n_traps <- n_trapsA
 z <- c(rep(1, n_ind), rep(0, M-n_ind))
 df_aug <- as.data.frame(matrix(0, nrow = (M - n_ind), ncol = n_traps), stringsAsFactors = FALSE)
 
-# convert to 3D array (n_individuals + augmented individuals) x n_traps x n_days
+# Convert to 3D array (n_individuals + augmented individuals) x n_traps x n_days
 EM_array <- array(NA, dim = c(M, n_traps, K))
 for(i in 1:K){
   foo <- EM[(which(EM[]$day == i)), ]
@@ -658,41 +658,86 @@ for(i in 1:K){
 # hours <- apply(traphoursA[ , 2:ncol(traphoursA)], 1, sum)
 # hours
 
+################# Function to Create Objects Needed Per SCR Model ###################
+
+create_site_objects <- function(traplocs, n_ind, n_traps, M, EM) {
+  X <- traplocs
+  z <- c(rep(1, n_ind), rep(0, M-n_ind))
+  df_aug <- as.data.frame(matrix(0, nrow = (M - n_ind), ncol = n_traps), stringsAsFactors = FALSE)
+  EM_array <- array(NA, dim = c(M, n_traps, K))
+  K <- 4
+  for(i in 1:K){
+    foo <- EM[(which(EM[]$day == i)), ]    # Error in EM[(which(EM[]$day == i)), ] : incorrect number of dimensions
+    foo_less <- select(foo, -ind, -day)
+    colnames(foo_less) <- colnames(df_aug)
+    foo_augment <- bind_rows(foo_less, df_aug)
+    EM_array[1:(M), 1:n_traps, i] <- as.matrix(foo_augment)
+  }
+  
+  sum_caps <- apply(EM_array, c(1,2), sum)
+  sst <- (sum_caps %*% traplocs) / (ifelse(rowSums(sum_caps) > 0, rowSums(sum_caps), 1))
+  
+  for(m in (n_ind+1):M) {
+    sst[m] <- c(runif(1, xlimA[1], xlimA[2])) #parameters, n, max, min
+  }
+}
+
+###########################################################################################
+
+
 ###### For Loop to Go Through Each Site and Each Species with SCR Model ######
 
 Sites <- c(1:12)
-M[s] <- c(200, 200, 200, 300, 1000, 400, 500, 200, 200, 800, 800, 800)
-traplocs <- c(traplocsA, traplocsC, traplocsD, traplocsE, traplocsF, traplocsG, traplocsJ, traplocsK, traplocsL, traplocsM, traplocsN, traplocsO)
+M <- c(200, 200, 200, 300, 1000, 400, 500, 200, 200, 800, 800, 800)
+traplocs <- rep(list(traplocsA, traplocsC, traplocsD, traplocsE, traplocsF, traplocsG, traplocsJ, traplocsK, traplocsL, traplocsM, traplocsN, traplocsO), length(Sites))
 n_traps <- c(n_trapsA, n_trapsC, n_trapsD, n_trapsE, n_trapsF, n_trapsG, n_trapsJ, n_trapsK, n_trapsL, n_trapsM, n_trapsN, n_trapsO)
 n_ind <- c(n_indA, n_indC, n_indD, n_indE, n_indF, n_indG, n_indJ, n_indK, n_indL, n_indM, n_indN, n_indO)
+EM <- rep(list(EMA, EMC, EMD, EME, EMF, EMG, EMJ, EMK, EML, EMM, EMN, EMO), length(Sites))
+
+site_objects <- rep(list(NA), length(Sites))
+
 
 for(s in 1:length(Sites)){
-  X[s] <- traplocs[s]
-  z[s] <- c(rep(1, n_ind[s]), rep(0, M[s]-n_ind[s]))
-  df_aug[s] <- as.data.frame(matrix(0, nrow = (M[s] - n_ind[s]), ncol = n_traps[s]), stringsAsFactors = FALSE)
-  EM[s] <- 
-  sum_caps[s] <- apply(EM_array[s], c(1,2), sum)
-  sst[s] <- (sum_caps[s] %*% traplocs[s]) / (ifelse(rowSums(sum_caps[s]) > 0, rowSums(sum_caps[s]), 1))
-  
-  for(i in (n_ind+1):M) {
-    sst[i] <- c(runif(1, xlimA[1], xlimA[2])) #parameters, n, max, min
-  }
-  sst
-  
+  site_objects[s] <- create_site_objects(traplocs = traplocs[s], n_ind = n_ind[s], n_traps = n_traps[s], M = M[s], EM = EM[s])
 }
 
+
+# for(s in 1:length(Sites)){
+#   X[s] <- traplocs[s]
+#   z[s] <- c(rep(1, n_ind[s]), rep(0, M[s]-n_ind[s]))
+#   df_aug[s] <- as.data.frame(matrix(0, nrow = (M[s] - n_ind[s]), ncol = n_traps[s]), stringsAsFactors = FALSE)
+#   EM_array[s] <- array(NA, dim = c(M[s], n_traps[s], K))
+#   for(i in 1:K){
+#     foo[s] <- EM[s][(which(EM[s][]$day == i)), ]
+#     foo_less[s] <- select(foo[s], -ind, -day)
+#     colnames(foo_less[s]) <- colnames(df_aug[s])
+#     foo_augment[s] <- bind_rows(foo_less[s], df_aug[s])
+#     EM_array[s][1:(M[s]), 1:n_traps[s], i] <- as.matrix(foo_augment[s])
+#   }
+#   
+#   
+#   sum_caps[s] <- apply(EM_array[s], c(1,2), sum)
+#   sst[s] <- (sum_caps[s] %*% traplocs[s]) / (ifelse(rowSums(sum_caps[s]) > 0, rowSums(sum_caps[s]), 1))
+#   
+#   for(m in (n_ind+1):M[i]) {
+#     sst[s, m] <- c(runif(1, xlimA[1], xlimA[2])) #parameters, n, max, min
+#   }
+#   sst
+#   
+# }
+
 #Start values for s (activity centers) of augments (from random uniform constrained by state space size)
-X <- traplocsA
+# X <- traplocsA
 # sst # Now populated by starting positions uniformally placed within state space
 # For every individual that is not 0, change starting x point to mean of traps associated with encounters for that individual; leaves 0's there from the augmented population and also puts in activity center for augmented individuals that were randomly given an encounter history (caught at least 1 time)
 
-sum_caps <- apply(EM_array, c(1,2), sum)
-sst <- (sum_caps %*% traplocsA) / (ifelse(rowSums(sum_caps) > 0, rowSums(sum_caps), 1))
-
-for(i in (n_ind+1):M) {
-  sst[i] <- c(runif(1, xlimA[1], xlimA[2])) #parameters, n, max, min
-}
-sst
+# sum_caps <- apply(EM_array, c(1,2), sum)
+# sst <- (sum_caps %*% traplocsA) / (ifelse(rowSums(sum_caps) > 0, rowSums(sum_caps), 1))
+# 
+# for(i in (n_ind+1):M) {
+#   sst[i] <- c(runif(1, xlimA[1], xlimA[2])) #parameters, n, max, min
+# }
+# sst
 
 
 # Create model function in BUGS code named X
@@ -748,7 +793,7 @@ cat ("
     N <- sum(z[ ])
     density <- N / (xlimA[2] - xlimA[1]) # divided distances by 100 so calculates turtles per 100 m of canal
   }
-", file = "Code/JAGS/SCRA.txt")
+", file = "Code/JAGS/SCR_Time.txt")
 
 #### Model with individual heterogeneity in capture probability ####
 cat ("
@@ -785,7 +830,14 @@ logit(p0[i,j,k]) <- alpha0[k] + eta[i,k]
      N <- sum(z[ ])
      density <- N / (xlimA[2] - xlimA[1]) # divided distances by 100 so calculates turtles per 100 m of canal
      }
-     ", file = "Code/JAGS/SCRA.txt")
+     ", file = "Code/JAGS/SCRA_Ind_Time.txt")
+
+jags_data <- list(y = EM_array, traplocsA = traplocsA, K=K, M=M, xlimA=xlimA, n_traps = n_traps)
+inits <- function() {
+  list(alpha0=rnorm(4,-2,.4), alpha1=runif(1,1,2), s=as.numeric(sst), z=z, psi = runif(1))
+}
+
+parameters <- c("alpha0", "alpha1", "sigma", "N", "density", "s", "sigma_ind", "psi", "z")
 
 
 #### Model with Sex Covariate #####
@@ -845,9 +897,7 @@ cat ("
      N <- sum(z[ ])
      density <- N / (xlimA[2] - xlimA[1]) # divided distances by 100 so calculates turtles per 100 m of canal
      }
-     ", file = "Code/JAGS/SCRA.txt")
-
-
+     ", file = "Code/JAGS/SCR_Ind_Time_Sex.txt")
 
 
 jags_data <- list(y = EM_array, Sex = Sex, traplocsA = traplocsA, K=K, M=M, xlimA=xlimA, n_traps = n_traps)
@@ -887,7 +937,7 @@ clusterSetRNGStream(cl = cl, 54354354)
 system.time({ # no status bar (% complete) when run in parallel
   out <- clusterEvalQ(cl, {
     library(rjags)
-    jm <- jags.model("Code/JAGS/SCRA.txt", jags_data, inits, n.adapt = na, n.chains = 1) # Compile model and run burnin
+    jm <- jags.model("Code/JAGS/SCR_Ind_Time.txt", jags_data, inits, n.adapt = na, n.chains = 1) # Compile model and run burnin
     out <- coda.samples(jm, parameters, n.iter = ni, thin = nt) # Sample from posterior distribution
     return(as.mcmc(out))
   })
@@ -899,7 +949,7 @@ stopCluster(cl)
 cpic_1_mcmc <- mcmc.list(out)
 plot(cpic_1_mcmc[ , c("alpha1")])
 plot(cpic_1_mcmc[ , c("alpha1", "sigma_ind")])
-plot(cpic_1_mcmc[ , c("p0[1]", "p0[2]", "p0[3]", "p0[4]", "alpha1", "density", "N")]) #
+plot(cpic_1_mcmc[ , c("alpha1", "density", "N")]) #
 par(mfrow = c(1,1))
 summary(cpic_1_mcmc[ , c("alpha0[1]", "alpha1", "density")])
 # summary(cpic_1_mcmc)
