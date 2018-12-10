@@ -1192,14 +1192,14 @@ M_F <- 200 # max population size, change with site
 # y <- rbind(EM[ , 2], matrix(0, nrow = M-n_ind, ncol = n_ind))
 # y <- rbind(EM, matrix(0, nrow = M - n_ind, ncol = n_traps))
 
-z_F <- c(rep(1, n_indF), rep(0, M_F-n_indF))
+z_F <- c(rep(1, n_indF), rep(0, M_F - n_indF))
 df_augF <- as.data.frame(matrix(0, nrow = (M_F - n_indF), ncol = n_trapsF), stringsAsFactors = FALSE)
 rm(df_augF)
 
 # Convert to 3D array (n_individuals + augmented individuals) x n_traps x n_days
-EM_arrayF <- array(NA, dim = c(M_F, n_trapsF, K))
+EM_arrayF_CSER <- array(NA, dim = c(M_F, n_trapsF, K))
 for(i in 1:K){
-  fooF <- EMF[(which(EMF[]$day == i)), ]
+  fooF <- EMF_CSER[(which(EMF_CSER[]$day == i)), ]
   foo_lessF <- select(fooF, -ind, -day)
   if(nrow(foo_lessF) > 0){
     foo_lessF$'1' <- 0
@@ -1214,13 +1214,10 @@ for(i in 1:K){
   colnames(foo_lessF) <- colnames(df_augF)
   foo_lessF <- as.data.frame(foo_lessF)
   foo_augmentF <- bind_rows(foo_lessF, df_augF)
-  EM_arrayF[1:(M_F), 1:n_trapsF, i] <- as.matrix(foo_augmentF)
+  EM_arrayF_CSER[1:(M_F), 1:n_trapsF, i] <- as.matrix(foo_augmentF)
 }
-str(df_augF)
 
-i = 1
-
-sum_capsF <- apply(EM_arrayF, c(1,2), sum)
+sum_capsF <- apply(EM_arrayF_CSER, c(1,2), sum)
 sstF <- (sum_capsF %*% traplocsF) / (ifelse(rowSums(sum_capsF) > 0, rowSums(sum_capsF), 1))
 
 for(m in (n_indF+1):M_F) {
@@ -1230,7 +1227,7 @@ for(m in (n_indF+1):M_F) {
 
 ##### Putting Objects into Model ######
 
-jags_data <- list(y = EM_arrayF, traplocsA = traplocsF, K=K, M=M_F, xlimA=xlimF, n_traps = n_trapsF)
+jags_data <- list(y = EM_arrayF_CSER, traplocsA = traplocsF, K=K, M=M_F, xlimA=xlimF, n_traps = n_trapsF)
 inits <- function() {
   list(alpha0=rnorm(4,-2,.4), alpha1=runif(1,1,2), s=as.numeric(sstF[]), z=z_F, psi = runif(1))
 }
@@ -1243,19 +1240,19 @@ clusterExport(cl, c("jags_data", "inits", "parameters", "z_F", "sstF", "ni", "na
 clusterSetRNGStream(cl = cl, 54354354)
 
 system.time({ # no status bar (% complete) when run in parallel
-  out_F_cpic <- clusterEvalQ(cl, {
+  out_F_cser <- clusterEvalQ(cl, {
     library(rjags)
     jm <- jags.model("Code/JAGS/SCR_Ind_Time.txt", jags_data, inits, n.adapt = na, n.chains = 1) # Compile model and run burnin
-    out_F_cpic <- coda.samples(jm, parameters, n.iter = ni, thin = nt) # Sample from posterior distribution
-    return(as.mcmc(out_F_cpic))
+    out_F_cser <- coda.samples(jm, parameters, n.iter = ni, thin = nt) # Sample from posterior distribution
+    return(as.mcmc(out_F_cser))
   })
 }) #
 
 stopCluster(cl)
 
-cpic_F_mcmc <- mcmc.list(out_F_cpic)
+cser_F_mcmc <- mcmc.list(out_F_cser)
 
-save(cpic_F_mcmc, file = "Results/JAGS/cpic_F_mcmc.RData")
+save(cser_F_mcmc, file = "Results/JAGS/cser_F_mcmc.RData")
 
 
 ########## Site G CPIC Objects for Model ##############
@@ -1346,6 +1343,109 @@ cpic_G_mcmc <- mcmc.list(out_G_cpic)
 save(cpic_G_mcmc, file = "Results/JAGS/cpic_G_mcmc.RData")
 
 ###################################################
+
+
+
+########## Site G CSER Objects for Model ################
+
+n_trapsG <- ncol(matrixG) # number of traps
+# as.character(EDFA$recap)
+N_G <- nrow(EDFG_CSER[which(EDFG_CSER$recap == "N"), ])
+K <- max(EDFG_CSER$day) # trap nights per session
+buffer <- 1 # check literature to make sure doesn't need to be larger
+#xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
+xlimG <- c(min(matrixG)-buffer, max(matrixG) + buffer)
+n_indG <- length(unique(EDFG_CSER$ind))
+
+# Make encounter histories with number of times each individual is captured in each trap
+EDFG_CSER
+
+EMG_CSER <- EDFG_CSER %>%
+  group_by(ind, trap, day) %>%
+  select(ind, trap, day) %>%
+  mutate(count = 1) %>%
+  summarise_all(sum) %>%
+  spread(trap, count, fill = 0) %>%
+  ungroup()
+# EM <- data.frame(select(EM, -ind))
+EMG_CSER
+
+full_dfG <- tidyr::expand(EMG_CSER, ind, day)
+
+EMG_CSER <- left_join(full_dfG, EMG_CSER)
+EMG_CSER <- as.data.frame(EMG_CSER, stringsAsFactors = FALSE)
+EMG_CSER[is.na(EMG_CSER)] <- 0
+
+##### DATA AUGMENTATION #####
+M_G <- 200 # max population size, change with site
+# J <- n_traps
+# y <- rbind(EM[ , 2], matrix(0, nrow = M-n_ind, ncol = n_ind))
+# y <- rbind(EM, matrix(0, nrow = M - n_ind, ncol = n_traps))
+
+z_G <- c(rep(1, n_indG), rep(0, M_G - n_indG))
+df_augG <- as.data.frame(matrix(0, nrow = (M_G - n_indG), ncol = n_trapsG), stringsAsFactors = FALSE)
+
+# Convert to 3D array (n_individuals + augmented individuals) x n_traps x n_days
+EM_arrayG_CSER <- array(NA, dim = c(M_G, n_trapsG, K))
+for(i in 1:K){
+  fooG <- EMG_CSER[(which(EMG_CSER[]$day == i)), ]
+  foo_lessG <- select(fooG, -ind, -day)
+  if(nrow(foo_lessG) > 0){
+    foo_lessG$'3' <- 0
+  }
+  if(nrow(foo_lessG) > 0){
+    foo_lessG$'4' <- 0
+  }
+  if(nrow(foo_lessG) > 0){
+    foo_lessG$'6' <- 0
+  }
+  if(nrow(foo_lessG) == 0){
+    foo_lessG <- array(0, dim = c(5, 7))
+  }
+  colnames(foo_lessG) <- c("1","2","3","4","5","6","7")
+  colnames(foo_lessG) <- colnames(df_augG)
+  foo_lessG <- as.data.frame(foo_lessG)
+  foo_augmentG <- bind_rows(foo_lessG, df_augG)
+  EM_arrayG_CSER[1:(M_G), 1:n_trapsG, i] <- as.matrix(foo_augmentG)
+}
+
+sum_capsG <- apply(EM_arrayG_CSER, c(1,2), sum)
+sstG <- (sum_capsG %*% traplocsG) / (ifelse(rowSums(sum_capsG) > 0, rowSums(sum_capsG), 1))
+
+for(m in (n_indG+1):M_G) {
+  sstG[m] <- c(runif(1, xlimG[1], xlimG[2])) #parameters, n, max, min
+}
+
+
+##### Putting Objects into Model ######
+
+jags_data <- list(y = EM_arrayG_CSER, traplocsA = traplocsG, K=K, M=M_G, xlimA=xlimG, n_traps = n_trapsG)
+inits <- function() {
+  list(alpha0=rnorm(4,-2,.4), alpha1=runif(1,1,2), s=as.numeric(sstG[]), z=z_G, psi = runif(1))
+}
+
+parameters <- c("alpha0", "alpha1", "sigma", "N", "density", "s", "sigma_ind", "psi", "z")
+
+# run in parallel explicitly
+cl <- makeCluster(nc)                       # Request # cores
+clusterExport(cl, c("jags_data", "inits", "parameters", "z_G", "sstG", "ni", "na", "nt")) # Make these available
+clusterSetRNGStream(cl = cl, 54354354)
+
+system.time({ # no status bar (% complete) when run in parallel
+  out_G_cser <- clusterEvalQ(cl, {
+    library(rjags)
+    jm <- jags.model("Code/JAGS/SCR_Ind_Time.txt", jags_data, inits, n.adapt = na, n.chains = 1) # Compile model and run burnin
+    out_G_cser <- coda.samples(jm, parameters, n.iter = ni, thin = nt) # Sample from posterior distribution
+    return(as.mcmc(out_G_cser))
+  })
+}) #
+
+stopCluster(cl)
+
+cser_G_mcmc <- mcmc.list(out_G_cser)
+
+save(cser_G_mcmc, file = "Results/JAGS/cser_G_mcmc.RData")
+
 
 ########## Site J CPIC Objects for Model ###########
 
@@ -1438,6 +1538,116 @@ save(cpic_J_mcmc, file = "Results/JAGS/cpic_J_mcmc.RData")
 
 ####################################################
 
+########## Site J CSER Objects for Model ###########
+
+n_trapsJ <- ncol(matrixJ) # number of traps
+# as.character(EDFA$recap)
+N_J <- nrow(EDFJ_CSER[which(EDFJ_CSER$recap == "N"), ])
+K <- max(EDFJ_CSER$day) # trap nights per session
+buffer <- 1 # check literature to make sure doesn't need to be larger
+#xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
+xlimJ <- c(min(matrixJ)-buffer, max(matrixJ) + buffer)
+n_indJ <- length(unique(EDFJ_CSER$ind))
+
+# Make encounter histories with number of times each individual is captured in each trap
+EDFJ_CSER
+
+EMJ_CSER <- EDFJ_CSER %>%
+  group_by(ind, trap, day) %>%
+  select(ind, trap, day) %>%
+  mutate(count = 1) %>%
+  summarise_all(sum) %>%
+  spread(trap, count, fill = 0) %>%
+  ungroup()
+# EM <- data.frame(select(EM, -ind))
+EMJ_CSER
+
+full_dfJ <- tidyr::expand(EMJ_CSER, ind, day)
+
+EMJ_CSER <- left_join(full_dfJ, EMJ_CSER)
+EMJ_CSER <- as.data.frame(EMJ_CSER, stringsAsFactors = FALSE)
+EMJ_CSER[is.na(EMJ_CSER)] <- 0
+
+##### DATA AUGMENTATION #####
+M_J <- 200 # max population size, change with site
+# J <- n_traps
+# y <- rbind(EM[ , 2], matrix(0, nrow = M-n_ind, ncol = n_ind))
+# y <- rbind(EM, matrix(0, nrow = M - n_ind, ncol = n_traps))
+
+z_J <- c(rep(1, n_indJ), rep(0, M_J-n_indJ))
+df_augJ <- as.data.frame(matrix(0, nrow = (M_J - n_indJ), ncol = n_trapsJ), stringsAsFactors = FALSE)
+
+# Convert to 3D array (n_individuals + augmented individuals) x n_traps x n_days
+EM_arrayJ_CSER <- array(NA, dim = c(M_J, n_trapsJ, K))
+for(i in 1:K){
+  fooJ <- EMJ_CSER[(which(EMJ_CSER[]$day == i)), ]
+  foo_lessJ <- select(fooJ, -ind, -day)
+  if(nrow(foo_lessJ) > 0){
+    foo_lessJ$'1' <- 0
+  }
+  if(nrow(foo_lessJ) > 0){
+    foo_lessJ$'2' <- 0
+  }
+  if(nrow(foo_lessJ) > 0){
+    foo_lessJ$'3' <- 0
+  }
+  if(nrow(foo_lessJ) > 0){
+    foo_lessJ$'6' <- 0
+  }
+  if(nrow(foo_lessJ) > 0){
+    foo_lessJ$'7' <- 0
+  }
+  if(nrow(foo_lessJ) > 0){
+    foo_lessJ$'9' <- 0
+  }
+  if(nrow(foo_lessJ) == 0){
+    foo_lessJ <- array(0, dim = c(5, 10))
+  }
+  colnames(foo_lessJ) <- c("1","2","3","4","5","6","7","8","9","10")
+  colnames(foo_lessJ) <- colnames(df_augJ)
+  foo_lessJ <- as.data.frame(foo_lessJ)
+  foo_augmentJ <- bind_rows(foo_lessJ, df_augJ)
+  EM_arrayJ_CSER[1:(M_J), 1:n_trapsJ, i] <- as.matrix(foo_augmentJ)
+}
+
+sum_capsJ <- apply(EM_arrayJ_CSER, c(1,2), sum)
+sstJ <- (sum_capsJ %*% traplocsJ) / (ifelse(rowSums(sum_capsJ) > 0, rowSums(sum_capsJ), 1))
+
+for(m in (n_indJ+1):M_J) {
+  sstJ[m] <- c(runif(1, xlimJ[1], xlimJ[2])) #parameters, n, max, min
+}
+
+
+##### Putting Objects into Model ######
+
+jags_data <- list(y = EM_arrayJ_CSER, traplocsA = traplocsJ, K=K, M=M_J, xlimA=xlimJ, n_traps = n_trapsJ)
+inits <- function() {
+  list(alpha0=rnorm(4,-2,.4), alpha1=runif(1,1,2), s=as.numeric(sstJ[]), z=z_J, psi = runif(1))
+}
+
+parameters <- c("alpha0", "alpha1", "sigma", "N", "density", "s", "sigma_ind", "psi", "z")
+
+# run in parallel explicitly
+cl <- makeCluster(nc)                       # Request # cores
+clusterExport(cl, c("jags_data", "inits", "parameters", "z_J", "sstJ", "ni", "na", "nt")) # Make these available
+clusterSetRNGStream(cl = cl, 54354354)
+
+system.time({ # no status bar (% complete) when run in parallel
+  out_J_cser <- clusterEvalQ(cl, {
+    library(rjags)
+    jm <- jags.model("Code/JAGS/SCR_Ind_Time.txt", jags_data, inits, n.adapt = na, n.chains = 1) # Compile model and run burnin
+    out_J_cser <- coda.samples(jm, parameters, n.iter = ni, thin = nt) # Sample from posterior distribution
+    return(as.mcmc(out_J_cser))
+  })
+}) #
+
+stopCluster(cl)
+
+cser_J_mcmc <- mcmc.list(out_J_cser)
+
+save(cser_J_mcmc, file = "Results/JAGS/cser_J_mcmc.RData")
+
+
 ########## Site K CPIC Objects for Model ###########
 
 n_trapsK <- ncol(matrixK) # number of traps
@@ -1526,9 +1736,8 @@ cpic_K_mcmc <- mcmc.list(out_K_cpic)
 
 save(cpic_K_mcmc, file = "Results/JAGS/cpic_K_mcmc.RData")
 
-
-
 ####################################################
+
 
 ########## Site L CPIC Objects for Model ###########
 
@@ -1713,6 +1922,120 @@ save(cpic_M_mcmc, file = "Results/JAGS/cpic_M_mcmc.RData")
 
 ####################################################
 
+
+########## Site M CSER Objects for Model ###########
+
+n_trapsM <- ncol(matrixM) # number of traps
+# as.character(EDFA$recap)
+N_M <- nrow(EDFM_CSER[which(EDFM_CSER$recap == "N"), ])
+K <- max(EDFM_CSER$day) # trap nights per session
+buffer <- 1 # check literature to make sure doesn't need to be larger
+#xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
+xlimM <- c(min(matrixM)-buffer, max(matrixM) + buffer)
+n_indM <- length(unique(EDFM_CSER$ind))
+
+# Make encounter histories with number of times each individual is captured in each trap
+EDFM_CSER
+
+EMM_CSER <- EDFM_CSER %>%
+  group_by(ind, trap, day) %>%
+  select(ind, trap, day) %>%
+  mutate(count = 1) %>%
+  summarise_all(sum) %>%
+  spread(trap, count, fill = 0) %>%
+  ungroup()
+# EM <- data.frame(select(EM, -ind))
+EMM_CSER
+
+full_dfM <- tidyr::expand(EMM_CSER, ind, day)
+
+EMM_CSER <- left_join(full_dfM, EMM_CSER)
+EMM_CSER <- as.data.frame(EMM_CSER, stringsAsFactors = FALSE)
+EMM_CSER[is.na(EMM_CSER)] <- 0
+
+##### DATA AUGMENTATION #####
+M_M <- 200 # max population size, change with site
+# J <- n_traps
+# y <- rbind(EM[ , 2], matrix(0, nrow = M-n_ind, ncol = n_ind))
+# y <- rbind(EM, matrix(0, nrow = M - n_ind, ncol = n_traps))
+
+z_M <- c(rep(1, n_indM), rep(0, M_M-n_indM))
+df_augM <- as.data.frame(matrix(0, nrow = (M_M - n_indM), ncol = n_trapsM), stringsAsFactors = FALSE)
+
+# Convert to 3D array (n_individuals + augmented individuals) x n_traps x n_days
+EM_arrayM_CSER <- array(NA, dim = c(M_M, n_trapsM, K))
+for(i in 1:K){
+  fooM <- EMM_CSER[(which(EMM_CSER[]$day == i)), ]
+  foo_lessM <- select(fooM, -ind, -day)
+  if(nrow(foo_lessM) > 0){
+    foo_lessM$'2' <- 0
+  }
+  if(nrow(foo_lessM) > 0){
+    foo_lessM$'3' <- 0
+  }
+  if(nrow(foo_lessM) > 0){
+    foo_lessM$'5' <- 0
+  }
+  if(nrow(foo_lessM) > 0){
+    foo_lessM$'8' <- 0
+  }
+  if(nrow(foo_lessM) > 0){
+    foo_lessM$'9' <- 0
+  }
+  if(nrow(foo_lessM) > 0){
+    foo_lessM$'11' <- 0
+  }
+  if(nrow(foo_lessM) == 0){
+    foo_lessM <- array(0, dim = c(8, 12))
+  }
+  colnames(foo_lessM) <- c("1","2","3","4","5","6","7","8","9","10","11","12")
+  colnames(foo_lessM) <- colnames(df_augM)
+  foo_lessM <- as.data.frame(foo_lessM)
+  foo_augmentM <- bind_rows(foo_lessM, df_augM)
+  EM_arrayM_CSER[1:(M_M), 1:n_trapsM, i] <- as.matrix(foo_augmentM)
+}
+
+sum_capsM <- apply(EM_arrayM_CSER, c(1,2), sum)
+sstM <- (sum_capsM %*% traplocsM) / (ifelse(rowSums(sum_capsM) > 0, rowSums(sum_capsM), 1))
+
+for(m in (n_indM+1):M_M) {
+  sstM[m] <- c(runif(1, xlimM[1], xlimM[2])) #parameters, n, max, min
+}
+
+
+##### Putting Objects into Model ######
+
+jags_data <- list(y = EM_arrayM_CSER, traplocsA = traplocsM, K=K, M=M_M, xlimA=xlimM, n_traps = n_trapsM)
+inits <- function() {
+  list(alpha0=rnorm(2,-2,.4), alpha1=runif(1,1,2), s=as.numeric(sstM[]), z=z_M, psi = runif(1))
+}
+
+parameters <- c("alpha0", "alpha1", "sigma", "N", "density", "s", "sigma_ind", "psi", "z")
+
+# run in parallel explicitly
+cl <- makeCluster(nc)                       # Request # cores
+clusterExport(cl, c("jags_data", "inits", "parameters", "z_M", "sstM", "ni", "na", "nt")) # Make these available
+clusterSetRNGStream(cl = cl, 54354354)
+
+system.time({ # no status bar (% complete) when run in parallel
+  out_M_cser <- clusterEvalQ(cl, {
+    library(rjags)
+    jm <- jags.model("Code/JAGS/SCR_Ind_Time.txt", jags_data, inits, n.adapt = na, n.chains = 1) # Compile model and run burnin
+    out_M_cser <- coda.samples(jm, parameters, n.iter = ni, thin = nt) # Sample from posterior distribution
+    return(as.mcmc(out_M_cser))
+  })
+}) #
+
+stopCluster(cl)
+
+cser_M_mcmc <- mcmc.list(out_M_cser)
+
+save(cser_M_mcmc, file = "Results/JAGS/cser_M_mcmc.RData")
+
+
+####################################################
+
+
 ########## Site N CPIC Objects for Model ###########
 
 n_trapsN <- ncol(matrixN) # number of traps
@@ -1804,6 +2127,121 @@ save(cpic_N_mcmc, file = "Results/JAGS/cpic_N_mcmc.RData")
 
 ####################################################
 
+########## Site N CSER Objects for Model ###########
+
+n_trapsN <- ncol(matrixN) # number of traps
+# as.character(EDFA$recap)
+N_N <- nrow(EDFN_CSER[which(EDFN_CSER$recap == "N"), ])
+K <- max(EDFN_CSER$day) # trap nights per session
+buffer <- 1 # check literature to make sure doesn't need to be larger
+#xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
+xlimN <- c(min(matrixN)-buffer, max(matrixN) + buffer)
+n_indN <- length(unique(EDFN_CSER$ind))
+
+# Make encounter histories with number of times each individual is captured in each trap
+EDFN_CSER
+
+EMN_CSER <- EDFN_CSER %>%
+  group_by(ind, trap, day) %>%
+  select(ind, trap, day) %>%
+  mutate(count = 1) %>%
+  summarise_all(sum) %>%
+  spread(trap, count, fill = 0) %>%
+  ungroup()
+# EM <- data.frame(select(EM, -ind))
+EMN_CSER
+
+full_dfN <- tidyr::expand(EMN_CSER, ind, day)
+
+EMN_CSER <- left_join(full_dfN, EMN_CSER)
+EMN_CSER <- as.data.frame(EMN_CSER, stringsAsFactors = FALSE)
+EMN_CSER[is.na(EMN_CSER)] <- 0
+
+##### DATA AUGMENTATION #####
+M_N <- 200 # max population size, change with site
+# J <- n_traps
+# y <- rbind(EM[ , 2], matrix(0, nrow = M-n_ind, ncol = n_ind))
+# y <- rbind(EM, matrix(0, nrow = M - n_ind, ncol = n_traps))
+
+z_N <- c(rep(1, n_indN), rep(0, M_N-n_indN))
+df_augN <- as.data.frame(matrix(0, nrow = (M_N - n_indN), ncol = n_trapsN), stringsAsFactors = FALSE)
+
+# Convert to 3D array (n_individuals + augmented individuals) x n_traps x n_days
+EM_arrayN_CSER <- array(NA, dim = c(M_N, n_trapsN, K))
+for(i in 1:K){
+  fooN <- EMN_CSER[(which(EMN_CSER[]$day == i)), ]
+  foo_lessN <- select(fooN, -ind, -day)
+  if(nrow(foo_lessN) > 0){
+    foo_lessN$'2' <- 0
+  }
+  if(nrow(foo_lessN) > 0){
+    foo_lessN$'3' <- 0
+  }
+  if(nrow(foo_lessN) > 0){
+    foo_lessN$'6' <- 0
+  }
+  if(nrow(foo_lessN) > 0){
+    foo_lessN$'7' <- 0
+  }
+  if(nrow(foo_lessN) > 0){
+    foo_lessN$'8' <- 0
+  }
+  if(nrow(foo_lessN) > 0){
+    foo_lessN$'9' <- 0
+  }
+  if(nrow(foo_lessN) > 0){
+    foo_lessN$'10' <- 0
+  }
+  if(nrow(foo_lessN) == 0){
+    foo_lessN <- array(0, dim = c(5, 10))
+  }
+  colnames(foo_lessN) <- c("1","2","3","4","5","6","7","8","9","10")
+  colnames(foo_lessN) <- colnames(df_augN)
+  foo_lessN <- as.data.frame(foo_lessN)
+  foo_augmentN <- bind_rows(foo_lessN, df_augN)
+  EM_arrayN_CSER[1:(M_N), 1:n_trapsN, i] <- as.matrix(foo_augmentN)
+}
+
+sum_capsN <- apply(EM_arrayN_CSER, c(1,2), sum)
+sstN <- (sum_capsN %*% traplocsN) / (ifelse(rowSums(sum_capsN) > 0, rowSums(sum_capsN), 1))
+
+for(m in (n_indN+1):M_N) {
+  sstN[m] <- c(runif(1, xlimN[1], xlimN[2])) #parameters, n, max, min
+}
+
+
+##### Putting Objects into Model ######
+
+jags_data <- list(y = EM_arrayN_CSER, traplocsA = traplocsN, K=K, M=M_N, xlimA=xlimN, n_traps = n_trapsN)
+inits <- function() {
+  list(alpha0=rnorm(4,-2,.4), alpha1=runif(1,1,2), s=as.numeric(sstN[]), z=z_N, psi = runif(1))
+}
+
+parameters <- c("alpha0", "alpha1", "sigma", "N", "density", "s", "sigma_ind", "psi", "z")
+
+# run in parallel explicitly
+cl <- makeCluster(nc)                       # Request # cores
+clusterExport(cl, c("jags_data", "inits", "parameters", "z_N", "sstN", "ni", "na", "nt")) # Make these available
+clusterSetRNGStream(cl = cl, 54354354)
+
+system.time({ # no status bar (% complete) when run in parallel
+  out_N_cser <- clusterEvalQ(cl, {
+    library(rjags)
+    jm <- jags.model("Code/JAGS/SCR_Ind_Time.txt", jags_data, inits, n.adapt = na, n.chains = 1) # Compile model and run burnin
+    out_N_cser <- coda.samples(jm, parameters, n.iter = ni, thin = nt) # Sample from posterior distribution
+    return(as.mcmc(out_N_cser))
+  })
+}) #
+
+stopCluster(cl)
+
+cser_N_mcmc <- mcmc.list(out_N_cser)
+
+save(cser_N_mcmc, file = "Results/JAGS/cser_N_mcmc.RData")
+
+
+####################################################
+
 ########## Site O CPIC Objects for Model ###########
 
 n_trapsO <- ncol(matrixO) # number of traps
@@ -1891,6 +2329,118 @@ stopCluster(cl)
 cpic_O_mcmc <- mcmc.list(out_O_cpic)
 
 save(cpic_O_mcmc, file = "Results/JAGS/cpic_O_mcmc.RData")
+
+
+####################################################
+
+########## Site O CSER Objects for Model ###########
+
+n_trapsO <- ncol(matrixO) # number of traps
+# as.character(EDFA$recap)
+N_O <- nrow(EDFO_CSER[which(EDFO_CSER$recap == "N"), ])
+K <- max(EDFO_CSER$day) # trap nights per session
+buffer <- 1 # check literature to make sure doesn't need to be larger
+#xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
+xlimO <- c(min(matrixO)-buffer, max(matrixO) + buffer)
+n_indO <- length(unique(EDFO_CSER$ind))
+
+# Make encounter histories with number of times each individual is captured in each trap
+EDFO_CSER
+
+EMO_CSER <- EDFO_CSER %>%
+  group_by(ind, trap, day) %>%
+  select(ind, trap, day) %>%
+  mutate(count = 1) %>%
+  summarise_all(sum) %>%
+  spread(trap, count, fill = 0) %>%
+  ungroup()
+# EM <- data.frame(select(EM, -ind))
+EMO_CSER
+
+full_dfO <- tidyr::expand(EMO_CSER, ind, day)
+
+EMO_CSER <- left_join(full_dfO, EMO_CSER)
+EMO_CSER <- as.data.frame(EMO_CSER, stringsAsFactors = FALSE)
+EMO_CSER[is.na(EMO_CSER)] <- 0
+
+##### DATA AUGMENTATION #####
+M_O <- 200 # max population size, change with site
+# J <- n_traps
+# y <- rbind(EM[ , 2], matrix(0, nrow = M-n_ind, ncol = n_ind))
+# y <- rbind(EM, matrix(0, nrow = M - n_ind, ncol = n_traps))
+
+z_O <- c(rep(1, n_indO), rep(0, M_O-n_indO))
+df_augO <- as.data.frame(matrix(0, nrow = (M_O - n_indO), ncol = n_trapsO), stringsAsFactors = FALSE)
+
+# Convert to 3D array (n_individuals + augmented individuals) x n_traps x n_days
+EM_arrayO_CSER <- array(NA, dim = c(M_O, n_trapsO, K))
+for(i in 1:K){
+  fooO <- EMO_CSER[(which(EMO_CSER[]$day == i)), ]
+  foo_lessO <- select(fooO, -ind, -day)
+  if(nrow(foo_lessO) > 0){
+    foo_lessO$'2' <- 0
+  }
+  if(nrow(foo_lessO) > 0){
+    foo_lessO$'3' <- 0
+  }
+  if(nrow(foo_lessO) > 0){
+    foo_lessO$'4' <- 0
+  }
+  if(nrow(foo_lessO) > 0){
+    foo_lessO$'6' <- 0
+  }
+  if(nrow(foo_lessO) > 0){
+    foo_lessO$'7' <- 0
+  }
+  if(nrow(foo_lessO) > 0){
+    foo_lessO$'8' <- 0
+  }
+  if(nrow(foo_lessO) == 0){
+    foo_lessO <- array(0, dim = c(5, 10))
+  }
+  colnames(foo_lessO) <- c("1","2","3","4","5","6","7","8","9","10")
+  colnames(foo_lessO) <- colnames(df_augO)
+  foo_lessO <- as.data.frame(foo_lessO)
+  foo_augmentO <- bind_rows(foo_lessO, df_augO)
+  EM_arrayO_CSER[1:(M_O), 1:n_trapsO, i] <- as.matrix(foo_augmentO)
+}
+
+sum_capsO <- apply(EM_arrayO_CSER, c(1,2), sum)
+sstO <- (sum_capsO %*% traplocsO) / (ifelse(rowSums(sum_capsO) > 0, rowSums(sum_capsO), 1))
+
+for(m in (n_indO+1):M_O) {
+  sstO[m] <- c(runif(1, xlimO[1], xlimO[2])) #parameters, n, max, min
+}
+
+
+##### Putting Objects into Model ######
+
+jags_data <- list(y = EM_arrayO_CSER, traplocsA = traplocsO, K=K, M=M_O, xlimA=xlimO, n_traps = n_trapsO)
+inits <- function() {
+  list(alpha0=rnorm(4,-2,.4), alpha1=runif(1,1,2), s=as.numeric(sstO[]), z=z_O, psi = runif(1))
+}
+
+parameters <- c("alpha0", "alpha1", "sigma", "N", "density", "s", "sigma_ind", "psi", "z")
+
+# run in parallel explicitly
+cl <- makeCluster(nc)                       # Request # cores
+clusterExport(cl, c("jags_data", "inits", "parameters", "z_O", "sstO", "ni", "na", "nt")) # Make these available
+clusterSetRNGStream(cl = cl, 54354354)
+
+system.time({ # no status bar (% complete) when run in parallel
+  out_O_cser <- clusterEvalQ(cl, {
+    library(rjags)
+    jm <- jags.model("Code/JAGS/SCR_Ind_Time.txt", jags_data, inits, n.adapt = na, n.chains = 1) # Compile model and run burnin
+    out_O_cser <- coda.samples(jm, parameters, n.iter = ni, thin = nt) # Sample from posterior distribution
+    return(as.mcmc(out_O_cser))
+  })
+}) #
+
+stopCluster(cl)
+
+cser_O_mcmc <- mcmc.list(out_O_cser)
+
+save(cser_O_mcmc, file = "Results/JAGS/cser_O_mcmc.RData")
 
 
 ####################################################
