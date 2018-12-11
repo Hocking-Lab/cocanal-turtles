@@ -912,3 +912,72 @@ linK_O_CSER <- envelope(OCSER_X, linearK, nsim = 99, nrank = 1)
 plot(linK_O_CSER, main = "Linear K Test on CSER Site O")
 
 #############   https://rdrr.io/cran/spatstat/man/lpp.html ############
+
+
+par(mfrow = c(3,2))
+hist(centers_cpic_A, main = "CPIC A", xlab = "Activity Centers")
+hist(centers_cpic_C, main = "CPIC C", xlab = "Activity Centers")
+hist(centers_cpic_D, main = "CPIC D", xlab = "Activity Centers")
+hist(centers_cpic_E, main = "CPIC E", xlab = "Activity Centers")
+hist(centers_cpic_F, main = "CPIC F", xlab = "Activity Centers")
+hist(centers_cpic_G, main = "CPIC G", xlab = "Activity Centers")
+
+hist(centers_cpic_J, main = "CPIC J", xlab = "Activity Centers")
+hist(centers_cpic_K, main = "CPIC K", xlab = "Activity Centers")
+hist(centers_cpic_L, main = "CPIC L", xlab = "Activity Centers")
+hist(centers_cpic_M, main = "CPIC M", xlab = "Activity Centers")
+hist(centers_cpic_N, main = "CPIC N", xlab = "Activity Centers")
+hist(centers_cpic_O, main = "CPIC O", xlab = "Activity Centers")
+
+########
+
+hist(centers_cser_A, main = "CSER A", xlab = "Activity Centers")
+hist(centers_cser_C, main = "CSER C", xlab = "Activity Centers")
+hist(centers_cser_E, main = "CSER E", xlab = "Activity Centers")
+hist(centers_cser_F, main = "CSER F", xlab = "Activity Centers")
+hist(centers_cser_G, main = "CSER G", xlab = "Activity Centers")
+hist(centers_cser_J, main = "CSER J", xlab = "Activity Centers")
+
+par(mfrow = c(3,2))
+hist(centers_cser_M, main = "CSER M", xlab = "Activity Centers")
+hist(centers_cser_N, main = "CSER N", xlab = "Activity Centers")
+hist(centers_cser_O, main = "CSER O", xlab = "Activity Centers")
+
+#########
+
+par(mfrow = c(2,2))
+plot(linK_A_CPIC, main = "CPIC A", legend = "")
+plot(linK_C_CPIC, main = "CPIC C", legend = "")
+plot(linK_D_CPIC, main = "CPIC D", legend = "")
+plot(linK_E_CPIC, main = "CPIC E", legend = "")
+
+plot(linK_F_CPIC, main = "CPIC F", legend = "")
+plot(linK_G_CPIC, main = "CPIC G", legend = "")
+plot(linK_J_CPIC, main = "CPIC J", legend = "")
+plot(linK_K_CPIC, main = "CPIC K", legend = "")
+
+plot(linK_L_CPIC, main = "CPIC L", legend = "")
+plot(linK_M_CPIC, main = "CPIC M", legend = "")
+plot(linK_N_CPIC, main = "CPIC N", legend = "")
+plot(linK_O_CPIC, main = "CPIC O", legend = "")
+
+########
+
+plot(linK_A_CSER, main = "CSER A", legend = "")
+plot(linK_C_CSER, main = "CSER C", legend = "")
+plot(linK_E_CSER, main = "CSER E", legend = "")
+plot(linK_F_CSER, main = "CSER F", legend = "")
+
+plot(linK_G_CSER, main = "CSER G", legend = "")
+plot(linK_J_CSER, main = "CSER J", legend = "")
+plot(linK_M_CSER, main = "CSER M", legend = "")
+plot(linK_N_CSER, main = "CSER N", legend = "")
+
+plot(linK_O_CSER, main = "CSER O", legend = "")
+
+##########
+
+veg_dbf <- read.dbf()
+
+
+
