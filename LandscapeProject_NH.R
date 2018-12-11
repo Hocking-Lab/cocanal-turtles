@@ -58,7 +58,7 @@ centers_cser_A <- df_mcmc_cser_A %>%
 
 centers_cser_A <- centers_cser_A[1:n_indA, ]
 
-hist(centers[1:n_indA, ]) # activity centers for individuals caught at least once
+hist(centers_cser_A) # activity centers for individuals caught at least once
 # hist(centers)
 
 #### Obtaining Density For Site 1 and CPICS from MCMC Output ####
@@ -118,11 +118,10 @@ centers_cser_C <- df_mcmc_cser_C %>%
   select(starts_with("s[")) %>%
   summarise_all(mean) %>%
   t()
-str(centers) # activity centers
 
 centers_cser_C <- centers_cser_C[1:n_indC, ]
 
-hist(centers[1:n_indC, ]) # activity centers for individuals caught at least once
+hist(centers_cser_C) # activity centers for individuals caught at least once
 # hist(centers)
 
 #### Obtaining Density For Site 1 and CPICS from MCMC Output ####
@@ -741,8 +740,15 @@ NCPIC_X <- as.lpp(NCPIC_X, L = canal_line)
 OCPIC_X <- list(x=c(centers_cpic_O), y = c(rep(0,80)))
 OCPIC_X <- as.lpp(OCPIC_X, L = canal_line)
 
-############ Linear K Monte Carlo Analysis Per Species Per Site ######################
+########
 
+ACSER_X <- list(x=c(centers_cser_A), y = c(rep(0,5)))
+ACSER_X <- as.lpp(ACSER_X, L = canal_line)
+
+CCSER_X <- list(x=c(centers_cser_C), y = c(rep(0,6)))
+CCSER_X <- as.lpp(CCSER_X, L = canal_line)
+
+############ Linear K Monte Carlo Analysis Per Species Per Site ######################
 
 ## CPIC, A
 linearK_A_CPIC <- linearK(X = ACPIC_X)
@@ -828,27 +834,19 @@ summary(linearK_O_CPIC)
 linK_O_CPIC <- envelope(OCPIC_X, linearK, nsim = 99, nrank = 1)
 plot(linK_O_CPIC, main = "Linear K Test on CPIC Site O")
 
+## CSER, A
+linearK_A_CSER <- linearK(X = ACSER_X)
+summary(linearK_A_CSER)
 
-############  Nearest Neighbor Monte Carlo Analysis #####################
+linK_A_CSER <- envelope(ACSER_X, linearK, nsim = 99, nrank = 1)
+plot(linK_A_CSER, main = "Linear K Test on CSER Site A")
 
-## CPIC, A
-# LPCF_A_CPIC <- linearpcf(X = ACPIC_X)
-# summary(LPCF_A_CPIC)
-# 
-# LPCF_A_CPIC <- envelope(ACPIC_X, linearpcf, nsim = 99, nrank = 1)
-# plot(LPCF_A_CPIC, main = "Linear Pair Correlation Function on CPIC Site A")
+## CSER, C
+linearK_C_CSER <- linearK(X = CCSER_X)
+summary(linearK_C_CSER)
 
-
-
-
-
-
-
-
-
-
-
-
+linK_C_CSER <- envelope(CCSER_X, linearK, nsim = 99, nrank = 1)
+plot(linK_C_CSER, main = "Linear K Test on CSER Site C")
 
 
 #############   https://rdrr.io/cran/spatstat/man/lpp.html ############
