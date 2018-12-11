@@ -210,11 +210,10 @@ centers_cser_E <- df_mcmc_cser_E %>%
   select(starts_with("s[")) %>%
   summarise_all(mean) %>%
   t()
-str(centers) # activity centers
 
 centers_cser_E <- centers_cser_E[1:n_indE, ]
 
-hist(centers[1:n_indE, ]) # activity centers for individuals caught at least once
+hist(centers_cser_E) # activity centers for individuals caught at least once
 # hist(centers)
 
 #### Obtaining Density For Site 1 and CPICS from MCMC Output ####
@@ -241,11 +240,10 @@ centers_cser_F <- df_mcmc_cser_F %>%
   select(starts_with("s[")) %>%
   summarise_all(mean) %>%
   t()
-str(centers) # activity centers
 
 centers_cser_F <- centers_cser_F[1:n_indF, ]
 
-hist(centers[1:n_indF, ]) # activity centers for individuals caught at least once
+hist(centers_cser_F) # activity centers for individuals caught at least once
 # hist(centers)
 
 #### Obtaining Density For Site 1 and CPICS from MCMC Output ####
@@ -333,11 +331,10 @@ centers_cser_G <- df_mcmc_cser_G %>%
   select(starts_with("s[")) %>%
   summarise_all(mean) %>%
   t()
-str(centers) # activity centers
 
 centers_cser_G <- centers_cser_G[1:n_indG, ]
 
-hist(centers[1:n_indG, ]) # activity centers for individuals caught at least once
+hist(centers_cser_G) # activity centers for individuals caught at least once
 # hist(centers)
 
 #### Obtaining Density For Site 1 and CPICS from MCMC Output ####
@@ -395,11 +392,10 @@ centers_cser_J <- df_mcmc_cser_J %>%
   select(starts_with("s[")) %>%
   summarise_all(mean) %>%
   t()
-str(centers) # activity centers
 
 centers_cser_J <- centers_cser_J[1:n_indJ, ]
 
-hist(centers[1:n_indJ, ]) # activity centers for individuals caught at least once
+hist(centers_cser_J) # activity centers for individuals caught at least once
 # hist(centers)
 
 #### Obtaining Density For Site 1 and CPICS from MCMC Output ####
@@ -516,11 +512,10 @@ centers_cser_M <- df_mcmc_cser_M %>%
   select(starts_with("s[")) %>%
   summarise_all(mean) %>%
   t()
-str(centers) # activity centers
 
 centers_cser_M <- centers_cser_M[1:n_indM, ]
 
-hist(centers[1:n_indM, ]) # activity centers for individuals caught at least once
+hist(centers_cser_M) # activity centers for individuals caught at least once
 # hist(centers)
 
 #### Obtaining Density For Site 1 and CPICS from MCMC Output ####
@@ -578,11 +573,10 @@ centers_cser_N <- df_mcmc_cser_N %>%
   select(starts_with("s[")) %>%
   summarise_all(mean) %>%
   t()
-str(centers) # activity centers
 
 centers_cser_N <- centers_cser_N[1:n_indN, ]
 
-hist(centers[1:n_indN, ]) # activity centers for individuals caught at least once
+hist(centers_cser_N) # activity centers for individuals caught at least once
 # hist(centers)
 
 #### Obtaining Density For Site 1 and CPICS from MCMC Output ####
@@ -639,11 +633,10 @@ centers_cser_O <- df_mcmc_cser_O %>%
   select(starts_with("s[")) %>%
   summarise_all(mean) %>%
   t()
-str(centers) # activity centers
 
 centers_cser_O <- centers_cser_O[1:n_indO, ]
 
-hist(centers[1:n_indO, ]) # activity centers for individuals caught at least once
+hist(centers_cser_O) # activity centers for individuals caught at least once
 # hist(centers)
 
 #### Obtaining Density For Site 1 and CPICS from MCMC Output ####
@@ -748,6 +741,27 @@ ACSER_X <- as.lpp(ACSER_X, L = canal_line)
 CCSER_X <- list(x=c(centers_cser_C), y = c(rep(0,6)))
 CCSER_X <- as.lpp(CCSER_X, L = canal_line)
 
+ECSER_X <- list(x=c(centers_cser_E), y = c(rep(0,11)))
+ECSER_X <- as.lpp(ECSER_X, L = canal_line)
+
+FCSER_X <- list(x=c(centers_cser_F), y = c(rep(0,8)))
+FCSER_X <- as.lpp(FCSER_X, L = canal_line)
+
+GCSER_X <- list(x=c(centers_cser_G), y = c(rep(0,5)))
+GCSER_X <- as.lpp(GCSER_X, L = canal_line)
+
+JCSER_X <- list(x=c(centers_cser_J), y = c(rep(0,5)))
+JCSER_X <- as.lpp(JCSER_X, L = canal_line)
+
+MCSER_X <- list(x=c(centers_cser_M), y = c(rep(0,8)))
+MCSER_X <- as.lpp(MCSER_X, L = canal_line)
+
+NCSER_X <- list(x=c(centers_cser_N), y = c(rep(0,5)))
+NCSER_X <- as.lpp(NCSER_X, L = canal_line)
+
+OCSER_X <- list(x=c(centers_cser_O), y = c(rep(0,5)))
+OCSER_X <- as.lpp(OCSER_X, L = canal_line)
+
 ############ Linear K Monte Carlo Analysis Per Species Per Site ######################
 
 ## CPIC, A
@@ -848,5 +862,53 @@ summary(linearK_C_CSER)
 linK_C_CSER <- envelope(CCSER_X, linearK, nsim = 99, nrank = 1)
 plot(linK_C_CSER, main = "Linear K Test on CSER Site C")
 
+## CSER, E
+linearK_E_CSER <- linearK(X = ECSER_X)
+summary(linearK_E_CSER)
+
+linK_E_CSER <- envelope(ECSER_X, linearK, nsim = 99, nrank = 1)
+plot(linK_E_CSER, main = "Linear K Test on CSER Site E")
+
+## CSER, F
+linearK_F_CSER <- linearK(X = FCSER_X)
+summary(linearK_F_CSER)
+
+linK_F_CSER <- envelope(FCSER_X, linearK, nsim = 99, nrank = 1)
+plot(linK_F_CSER, main = "Linear K Test on CSER Site F")
+
+## CSER, G
+linearK_G_CSER <- linearK(X = GCSER_X)
+summary(linearK_G_CSER)
+
+linK_G_CSER <- envelope(GCSER_X, linearK, nsim = 99, nrank = 1)
+plot(linK_G_CSER, main = "Linear K Test on CSER Site G")
+
+## CSER, J
+linearK_J_CSER <- linearK(X = JCSER_X)
+summary(linearK_J_CSER)
+
+linK_J_CSER <- envelope(JCSER_X, linearK, nsim = 99, nrank = 1)
+plot(linK_J_CSER, main = "Linear K Test on CSER Site J")
+
+## CSER, M
+linearK_M_CSER <- linearK(X = MCSER_X)
+summary(linearK_M_CSER)
+
+linK_M_CSER <- envelope(MCSER_X, linearK, nsim = 99, nrank = 1)
+plot(linK_M_CSER, main = "Linear K Test on CSER Site M")
+
+## CSER, N
+linearK_N_CSER <- linearK(X = NCSER_X)
+summary(linearK_N_CSER)
+
+linK_N_CSER <- envelope(NCSER_X, linearK, nsim = 99, nrank = 1)
+plot(linK_N_CSER, main = "Linear K Test on CSER Site N")
+
+## CSER, O
+linearK_O_CSER <- linearK(X = OCSER_X)
+summary(linearK_O_CSER)
+
+linK_O_CSER <- envelope(OCSER_X, linearK, nsim = 99, nrank = 1)
+plot(linK_O_CSER, main = "Linear K Test on CSER Site O")
 
 #############   https://rdrr.io/cran/spatstat/man/lpp.html ############
