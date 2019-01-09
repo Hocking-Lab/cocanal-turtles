@@ -5,6 +5,11 @@
 library(dplyr)
 library(spatstat)
 library(spThin)
+library(rjags)
+library(parallel)
+library(tibble)
+library(tidyr)
+library(ggplot2)
 
 ######## Activity Centers Per Individual and Densities Per Species Per Site #########
 
@@ -648,10 +653,6 @@ estimated_N_cser_O <- df_mcmc_cser_O$N[501:1000]
 mean_est_N_cser_O <- mean(estimated_N_cser_O) # Mean # turtles over trap area (+ boundary)
 mean_est_N_cser_O/mean_density_cser_O
 
-########################### Histograms #########################
-
-
-
 ##################### Plotting Activity Centers ################
 
 par(mfrow=c(3,2))
@@ -672,7 +673,7 @@ plot(xy.coords(x = centers_cpic_O[], y = rep(0, 80)), pch = ".", cex = 4, xlab =
 par(mfrow = c(1,1))
 
 
-########################### FGK TESTS ###################################
+########################### Dispersion TEST ###################################
 
 #####See methods.lpp and methods.ppx for other methods applicable to lpp objects.
 
@@ -977,7 +978,9 @@ plot(linK_O_CSER, main = "CSER O", legend = "")
 
 ##########
 
-veg_dbf <- read.dbf()
+###############  Graphing Density By Site ################
 
+x <- c("A","C","D","E","F","G","J","K","L","M","N","O")
+density_list <- c(mean_density_cpic_A, mean_density_cpic_C, mean_density_cpic_D, mean_density_cpic_E, mean_density_cpic_F, mean_density_cpic_G, mean_density_cpic_J, mean_density_cpic_K, mean_density_cpic_L, mean_density_cpic_M, mean_density_cpic_N, mean_density_cpic_O)
 
-
+barplot(density_list, names.arg = c("A","C","D","E","F","G","J","K","L","M","N","O"), main = "CPIC Density by Site", col = "darkred")

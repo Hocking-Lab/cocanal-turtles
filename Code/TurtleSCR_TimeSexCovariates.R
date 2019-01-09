@@ -377,7 +377,7 @@ logit(p0[i,j,k]) <- alpha0[k] + eta[i,k]
      N <- sum(z[ ])
      density <- N / (xlimA[2] - xlimA[1]) # divided distances by 100 so calculates turtles per 100 m of canal
      }
-     ", file = "Code/JAGS/SCRA.txt")
+     ", file = "Code/JAGS/SCRA_Time_Ind.txt")
 
 
 #### Model with Sex Covariate #####
@@ -437,7 +437,7 @@ cat ("
      N <- sum(z[ ])
      density <- N / (xlimA[2] - xlimA[1]) # divided distances by 100 so calculates turtles per 100 m of canal
      }
-     ", file = "Code/JAGS/SCRA.txt")
+     ", file = "Code/JAGS/SCRA_Sex_Time_Ind.txt")
 
 
 

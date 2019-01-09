@@ -229,6 +229,36 @@ estimated_N_cser_E <- df_mcmc_cser_E$N[501:1000]
 mean_est_N_cser_E <- mean(estimated_N_cser_E) # Mean # turtles over trap area (+ boundary)
 mean_est_N_cser_E/mean_density_cser_E
 
+####### Site F, CSER ########
+
+load("Results/JAGS/cser_F_mcmc.RData")
+
+# combine chains
+df_mcmc_cser_F <- as.data.frame(cser_F_mcmc[[1]])
+for(i in 2:length(cser_F_mcmc)) {
+  df_mcmc_cser_F <- bind_rows(df_mcmc_cser_F, as.data.frame(cser_F_mcmc[[i]]))
+}
+
+# Obtain Activity Centers
+centers_cser_F <- df_mcmc_cser_F %>%
+  select(starts_with("s[")) %>%
+  summarise_all(mean) %>%
+  t()
+str(centers) # activity centers
+
+centers_cser_F <- centers_cser_F[1:n_indF, ]
+
+hist(centers[1:n_indF, ]) # activity centers for individuals caught at least once
+# hist(centers)
+
+#### Obtaining Density For Site 1 and CPICS from MCMC Output ####
+
+densities_cser_F <- df_mcmc_cser_F$density[501:1000] #densities per iteration after burnin
+mean_density_cser_F <- mean(densities_cser_F) # Mean # turtles per 100 meters
+
+estimated_N_cser_F <- df_mcmc_cser_F$N[501:1000]
+mean_est_N_cser_F <- mean(estimated_N_cser_F) # Mean # turtles over trap area (+ boundary)
+mean_est_N_cser_F/mean_density_cser_F
 
 ####### Site F, CPIC ########
 
@@ -261,6 +291,7 @@ estimated_N_cpic_F <- df_mcmc_cpic_F$N[501:1000]
 mean_est_N_cpic_F <- mean(estimated_N_cpic_F) # Mean # turtles over trap area (+ boundary)
 mean_est_N_cpic_F/mean_density_cpic_F
 
+
 ####### Site G, CPIC ########
 
 load("Results/JAGS/cpic_G_mcmc.RData")
@@ -292,6 +323,38 @@ estimated_N_cpic_G <- df_mcmc_cpic_G$N[501:1000]
 mean_est_N_cpic_G <- mean(estimated_N_cpic_G) # Mean # turtles over trap area (+ boundary)
 mean_est_N_cpic_G/mean_density_cpic_G
 
+####### Site G, CSER ########
+
+load("Results/JAGS/cser_G_mcmc.RData")
+
+# combine chains
+df_mcmc_cser_G <- as.data.frame(cser_G_mcmc[[1]])
+for(i in 2:length(cser_G_mcmc)) {
+  df_mcmc_cser_G <- bind_rows(df_mcmc_cser_G, as.data.frame(cser_G_mcmc[[i]]))
+}
+
+# Obtain Activity Centers
+centers_cser_G <- df_mcmc_cser_G %>%
+  select(starts_with("s[")) %>%
+  summarise_all(mean) %>%
+  t()
+str(centers) # activity centers
+
+centers_cser_G <- centers_cser_G[1:n_indG, ]
+
+hist(centers[1:n_indG, ]) # activity centers for individuals caught at least once
+# hist(centers)
+
+#### Obtaining Density For Site 1 and CPICS from MCMC Output ####
+
+densities_cser_G <- df_mcmc_cser_G$density[501:1000] #densities per iteration after burnin
+mean_density_cser_G <- mean(densities_cser_G) # Mean # turtles per 100 meters
+
+estimated_N_cser_G <- df_mcmc_cser_G$N[501:1000]
+mean_est_N_cser_G <- mean(estimated_N_cser_G) # Mean # turtles over trap area (+ boundary)
+mean_est_N_cser_G/mean_density_cser_G
+
+
 ####### Site J, CPIC ########
 
 load("Results/JAGS/cpic_J_mcmc.RData")
@@ -322,6 +385,37 @@ mean_density_cpic_J <- mean(densities_cpic_J) # Mean # turtles per 100 meters
 estimated_N_cpic_J <- df_mcmc_cpic_J$N[501:1000]
 mean_est_N_cpic_J <- mean(estimated_N_cpic_J) # Mean # turtles over trap area (+ boundary)
 mean_est_N_cpic_J/mean_density_cpic_J
+
+####### Site J, CSER ########
+
+load("Results/JAGS/cser_J_mcmc.RData")
+
+# combine chains
+df_mcmc_cser_J <- as.data.frame(cser_J_mcmc[[1]])
+for(i in 2:length(cser_J_mcmc)) {
+  df_mcmc_cser_J <- bind_rows(df_mcmc_cser_J, as.data.frame(cser_J_mcmc[[i]]))
+}
+
+# Obtain Activity Centers
+centers_cser_J <- df_mcmc_cser_J %>%
+  select(starts_with("s[")) %>%
+  summarise_all(mean) %>%
+  t()
+str(centers) # activity centers
+
+centers_cser_J <- centers_cser_J[1:n_indJ, ]
+
+hist(centers[1:n_indJ, ]) # activity centers for individuals caught at least once
+# hist(centers)
+
+#### Obtaining Density For Site 1 and CPICS from MCMC Output ####
+
+densities_cser_J <- df_mcmc_cser_J$density[501:1000] #densities per iteration after burnin
+mean_density_cser_J <- mean(densities_cser_J) # Mean # turtles per 100 meters
+
+estimated_N_cser_J <- df_mcmc_cser_J$N[501:1000]
+mean_est_N_cser_J <- mean(estimated_N_cser_J) # Mean # turtles over trap area (+ boundary)
+mean_est_N_cser_J/mean_density_cser_J
 
 ####### Site K, CPIC ########
 
@@ -416,6 +510,38 @@ estimated_N_cpic_M <- df_mcmc_cpic_M$N[501:1000]
 mean_est_N_cpic_M <- mean(estimated_N_cpic_M) # Mean # turtles over trap area (+ boundary)
 mean_est_N_cpic_M/mean_density_cpic_M
 
+####### Site M, CSER ########
+
+load("Results/JAGS/cser_M_mcmc.RData")
+
+# combine chains
+df_mcmc_cser_M <- as.data.frame(cser_M_mcmc[[1]])
+for(i in 2:length(cser_M_mcmc)) {
+  df_mcmc_cser_M <- bind_rows(df_mcmc_cser_M, as.data.frame(cser_M_mcmc[[i]]))
+}
+
+# Obtain Activity Centers
+centers_cser_M <- df_mcmc_cser_M %>%
+  select(starts_with("s[")) %>%
+  summarise_all(mean) %>%
+  t()
+str(centers) # activity centers
+
+centers_cser_M <- centers_cser_M[1:n_indM, ]
+
+hist(centers[1:n_indM, ]) # activity centers for individuals caught at least once
+# hist(centers)
+
+#### Obtaining Density For Site 1 and CPICS from MCMC Output ####
+
+densities_cser_M <- df_mcmc_cser_M$density[501:1000] #densities per iteration after burnin
+mean_density_cser_M <- mean(densities_cser_M) # Mean # turtles per 100 meters
+
+estimated_N_cser_M <- df_mcmc_cser_M$N[501:1000]
+mean_est_N_cser_M <- mean(estimated_N_cser_M) # Mean # turtles over trap area (+ boundary)
+mean_est_N_cser_M/mean_density_cser_M
+
+
 ####### Site N, CPIC ########
 
 load("Results/JAGS/cpic_N_mcmc.RData")
@@ -445,7 +571,38 @@ mean_density_cpic_N <- mean(densities_cpic_N) # Mean # turtles per 100 meters
 
 estimated_N_cpic_N <- df_mcmc_cpic_N$N[501:1000]
 mean_est_N_cpic_N <- mean(estimated_N_cpic_N) # Mean # turtles over trap area (+ boundary)
-mean_est_N_cpic_N/mean_density_cpic_N ######### ERROR HERE !!!! Didn't standardize??
+mean_est_N_cpic_N/mean_density_cpic_N
+
+####### Site N, CSER ########
+
+load("Results/JAGS/cser_N_mcmc.RData")
+
+# combine chains
+df_mcmc_cser_N <- as.data.frame(cser_N_mcmc[[1]])
+for(i in 2:length(cser_N_mcmc)) {
+  df_mcmc_cser_N <- bind_rows(df_mcmc_cser_N, as.data.frame(cser_N_mcmc[[i]]))
+}
+
+# Obtain Activity Centers
+centers_cser_N <- df_mcmc_cser_N %>%
+  select(starts_with("s[")) %>%
+  summarise_all(mean) %>%
+  t()
+str(centers) # activity centers
+
+centers_cser_N <- centers_cser_N[1:n_indN, ]
+
+hist(centers[1:n_indN, ]) # activity centers for individuals caught at least once
+# hist(centers)
+
+#### Obtaining Density For Site 1 and CPICS from MCMC Output ####
+
+densities_cser_N <- df_mcmc_cser_N$density[501:1000] #densities per iteration after burnin
+mean_density_cser_N <- mean(densities_cser_N) # Mean # turtles per 100 meters
+
+estimated_N_cser_N <- df_mcmc_cser_N$N[501:1000]
+mean_est_N_cser_N <- mean(estimated_N_cser_N) # Mean # turtles over trap area (+ boundary)
+mean_est_N_cser_N/mean_density_cser_N
 
 ####### Site O, CPIC ########
 
@@ -477,6 +634,37 @@ mean_density_cpic_O <- mean(densities_cpic_O) # Mean # turtles per 100 meters
 estimated_N_cpic_O <- df_mcmc_cpic_O$N[501:1000]
 mean_est_N_cpic_O <- mean(estimated_N_cpic_O) # Mean # turtles over trap area (+ boundary)
 mean_est_N_cpic_O/mean_density_cpic_O
+
+####### Site O, CSER ########
+
+load("Results/JAGS/cser_O_mcmc.RData")
+
+# combine chains
+df_mcmc_cser_O <- as.data.frame(cser_O_mcmc[[1]])
+for(i in 2:length(cser_O_mcmc)) {
+  df_mcmc_cser_O <- bind_rows(df_mcmc_cser_O, as.data.frame(cser_O_mcmc[[i]]))
+}
+
+# Obtain Activity Centers
+centers_cser_O <- df_mcmc_cser_O %>%
+  select(starts_with("s[")) %>%
+  summarise_all(mean) %>%
+  t()
+str(centers) # activity centers
+
+centers_cser_O <- centers_cser_O[1:n_indO, ]
+
+hist(centers[1:n_indO, ]) # activity centers for individuals caught at least once
+# hist(centers)
+
+#### Obtaining Density For Site 1 and CPICS from MCMC Output ####
+
+densities_cser_O <- df_mcmc_cser_O$density[501:1000] #densities per iteration after burnin
+mean_density_cser_O <- mean(densities_cser_O) # Mean # turtles per 100 meters
+
+estimated_N_cser_O <- df_mcmc_cser_O$N[501:1000]
+mean_est_N_cser_O <- mean(estimated_N_cser_O) # Mean # turtles over trap area (+ boundary)
+mean_est_N_cser_O/mean_density_cser_O
 
 
 ######## Checking z and psi
