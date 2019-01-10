@@ -1,5 +1,6 @@
 
 ##### SCR Analysis Data Compilation and Model Creation Using BUGS and JAGS ####
+#### NULL MODEL ####
 
 library(dplyr)
 library(tidyr)
@@ -154,7 +155,7 @@ model {
 N <- sum(z[ ])
 density <- N / (xlimA[2] - xlimA[1]) # divided distances by 100 so calculates turtles per 100 m of canal
 }
-", file = "Code/JAGS/SCRA.txt")
+", file = "Code/JAGS/SCRA_Null.txt")
 
 jags_data <- list(y = y, traplocsA = traplocsA, K=K, M=M, xlimA=xlimA, n_traps = n_traps)
 inits <- function() {
@@ -193,22 +194,22 @@ clusterSetRNGStream(cl = cl, 54354354)
 system.time({ # no status bar (% complete) when run in parallel
   out <- clusterEvalQ(cl, {
     library(rjags)
-    jm <- jags.model("Code/JAGS/SCRA.txt", jags_data, inits, n.adapt = na, n.chains = 1) # Compile model and run burnin
+    jm <- jags.model("Code/JAGS/SCR.txt", jags_data, inits, n.adapt = na, n.chains = 1) # Compile model and run burnin
     out <- coda.samples(jm, parameters, n.iter = ni, thin = nt) # Sample from posterior distribution
-    return(as.mcmc(out))
+    return(as.mcmc(null_out))
   })
 }) # 
 
 stopCluster(cl)
 
 # Results
-cpic_1_mcmc <- mcmc.list(out)
-plot(cpic_1_mcmc[ , c("alpha0", "alpha1", "density")]) # 
+cpic_1_null_mcmc <- mcmc.list(null_out)
+plot(cpic_1_null_mcmc[ , c("alpha0", "alpha1", "density")]) # 
 par(mfrow = c(1,1))
-summary(cpic_1_mcmc[ , c("alpha0", "alpha1", "density")])
+summary(cpic_1_null_mcmc[ , c("alpha0", "alpha1", "density")])
 # summary(cpic_1_mcmc)
 
-save(cpic_1_mcmc, file = "Results/JAGS/cpic_1_mcmc.RData")
+save(cpic_1_null_mcmc, file = "Results/JAGS/cpic_1_null_mcmc.RData")
 
 
 

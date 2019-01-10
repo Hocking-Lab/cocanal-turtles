@@ -8,10 +8,10 @@
 
 library(dplyr)
 library(tidyr)
+library(rjags)
+library(parallel)
 # library(AHMbook)
-# library(R2jags)  #rjags could not be loaded?
 # library(jagsUI)
-# library(R2WinBUGS)
 
 EDF <- read.csv(file = "Data/EDF.csv", stringsAsFactors = FALSE)
 head(EDF)
@@ -116,14 +116,14 @@ for(i in 1:K){
 # EM <- cbind(1:n_ind, rowSums(EM))
 # EM <- rowSums(EM)
 # Read in trap hour file
-traphoursA <- read.csv(file = "Data/traphoursA.csv", stringsAsFactors = FALSE)
-traphoursA
+# traphoursA <- read.csv(file = "Data/traphoursA.csv", stringsAsFactors = FALSE)
+# traphoursA
 # hours <- apply(traphoursA[ , 2:ncol(traphoursA)], 1, sum)
 # hours
 
 #Start values for s (activity centers) of augments (from random uniform constrained by state space size)
-X <- traplocsA
-sst # Now populated by starting positions uniformally placed within state space
+#X <- traplocsA
+# Now populated by starting positions uniformally placed within state space
 # For every individual that is not 0, change starting x point to mean of traps associated with encounters for that individual; leaves 0's there from the augmented population and also puts in activity center for augmented individuals that were randomly given an encounter history (caught at least 1 time)
 
 sum_caps <- apply(EM_array, c(1,2), sum)
@@ -189,6 +189,92 @@ for(i in 2:length(scale_par)) {
 library(ggplot2)
 ggplot(alpha1_priors) + geom_density(aes(x = alpha1, fill = as.factor(scale)), alpha = 0.2) + xlim(0, 15)
 
+
+
+####################### MODELS ############################
+
+########## NULL ############
+
+cat ("
+model {
+     # alpha1 ~ dgamma(0.1, 0.1) # consider appropriate prior
+     alpha1 ~ dt(0, 1 / (5^2), 1)I(0, ) 	## implies half-cauchy with scale of 5
+     sigma <- pow(1 / (2*alpha1), 0.5) # sd of half normal
+     psi ~ dunif(0, 1)
+     alpha0 ~ dnorm(0, 0.1)
+     logit(p0) <- alpha0
+     for(i in 1:M) {
+     z[i] ~ dbern(psi)
+     s[i] ~ dunif(xlimA[1], xlimA[2])
+     for(j in 1:n_traps) {
+     d[i,j] <- abs(s[i] - traplocsA[j])
+     y[i,j] ~ dbin(p[i,j], K)
+     p[i,j] <- z[i]*p0*exp(- alpha1 * d[i,j] * d[i,j])
+     }
+     }
+     
+     # Derived parameters
+     N <- sum(z[ ])
+     density <- N / (xlimA[2] - xlimA[1]) # divided distances by 100 so calculates turtles per 100 m of canal
+     }
+     ", file = "Code/JAGS/SCRA_Null.txt")
+
+jags_data <- list(y = y, traplocsA = traplocsA, K=K, M=M, xlimA=xlimA, n_traps = n_traps)
+inits <- function() {
+  list(alpha0=rnorm(4,-2,.4), alpha1=runif(1,1,2), s=sst, z=z)
+}
+
+parameters <- c("alpha0", "alpha1", "sigma", "N", "density", "p", "s") # 
+
+testing <- TRUE
+if(testing) {
+  na = 500
+  ni = 500
+  nt = 1
+  nc = 3
+} else {
+  na = 100000
+  ni = 600000
+  nt = 60
+  nc = 4
+}
+
+cl <- makeCluster(nc)                       # Request # cores
+clusterExport(cl, c("jags_data", "inits", "parameters", "z", "sst", "ni", "na", "nt")) # Make these available
+clusterSetRNGStream(cl = cl, 54354354)
+
+system.time({ # no status bar (% complete) when run in parallel
+  out <- clusterEvalQ(cl, {
+    library(rjags)
+    jm <- jags.model("Code/JAGS/SCR_Null.txt", jags_data, inits, n.adapt = na, n.chains = 1) # Compile model and run burnin
+    out <- coda.samples(jm, parameters, n.iter = ni, thin = nt) # Sample from posterior distribution
+    return(as.mcmc(null_out))
+  })
+}) # 
+
+stopCluster(cl)
+
+# Results
+cpic_1_null_mcmc <- mcmc.list(null_out)
+plot(cpic_1_null_mcmc[ , c("alpha0", "alpha1", "density")]) # 
+par(mfrow = c(1,1))
+summary(cpic_1_null_mcmc[ , c("alpha0", "alpha1", "density")])
+# summary(cpic_1_mcmc)
+
+save(cpic_1_null_mcmc, file = "Results/JAGS/cpic_1_null_mcmc.RData")
+
+# Results
+cpic_1_null_mcmc <- mcmc.list(null_out)
+plot(cpic_1_null_mcmc[ , c("alpha0", "alpha1", "density")]) # 
+par(mfrow = c(1,1))
+summary(cpic_1_null_mcmc[ , c("alpha0", "alpha1", "density")])
+# summary(cpic_1_mcmc)
+
+save(cpic_1_null_mcmc, file = "Results/JAGS/cpic_1_null_mcmc.RData")
+
+
+##### Heterogenity in Capture Probability Over Time #####
+
 cat ("
   model {
     # alpha1 ~ dgamma(0.1, 0.1) # consider appropriate prior
@@ -215,7 +301,56 @@ cat ("
     N <- sum(z[ ])
     density <- N / (xlimA[2] - xlimA[1]) # divided distances by 100 so calculates turtles per 100 m of canal
   }
-", file = "Code/JAGS/SCRA.txt")
+", file = "Code/JAGS/SCR_Time.txt")
+
+
+####### End Time Model ######
+####### Running Time Model #######
+jags_data <- list(y = EM_array, traplocsA = traplocsA, K=K, M=M, xlimA=xlimA, n_traps = n_traps)
+inits <- function() {
+  list(alpha0=rnorm(4,-2,.4), alpha1=runif(1,1,2), s=as.numeric(sst), z=z, psi = runif(1))
+}
+
+parameters <- c("alpha0", "alpha1", "sigma", "N", "density", "s", "sigma_ind", "psi", "z") # 
+
+# cpic_1_mcmc <- jagsUI(model.file = "Code/JAGS/SCRA.txt", parameters.to.save = parameters, data=jags_data, inits=inits, n.iter = 1000, n.chains = 3, n.adapt =500) # jagsUI is nice but the plotting is interactive which is obnoxious 
+
+# plot(cpic_1_mcmc)
+# traceplot(cpic_1_mcmc)
+# cpic_1_mcmc
+
+testing <- TRUE
+if(testing) {
+  na = 500
+  ni = 500
+  nt = 1
+  nc = 3
+} else {
+  na = 100000
+  ni = 600000
+  nt = 60
+  nc = 4
+}
+
+# run in parallel explicitly
+
+cl <- makeCluster(nc)                       # Request # cores
+clusterExport(cl, c("jags_data", "inits", "parameters", "z", "sst", "ni", "na", "nt")) # Make these available
+clusterSetRNGStream(cl = cl, 54354354)
+
+system.time({ # no status bar (% complete) when run in parallel
+  out <- clusterEvalQ(cl, {
+    library(rjags)
+    jm <- jags.model("Code/JAGS/SCR_Time.txt", jags_data, inits, n.adapt = na, n.chains = 1) # Compile model and run burnin
+    out <- coda.samples(jm, parameters, n.iter = ni, thin = nt) # Sample from posterior distribution
+    return(as.mcmc(out))
+  })
+}) # 
+
+stopCluster(cl)
+
+########## End Running Time Model ###########
+
 
 cat ("
   model {
@@ -252,14 +387,14 @@ logit(p0[i,j,k]) <- alpha0[k] + eta[i,k]
      N <- sum(z[ ])
      density <- N / (xlimA[2] - xlimA[1]) # divided distances by 100 so calculates turtles per 100 m of canal
      }
-     ", file = "Code/JAGS/SCRA.txt")
+     ", file = "Code/JAGS/SCR_Ind_Time.txt")
 
 jags_data <- list(y = EM_array, traplocsA = traplocsA, K=K, M=M, xlimA=xlimA, n_traps = n_traps)
 inits <- function() {
-  list(alpha0=rnorm(4,-2,.4), alpha1=runif(1,1,2), s=as.numeric(sst), z=z)
+  list(alpha0=rnorm(4,-2,.4), alpha1=runif(1,1,2), s=as.numeric(sst), z=z, psi = runif(1))
 }
 
-parameters <- c("alpha0", "alpha1", "sigma", "N", "density", "p0", "s", "sigma_ind") # 
+parameters <- c("alpha0", "alpha1", "sigma", "N", "density", "s", "sigma_ind", "psi", "z") # 
 
 # cpic_1_mcmc <- jagsUI(model.file = "Code/JAGS/SCRA.txt", parameters.to.save = parameters, data=jags_data, inits=inits, n.iter = 1000, n.chains = 3, n.adapt =500) # jagsUI is nice but the plotting is interactive which is obnoxious 
 
@@ -281,8 +416,6 @@ if(testing) {
 }
 
 # run in parallel explicitly
-library(rjags)
-library(parallel)
 
 cl <- makeCluster(nc)                       # Request # cores
 clusterExport(cl, c("jags_data", "inits", "parameters", "z", "sst", "ni", "na", "nt")) # Make these available
