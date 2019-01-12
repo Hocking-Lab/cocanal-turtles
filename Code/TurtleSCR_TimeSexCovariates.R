@@ -381,9 +381,6 @@ summary(cpic_1_mcmc[ , c("alpha0", "alpha1", "density")])
 
 save(cpic_1_mcmc, file = "Results/JAGS/cpic_1_mcmc.RData")
 
-
-
-
 #### Model with Sex Covariate #####
 cat ("
      model {
@@ -502,8 +499,6 @@ summary(cpic_1_mcmc[ , c("alpha0", "alpha1", "density")])
 save(cpic_1_mcmc, file = "Results/JAGS/cpic_1_mcmc.RData")
 
 #############################
-
-
 
 
 

@@ -303,8 +303,8 @@ cat ("
   }
 ", file = "Code/JAGS/SCR_Time.txt")
 
+####### End Time Model ##########
 
-####### End Time Model ######
 ####### Running Time Model #######
 jags_data <- list(y = EM_array, traplocsA = traplocsA, K=K, M=M, xlimA=xlimA, n_traps = n_traps)
 inits <- function() {
@@ -351,7 +351,7 @@ stopCluster(cl)
 
 ########## End Running Time Model ###########
 
-
+######### Time and Individual Heterogeneity #########
 cat ("
   model {
      # alpha1 ~ dgamma(0.1, 0.1) # consider appropriate prior
@@ -388,6 +388,10 @@ logit(p0[i,j,k]) <- alpha0[k] + eta[i,k]
      density <- N / (xlimA[2] - xlimA[1]) # divided distances by 100 so calculates turtles per 100 m of canal
      }
      ", file = "Code/JAGS/SCR_Ind_Time.txt")
+
+#############  End Individual and Time Model ##############
+
+############   Running Individual and Time Model ##########
 
 jags_data <- list(y = EM_array, traplocsA = traplocsA, K=K, M=M, xlimA=xlimA, n_traps = n_traps)
 inits <- function() {
@@ -441,16 +445,135 @@ par(mfrow = c(1,1))
 summary(cpic_1_mcmc[ , c("alpha0", "alpha1", "density")])
 # summary(cpic_1_mcmc)
 
-## Obtaining Point Process and Density from Model ##
-# plot(cpic_1_mcmc[ , c("s[1:n_ind]")])
-Sxout <- out$mcmc$s
-Dout <- out$sim.list$density
-str(cpic_1_mcmc)
-str(out)
-out
+##############################
+
+######### Individual Time and Sex Heterogeneity Model (ITS) ##########
+
+##### SEX VECTOR with sex (as a random variable) indicated for caught individuals and NA for augmented individuals #####
+
+sex_list <- EDFA$sex
+sex_vector <- ifelse(sex_list == "F", 1, 2)
+Sex <- c(sex_vector-1, rep(NA, length = M-n_ind))
+
+cat ("
+     model {
+     # alpha1 ~ dgamma(0.1, 0.1) # consider appropriate prior
+     # alpha1 ~ dt(0, 1 / (5^2), 1)I(0, ) 	## implies half-cauchy with scale of 5
+     psi ~ dunif(0, 1) # giving numbers between 0 and 1, need to change?
+     psi.sex ~ dunif(0, 1)
+     
+     for(t in 1:2){
+     alpha1[t] ~ dnorm(0, 1 / (25^2))I(0, ) 	## half normal
+     sigma[t] <- pow(1 / (2*alpha1[t]), 0.5) # sd of half normal
+     } # t
+     
+     
+     sigma_ind ~ dt(0, 1 / (25^2), 1)I(0, ) 	## implies half-cauchy with scale of 25
+     for(i in 1:M) {
+     for(k in 1:K) { ## Would it work to add an extra eta loop here for sex?
+     eta[i,k] ~ dnorm(0, 1 / (sigma_ind * sigma_ind))
+     } # i
+     } # k
+     
+     for(k in 1:K) {
+     for(t in 1:2) {
+     alpha0[k, t] ~ dnorm(0, 0.1)
+     } # k
+     } # t
+     
+     for(i in 1:M) {
+     z[i] ~ dbern(psi)
+     s[i] ~ dunif(xlimA[1], xlimA[2])
+     
+     for(j in 1:n_traps) {
+     d[i,j] <- abs(s[i] - traplocsA[j])
+     
+     for(k in 1:K) {
+     for(t in 1:2) {
+     logit(p0[i, j, k, t]) <- alpha0[k, t] + eta[i,k]
+     } # i
+     } # j
+     } # k
+     } # t
+     
+     for(i in 1:M) {
+     Sex[i] ~ dbern(psi.sex)
+     Sex2[i] <- Sex[i] + 1
+     for (j in 1:n_traps) {
+     for (k in 1:K) {
+     y[i, j, k] ~ dbern(p[i,j,k])
+     p[i, j, k] <- z[i]*p0[i, j, k, Sex2[i]]* exp(- alpha1[Sex2[i]] * d[i,j] * d[i,j])
+     } # i
+     } # j
+     } # k
+     
+     # Derived parameters
+     N <- sum(z[ ])
+     density <- N / (xlimA[2] - xlimA[1]) # divided distances by 100 so calculates turtles per 100 m of canal
+     }
+     ", file = "Code/JAGS/SCR_Sex_Time_Ind.txt")
+
+############## End ITS Model ################
+
+############ Running ITS Model ##############
+
+jags_data <- list(y = EM_array, Sex = Sex, traplocsA = traplocsA, K=K, M=M, xlimA=xlimA, n_traps = n_traps)
+inits <- function() {
+  list(alpha0=rnorm(4,-2,.4), alpha1=runif(1,1,2), s=as.numeric(sst), z=z, psi = runif(1), psi.sex = runif(1), Sex = c(rep(NA, n_ind)))
+}
+
+parameters <- c("alpha0", "alpha1", "sigma", "N", "density", "s", "sigma_ind", "psi", "psi.sex", "n_ind") # 
+
+# cpic_1_mcmc <- jagsUI(model.file = "Code/JAGS/SCRA.txt", parameters.to.save = parameters, data=jags_data, inits=inits, n.iter = 1000, n.chains = 3, n.adapt =500) # jagsUI is nice but the plotting is interactive which is obnoxious 
+
+# plot(cpic_1_mcmc)
+# traceplot(cpic_1_mcmc)
+# cpic_1_mcmc
 
 
-save(cpic_1_mcmc, file = "Results/JAGS/cpic_1_mcmc.RData")
+testing <- TRUE
+if(testing) {
+  na = 500
+  ni = 500
+  nt = 1
+  nc = 3
+} else {
+  na = 100000
+  ni = 600000
+  nt = 60
+  nc = 4
+}
+
+# run in parallel explicitly
+library(rjags)
+library(parallel)
+
+cl <- makeCluster(nc)                       # Request # cores
+clusterExport(cl, c("jags_data", "inits", "parameters", "z", "sst", "ni", "na", "nt")) # Make these available
+clusterSetRNGStream(cl = cl, 54354354)
+
+system.time({ # no status bar (% complete) when run in parallel
+  out <- clusterEvalQ(cl, {
+    library(rjags)
+    jm <- jags.model("Code/JAGS/SCR_Sex_Time_Ind.txt", jags_data, inits, n.adapt = na, n.chains = 1) # Compile model and run burnin
+    out <- coda.samples(jm, parameters, n.iter = ni, thin = nt) # Sample from posterior distribution
+    return(as.mcmc(out))
+  })
+}) # 
+
+stopCluster(cl)
+
+######################################
+
+
+
+
+
+
+
+
+
+
 
 #------ Prior check on alpha1 -----
 dhalfcauchy <- function(x, scale=1, log=FALSE)
