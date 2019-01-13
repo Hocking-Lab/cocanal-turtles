@@ -453,7 +453,8 @@ summary(cpic_1_mcmc[ , c("alpha0", "alpha1", "density")])
 
 sex_list <- EDFA$sex
 sex_vector <- ifelse(sex_list == "F", 1, 2)
-Sex <- c(sex_vector-1, rep(NA, length = M-n_ind))
+Sex <- c(sex_vector-1, rep(NA, M-n_ind))
+Sexst = rep(NA, M)
 
 cat ("
      model {
@@ -519,7 +520,7 @@ cat ("
 
 jags_data <- list(y = EM_array, Sex = Sex, traplocsA = traplocsA, K=K, M=M, xlimA=xlimA, n_traps = n_traps)
 inits <- function() {
-  list(alpha0=rnorm(4,-2,.4), alpha1=runif(1,1,2), s=as.numeric(sst), z=z, psi = runif(1), psi.sex = runif(1), Sex = c(rep(NA, n_ind)))
+  list(alpha0=rnorm(4,-2,.4), alpha1=runif(1,1,2), s=as.numeric(sst), z=z, psi = runif(1), psi.sex = runif(1), Sex = Sexst)
 }
 
 parameters <- c("alpha0", "alpha1", "sigma", "N", "density", "s", "sigma_ind", "psi", "psi.sex", "n_ind") # 
@@ -549,7 +550,7 @@ library(rjags)
 library(parallel)
 
 cl <- makeCluster(nc)                       # Request # cores
-clusterExport(cl, c("jags_data", "inits", "parameters", "z", "sst", "ni", "na", "nt")) # Make these available
+clusterExport(cl, c("jags_data", "inits", "parameters", "z", "sst", "Sexst", "ni", "na", "nt")) # Make these available
 clusterSetRNGStream(cl = cl, 54354354)
 
 system.time({ # no status bar (% complete) when run in parallel
