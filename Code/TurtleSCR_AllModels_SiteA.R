@@ -428,7 +428,7 @@ clusterSetRNGStream(cl = cl, 54354354)
 system.time({ # no status bar (% complete) when run in parallel
   out <- clusterEvalQ(cl, {
     library(rjags)
-    jm <- jags.model("Code/JAGS/SCRA.txt", jags_data, inits, n.adapt = na, n.chains = 1) # Compile model and run burnin
+    jm <- jags.model("Code/JAGS/SCR_Ind_Time.txt", jags_data, inits, n.adapt = na, n.chains = 1) # Compile model and run burnin
     out <- coda.samples(jm, parameters, n.iter = ni, thin = nt) # Sample from posterior distribution
     return(as.mcmc(out))
   })
