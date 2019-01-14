@@ -454,7 +454,7 @@ summary(cpic_1_mcmc[ , c("alpha0", "alpha1", "density")])
 
 sex_list <- EDFA$sex
 sex_vector <- ifelse(sex_list == "F", 1, 2)
-Sex <- c(sex_vector-1, rep(NA, M-n_ind))
+Sex <- c(sex_vector-1, rep(NA, M-nind))
 Sexst = rep(NA, M)
 
 cat ("
@@ -525,7 +525,7 @@ inits <- function() {
   list(alpha0=rnorm(4,-2,.4), alpha1=runif(1,1,2), s=as.numeric(sst), z=z, psi = runif(1), psi.sex = runif(1), Sex = c(rep(NA, n_inds))) #why n_ind and not M? used n_ind in txtbk example pg. 211
 }
 
-parameters <- c("sigma", "N", "density", "s", "sigma_ind", "psi", "psi.sex", "n_ind") 
+parameters <- c("sigma", "N", "density", "s", "sigma_ind", "psi", "psi.sex", "n_inds") 
 
 # cpic_1_mcmc <- jagsUI(model.file = "Code/JAGS/SCRA.txt", parameters.to.save = parameters, data=jags_data, inits=inits, n.iter = 1000, n.chains = 3, n.adapt =500) # jagsUI is nice but the plotting is interactive which is obnoxious 
 
