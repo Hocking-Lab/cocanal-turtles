@@ -448,6 +448,7 @@ summary(cpic_1_mcmc[ , c("alpha0", "alpha1", "density")])
 ##############################
 
 ######### Individual Time and Sex Heterogeneity Model (ITS) ##########
+#### Sex as an individual covariate (not sex effects - see pg. 215)
 
 ##### SEX VECTOR with sex (as a random variable) indicated for caught individuals and NA for augmented individuals #####
 
@@ -518,12 +519,13 @@ cat ("
 
 ############ Running ITS Model ##############
 
-jags_data <- list(y = EM_array, Sex = Sex, traplocsA = traplocsA, K=K, M=M, xlimA=xlimA, n_traps = n_traps)
+jags_data <- list(y = EM_array, Sex = Sex, traplocsA = traplocsA, K=K, M=M, xlimA=xlimA, n_traps = n_traps, n_inds = n_ind)
+# "initial values for the observed data have to be specified as NA"
 inits <- function() {
-  list(alpha0=rnorm(4,-2,.4), alpha1=runif(1,1,2), s=as.numeric(sst), z=z, psi = runif(1), psi.sex = runif(1), Sex = Sexst)
+  list(alpha0=rnorm(4,-2,.4), alpha1=runif(1,1,2), s=as.numeric(sst), z=z, psi = runif(1), psi.sex = runif(1), Sex = c(rep(NA, n_inds))) #why n_ind and not M? used n_ind in txtbk example pg. 211
 }
 
-parameters <- c("alpha0", "alpha1", "sigma", "N", "density", "s", "sigma_ind", "psi", "psi.sex", "n_ind") # 
+parameters <- c("sigma", "N", "density", "s", "sigma_ind", "psi", "psi.sex", "n_ind") 
 
 # cpic_1_mcmc <- jagsUI(model.file = "Code/JAGS/SCRA.txt", parameters.to.save = parameters, data=jags_data, inits=inits, n.iter = 1000, n.chains = 3, n.adapt =500) # jagsUI is nice but the plotting is interactive which is obnoxious 
 
@@ -546,8 +548,6 @@ if(testing) {
 }
 
 # run in parallel explicitly
-library(rjags)
-library(parallel)
 
 cl <- makeCluster(nc)                       # Request # cores
 clusterExport(cl, c("jags_data", "inits", "parameters", "z", "sst", "Sexst", "ni", "na", "nt")) # Make these available
