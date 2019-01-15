@@ -455,7 +455,6 @@ summary(cpic_1_mcmc[ , c("alpha0", "alpha1", "density")])
 sex_list <- EDFA$sex
 sex_vector <- ifelse(sex_list == "F", 1, 2)
 Sex <- c(sex_vector-1, rep(NA, M-nind))
-Sexst = rep(NA, M)
 
 cat ("
      model {
@@ -519,13 +518,13 @@ cat ("
 
 ############ Running ITS Model ##############
 
-jags_data <- list(y = EM_array, Sex = Sex, traplocsA = traplocsA, K=K, M=M, xlimA=xlimA, n_traps = n_traps, n_inds = n_ind)
+jags_data_m3 <- list(y = EM_array, Sex = Sex, traplocsA = traplocsA, K=K, M=M, xlimA=xlimA, n_traps = n_traps, n_ind = n_ind)
 # "initial values for the observed data have to be specified as NA"
 inits <- function() {
-  list(alpha0=rnorm(4,-2,.4), alpha1=runif(1,1,2), s=as.numeric(sst), z=z, psi = runif(1), psi.sex = runif(1), Sex = c(rep(NA, n_inds))) #why n_ind and not M? used n_ind in txtbk example pg. 211
+  list(alpha0=rnorm(4,-2,.4), alpha1=runif(1,1,2), s=as.numeric(sst), z=z, psi = runif(1), psi.sex = runif(1), Sex = c(rep(NA, n_ind))) #why n_ind and not M? used n_ind in txtbk example pg. 211 # Error = "non-numeric intial values supplied for variable(s) Sex"
 }
 
-parameters <- c("sigma", "N", "density", "s", "sigma_ind", "psi", "psi.sex", "n_inds") 
+parameters <- c("sigma", "N", "density", "s", "sigma_ind", "psi", "psi.sex") 
 
 # cpic_1_mcmc <- jagsUI(model.file = "Code/JAGS/SCRA.txt", parameters.to.save = parameters, data=jags_data, inits=inits, n.iter = 1000, n.chains = 3, n.adapt =500) # jagsUI is nice but the plotting is interactive which is obnoxious 
 
@@ -550,13 +549,13 @@ if(testing) {
 # run in parallel explicitly
 
 cl <- makeCluster(nc)                       # Request # cores
-clusterExport(cl, c("jags_data", "inits", "parameters", "z", "sst", "Sexst", "ni", "na", "nt")) # Make these available
+clusterExport(cl, c("jags_data_m3", "inits", "parameters", "n_ind", "z", "sst", "Sexst", "ni", "na", "nt")) # Make these available
 clusterSetRNGStream(cl = cl, 54354354)
 
 system.time({ # no status bar (% complete) when run in parallel
   out <- clusterEvalQ(cl, {
     library(rjags)
-    jm <- jags.model("Code/JAGS/SCR_Sex_Time_Ind.txt", jags_data, inits, n.adapt = na, n.chains = 1) # Compile model and run burnin
+    jm <- jags.model("Code/JAGS/SCR_Sex_Time_Ind.txt", jags_data_m3, inits, n.adapt = na, n.chains = 1) # Compile model and run burnin
     out <- coda.samples(jm, parameters, n.iter = ni, thin = nt) # Sample from posterior distribution
     return(as.mcmc(out))
   })
