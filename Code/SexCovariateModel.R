@@ -205,10 +205,10 @@ cat ("
 
 ############ Running ITS Model ##############
 
-jags_data_m3 <- list(y = EM_array, Sex = Sex, traplocsA = traplocsA, K=K, M=M, xlimA=xlimA, n_traps = n_traps, n_ind = n_ind)
+jags_data_m3 <- list(y = EM_array, Sex = Sex, traplocsA = traplocsA, K=K, M=M, xlimA=xlimA, n_traps = n_traps) #, n_ind = n_ind)
 # "initial values for the observed data have to be specified as NA"
 inits <- function() {
-  list(alpha0=rnorm(4,-2,.4), alpha1=runif(1,1,2), s=as.numeric(sst), z=z, psi = runif(1), psi.sex = runif(1), Sex = c(rep(NA, n_ind))) ## Error = "Invalid parameters for chain 1: non-numeric intial values supplied for variable(s) Sex"
+  list(alpha0=matrix(rnorm(K*2,-2,0.5), 4, 2), alpha1=runif(2,1,2), s=as.numeric(sst), z=z, psi = runif(1), psi.sex = runif(1)) #, Sex = c(rep(NA, n_ind))) ## Error = "Invalid parameters for chain 1: non-numeric intial values supplied for variable(s) Sex"
 }
 
 parameters <- c("sigma", "N", "density", "s", "sigma_ind", "psi", "psi.sex") 
@@ -236,7 +236,7 @@ if(testing) {
 # run in parallel explicitly
 
 cl <- makeCluster(nc)                       # Request # cores
-clusterExport(cl, c("jags_data_m3", "inits", "parameters", "n_ind", "z", "sst", "Sexst", "ni", "na", "nt")) # Make these available
+clusterExport(cl, c("jags_data_m3", "inits", "parameters", "n_ind", "z", "sst", "Sex", "ni", "na", "nt", "K")) # Make these available
 clusterSetRNGStream(cl = cl, 54354354)
 
 system.time({ # no status bar (% complete) when run in parallel
@@ -249,6 +249,9 @@ system.time({ # no status bar (% complete) when run in parallel
 }) # 
 
 stopCluster(cl)
+
+out2 <- mcmc.list(out)
+plot(out2[ , c("N", "density", "sigma_ind")])
 
 ######################################
 
