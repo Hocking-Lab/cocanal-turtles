@@ -46,18 +46,7 @@ EDFA
 
 # Create a Trap Location Matrix (integers = distance apart in m)
 traplocsA <- c(0,25,50,75,100,125,150,175) # create trap location file
-traplocsC <- c(0,25,50,75,100,125,150,175,200,225)
-traplocsD <- c(0,25,50,75,100,125,150,175)
-traplocsE <- c(0,25,50,75,100,125,150,175,200,225,250,275,300,325)
-traplocsF <- c(0,25,50,75,100,125,150)
-traplocsG <- c(0,25,50,75,100,125,150)
-traplocsJ <- c(0,25,50,75,100,125,150,175,200,225)
-traplocsK <- c(0,25,50,75,100,125,150,175,200,225)
-traplocsL <- c(0,25,50,75,100,125,150,175)
-traplocsM <- c(0,25,50,75,100,125,150,175,200,225,250,275)
-traplocsN <- c(0,25,50,75,100,125,150,175,200,225)
-traplocsO <- c(0,25,50,75,100,125,150,175,200,225)
-#thess are in a vertical format
+#these are in a vertical format
 
 #### MatrixA
 matrixA <- matrix(NA, ncol = length(traplocsA), nrow = length(traplocsA))
@@ -71,116 +60,6 @@ matrixA[ ,6] <- c(125,100,75, 50,25,0,25,50)
 matrixA[ ,7] <- c(150,125,100,75, 50,25,0,25)
 matrixA[ ,8] <- c(175,150,125,100,75, 50,25,0)
 matrixA  # will need to use coordinates if use all sites in 1 model! or figure out distance b/w sites
-
-#### Matrix C
-matrixC <- matrix(NA, ncol = length(traplocsC), nrow = length(traplocsC))
-matrixC[ ,1] <- c(0,25,50,75,100,125,150,175,200,225)
-matrixC[ ,2] <- c(25,0,25,50,75,100,125,150,175,200)
-matrixC[ ,3] <- c(50,25,0,25,50,75,100,125,150,175)
-matrixC[ ,4] <- c(75, 50,25,0,25,50,75,100,125,150)
-matrixC[ ,5] <- c(100,75,50,25,0,25,50,75,100,125)
-matrixC[ ,6] <- c(125,100,75,50,25,0,25,50,75,100)
-matrixC[ ,7] <- c(150,125,100,75,50,25,0,25,50,75)
-matrixC[ ,8] <- c(175,150,125,100,75,50,25,0,25,50)
-matrixC[ , 9] <- c(200,175,150,125,100,75,50,25,0,25)
-matrixC[ , 10] <- c(225,200,175,150,125,100,75,50,25,0)
-
-#### Matrix D
-matrixD <- matrix(NA, ncol = length(traplocsD), nrow = length(traplocsD))
-matrixD[ ,1] <- c(0,25,50,75,100,125,150,175)
-matrixD[ ,2] <- c(25,0,25,50,75,100,125,150)
-matrixD[ ,3] <- c(50,25,0,25,50,75,100,125)
-matrixD[ ,4] <- c(75, 50,25,0,25,50,75,100)
-matrixD[ ,5] <- c(100,75, 50,25,0,25,50,75)
-matrixD[ ,6] <- c(125,100,75, 50,25,0,25,50)
-matrixD[ ,7] <- c(150,125,100,75, 50,25,0,25)
-matrixD[ ,8] <- c(175,150,125,100,75, 50,25,0)
-
-#### Matrix E
-matrixE <- matrix(NA, ncol = length(traplocsE), nrow = length(traplocsE))
-matrixE[ ,1] <- c(0,25,50,75,100,125,150,175,200,225,250,275,300,325)
-matrixE[ ,2] <- c(25,0,25,50,75,100,125,150,175,200,225,250,275,300)
-matrixE[ ,3] <- c(50,25,0,25,50,75,100,125,150,175,200,225,250,275)
-matrixE[ ,4] <- c(75, 50,25,0,25,50,75,100,125,150,175,200,225,250)
-matrixE[ ,5] <- c(100,75,50,25,0,25,50,75,100,125,150,175,200,225)
-matrixE[ ,6] <- c(125,100,75,50,25,0,25,50,75,100,125,150,175,200)
-matrixE[ ,7] <- c(150,125,100,75,50,25,0,25,50,75,100,125,150,175)
-matrixE[ ,8] <- c(175,150,125,100,75,50,25,0,25,50,75,100,125,150)
-matrixE[ , 9] <- c(200,175,150,125,100,75,50,25,0,25,50,75,100,125)
-matrixE[ , 10] <- c(225,200,175,150,125,100,75,50,25,0,25,50,75,100)
-matrixE[ , 11] <- c(250,225,200,175,150,125,100,75,50,25,0,25,50,75)
-matrixE[ , 12] <- c(275,250,225,200,175,150,125,100,75,50,25,0,25,50)
-matrixE[ , 13] <- c(300,275,250,225,200,175,150,125,100,75,50,25,0,25)
-matrixE[ , 14] <- c(325,300,275,250,225,200,175,150,125,100,75,50,25,0)
-
-
-#### Matrix F
-matrixF <- matrix(NA, ncol = length(traplocsF), nrow = length(traplocsF))
-matrixF[ ,1] <- c(0,25,50,75,100,125,150)
-matrixF[ ,2] <- c(25,0,25,50,75,100,125)
-matrixF[ ,3] <- c(50,25,0,25,50,75,100)
-matrixF[ ,4] <- c(75, 50,25,0,25,50,75)
-matrixF[ ,5] <- c(100,75, 50,25,0,25,50)
-matrixF[ ,6] <- c(125,100,75, 50,25,0,25)
-matrixF[ ,7] <- c(150,125,100,75, 50,25,0)
-
-#### Matrix G
-matrixG <- matrixF
-
-#### Matrix J
-matrixJ <- matrixC
-
-#### Matrix K
-matrixK <- matrixC
-
-#### Matrix L
-matrixL <- matrixA
-
-#### Matrix M
-matrixM <- matrix(NA, ncol = length(traplocsM), nrow = length(traplocsM))
-
-matrixM[ ,1] <- c(0,25,50,75,100,125,150,175,200,225,250,275)
-matrixM[ ,2] <- c(25,0,25,50,75,100,125,150,175,200,225,250)
-matrixM[ ,3] <- c(50,25,0,25,50,75,100,125,150,175,200,225)
-matrixM[ ,4] <- c(75, 50,25,0,25,50,75,100,125,150,175,200)
-matrixM[ ,5] <- c(100,75,50,25,0,25,50,75,100,125,150,175)
-matrixM[ ,6] <- c(125,100,75,50,25,0,25,50,75,100,125,150)
-matrixM[ ,7] <- c(150,125,100,75,50,25,0,25,50,75,100,125)
-matrixM[ ,8] <- c(175,150,125,100,75,50,25,0,25,50,75,100)
-matrixM[ , 9] <- c(200,175,150,125,100,75,50,25,0,25,50,75)
-matrixM[ , 10] <- c(225,200,175,150,125,100,75,50,25,0,25,50)
-matrixM[ , 11] <- c(250,225,200,175,150,125,100,75,50,25,0,25)
-matrixM[ , 12] <- c(275,250,225,200,175,150,125,100,75,50,25,0)
-
-#### Matrix N
-matrixN <- matrixC
-
-#### Matrix O
-matrixO <- matrixC
-
-# Trap location and distance matrices / 100
-traplocsA <- traplocsA / 100
-traplocsC <- traplocsC / 100
-traplocsD <- traplocsD / 100
-traplocsE <- traplocsE / 100
-traplocsF <- traplocsF / 100
-traplocsG <- traplocsG / 100
-traplocsJ <- traplocsJ / 100
-traplocsK <- traplocsK / 100
-traplocsL <- traplocsL / 100
-traplocsM <- traplocsM / 100
-traplocsN <- traplocsN / 100
-traplocsO <- traplocsO / 100
-matrixA <- matrixA / 100 # scale for computational purposes
-matrixC <- matrixC / 100
-matrixD <- matrixD / 100
-matrixE <- matrixE / 100
-matrixF <- matrixF / 100
-matrixG <- matrixG / 100
-matrixJ <- matrixJ / 100
-matrixK <- matrixK / 100
-matrixL <- matrixL / 100
-matrixM <- matrixM / 100
 
 n_traps <- ncol(matrixA) # number of traps
 # as.character(EDFA$recap)
@@ -241,14 +120,14 @@ Sex <- c(sex_vector-1, rep(NA, length = M-n_ind))
 # EM <- cbind(1:n_ind, rowSums(EM))
 # EM <- rowSums(EM)
 # Read in trap hour file
-traphoursA <- read.csv(file = "Data/traphoursA.csv", stringsAsFactors = FALSE)
-traphoursA
+# traphoursA <- read.csv(file = "Data/traphoursA.csv", stringsAsFactors = FALSE)
+# traphoursA
 # hours <- apply(traphoursA[ , 2:ncol(traphoursA)], 1, sum)
 # hours
 
 #Start values for s (activity centers) of augments (from random uniform constrained by state space size)
 X <- traplocsA
-sst # Now populated by starting positions uniformally placed within state space
+# Now populated by starting positions uniformally placed within state space
 # For every individual that is not 0, change starting x point to mean of traps associated with encounters for that individual; leaves 0's there from the augmented population and also puts in activity center for augmented individuals that were randomly given an encounter history (caught at least 1 time)
 
 sum_caps <- apply(EM_array, c(1,2), sum)
@@ -283,7 +162,9 @@ sst
 # Calculate population size by summing all 1s associated with individuals within the population that were sampled (prob. of z = 1)
 # Calculate density by dividing pop. size by state space size (trapping length + buffers)
 
-if(!dir.exists("Code/JAGS")) dir.create("Code/JAGS", recursive = TRUE)
+#if(!dir.exists("Code/JAGS")) dir.create("Code/JAGS", recursive = TRUE)
+
+#########################
 
 d <- seq(xlimA[1], xlimA[2], length.out = 100)
 
@@ -314,6 +195,8 @@ for(i in 2:length(scale_par)) {
 library(ggplot2)
 ggplot(alpha1_priors) + geom_density(aes(x = alpha1, fill = as.factor(scale)), alpha = 0.2) + xlim(0, 15)
 
+############################
+
 cat ("
   model {
     # alpha1 ~ dgamma(0.1, 0.1) # consider appropriate prior
@@ -340,7 +223,69 @@ cat ("
     N <- sum(z[ ])
     density <- N / (xlimA[2] - xlimA[1]) # divided distances by 100 so calculates turtles per 100 m of canal
   }
-", file = "Code/JAGS/SCRA.txt")
+", file = "Code/JAGS/SCRA_Time.txt")
+
+########
+jags_data <- list(y = y, traplocsA = traplocsA, K=K, M=M, xlimA=xlimA, n_traps = n_traps)
+inits <- function() {
+  list(alpha0=rnorm(1,-2,.4), alpha1=runif(1,1,2), s=sst, z=z)
+}
+
+parameters <- c("alpha0", "alpha1", "sigma", "N", "density", "p", "s") # 
+
+# cpic_1_mcmc <- jagsUI(model.file = "Code/JAGS/SCRA.txt", parameters.to.save = parameters, data=jags_data, inits=inits, n.iter = 1000, n.chains = 3, n.adapt =500) # jagsUI is nice but the plotting is interactive which is obnoxious 
+
+# plot(cpic_1_mcmc)
+# traceplot(cpic_1_mcmc)
+# cpic_1_mcmc
+
+testing <- TRUE
+if(testing) {
+  na = 500
+  ni = 500
+  nt = 1
+  nc = 3
+} else {
+  na = 100000
+  ni = 600000
+  nt = 60
+  nc = 4
+}
+
+# run in parallel explicitly
+library(rjags)
+library(parallel)
+
+cl <- makeCluster(nc)                       # Request # cores
+clusterExport(cl, c("jags_data", "inits", "parameters", "z", "sst", "ni", "na", "nt")) # Make these available
+clusterSetRNGStream(cl = cl, 54354354)
+
+system.time({ # no status bar (% complete) when run in parallel
+  out <- clusterEvalQ(cl, {
+    library(rjags)
+    jm <- jags.model("Code/JAGS/SCRA_Null.txt", jags_data, inits, n.adapt = na, n.chains = 1) # Compile model and run burnin
+    out <- coda.samples(jm, parameters, n.iter = ni, thin = nt) # Sample from posterior distribution
+    return(as.mcmc(out))
+  })
+}) # 
+
+stopCluster(cl)
+
+# Results
+cpic_1_mcmc <- mcmc.list(out)
+plot(cpic_1_mcmc[ , c("alpha0", "alpha1", "density")]) # 
+par(mfrow = c(1,1))
+summary(cpic_1_mcmc[ , c("alpha0", "alpha1", "density")])
+# summary(cpic_1_mcmc)
+
+save(cpic_1_mcmc, file = "Results/JAGS/cpic_1_mcmc.RData")
+
+# library(R2jags)
+# jinitA <- R2jags::jags(model.file = "Code/JAGS/SCRA.txt", parameters.to.save = parameters, data=jags_data, inits=inits, n.chains = 3, n.burnin = 500, n.iter = 1000)
+
+######
+
+
 
 #### Model with individual heterogeneity in capture probability ####
 cat ("
@@ -377,12 +322,68 @@ logit(p0[i,j,k]) <- alpha0[k] + eta[i,k]
      N <- sum(z[ ])
      density <- N / (xlimA[2] - xlimA[1]) # divided distances by 100 so calculates turtles per 100 m of canal
      }
-     ", file = "Code/JAGS/SCRA.txt")
+     ", file = "Code/JAGS/SCRA_Time_Ind.txt")
 
+
+jags_data <- list(y = EM_array, traplocsA = traplocsA, K=K, M=M, xlimA=xlimA, n_traps = n_traps)
+inits <- function() {
+  list(alpha0=rnorm(4,-2,.4), alpha1=runif(1,1,2), s=as.numeric(sst), z=z, psi = runif(1))
+}
+
+parameters <- c("alpha0", "alpha1", "sigma", "N", "density", "s", "sigma_ind", "psi", "z") # 
+
+# cpic_1_mcmc <- jagsUI(model.file = "Code/JAGS/SCRA.txt", parameters.to.save = parameters, data=jags_data, inits=inits, n.iter = 1000, n.chains = 3, n.adapt =500) # jagsUI is nice but the plotting is interactive which is obnoxious 
+
+# plot(cpic_1_mcmc)
+# traceplot(cpic_1_mcmc)
+# cpic_1_mcmc
+
+testing <- TRUE
+if(testing) {
+  na = 500
+  ni = 500
+  nt = 1
+  nc = 3
+} else {
+  na = 100000
+  ni = 600000
+  nt = 60
+  nc = 4
+}
+
+# run in parallel explicitly
+library(rjags)
+library(parallel)
+
+cl <- makeCluster(nc)                       # Request # cores
+clusterExport(cl, c("jags_data", "inits", "parameters", "z", "sst", "ni", "na", "nt")) # Make these available
+clusterSetRNGStream(cl = cl, 54354354)
+
+system.time({ # no status bar (% complete) when run in parallel
+  out <- clusterEvalQ(cl, {
+    library(rjags)
+    jm <- jags.model("Code/JAGS/SCRA.txt", jags_data, inits, n.adapt = na, n.chains = 1) # Compile model and run burnin
+    out <- coda.samples(jm, parameters, n.iter = ni, thin = nt) # Sample from posterior distribution
+    return(as.mcmc(out))
+  })
+}) # 
+
+stopCluster(cl)
+
+# Results
+cpic_1_mcmc <- mcmc.list(out)
+plot(cpic_1_mcmc[ , c("alpha1")])
+plot(cpic_1_mcmc[ , c("alpha1", "sigma_ind")])
+plot(cpic_1_mcmc[ , c("p0[1]", "p0[2]", "p0[3]", "p0[4]", "alpha1", "density", "N")]) #
+par(mfrow = c(1,1))
+summary(cpic_1_mcmc[ , c("alpha0", "alpha1", "density")])
+# summary(cpic_1_mcmc)
+
+save(cpic_1_mcmc, file = "Results/JAGS/cpic_1_mcmc.RData")
 
 #### Model with Sex Covariate #####
 cat ("
-  model {
+     model {
      # alpha1 ~ dgamma(0.1, 0.1) # consider appropriate prior
      # alpha1 ~ dt(0, 1 / (5^2), 1)I(0, ) 	## implies half-cauchy with scale of 5
      psi ~ dunif(0, 1)
@@ -392,7 +393,7 @@ cat ("
      alpha1[t] ~ dnorm(0, 1 / (25^2))I(0, ) 	## half normal
      sigma[t] <- pow(1 / (2*alpha1[t]), 0.5) # sd of half normal
      } # t
-
+     
      
      sigma_ind ~ dt(0, 1 / (25^2), 1)I(0, ) 	## implies half-cauchy with scale of 25
      for(i in 1:M) {
@@ -406,14 +407,14 @@ cat ("
      alpha0[k, t] ~ dnorm(0, 0.1)
      } # k
      } # t
-
+     
      for(i in 1:M) {
      z[i] ~ dbern(psi)
      s[i] ~ dunif(xlimA[1], xlimA[2])
-
+     
      for(j in 1:n_traps) {
      d[i,j] <- abs(s[i] - traplocsA[j])
-
+     
      for(k in 1:K) {
      for(t in 1:2) {
      logit(p0[i, j, k, t]) <- alpha0[k, t] + eta[i,k]
@@ -421,7 +422,7 @@ cat ("
      } # j
      } # k
      } # t
-
+     
      for(i in 1:M) {
      Sex[i] ~ dbern(psi.sex)
      Sex2[i] <- Sex[i] + 1
@@ -432,15 +433,14 @@ cat ("
      } # i
      } # j
      } # k
-
+     
      # Derived parameters
      N <- sum(z[ ])
      density <- N / (xlimA[2] - xlimA[1]) # divided distances by 100 so calculates turtles per 100 m of canal
      }
-     ", file = "Code/JAGS/SCRA.txt")
+     ", file = "Code/JAGS/SCRA_Sex_Time_Ind.txt")
 
-
-
+###########################
 
 jags_data <- list(y = EM_array, Sex = Sex, traplocsA = traplocsA, K=K, M=M, xlimA=xlimA, n_traps = n_traps)
 inits <- function() {
@@ -497,6 +497,9 @@ summary(cpic_1_mcmc[ , c("alpha0", "alpha1", "density")])
 # summary(cpic_1_mcmc)
 
 save(cpic_1_mcmc, file = "Results/JAGS/cpic_1_mcmc.RData")
+
+#############################
+
 
 
 #------ Prior check on alpha1 -----
