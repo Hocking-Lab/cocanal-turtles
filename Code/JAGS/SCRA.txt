@@ -1,20 +1,35 @@
 
-model {
-    alpha0 ~ dnorm(0, 0.1)
-    logit(p0) <- alpha0
-    alpha1 ~ dnorm(0, 0.1)
-    sigma <- pow(1/(2*alpha1), 0.5) # circular home range?
-    psi ~ dunif(0, 1)
-    for(i in 1:M) {
-        z[i] ~ dbern(psi)
-        s[i] ~ dunif(xlimA[1], xlimA[2])
-        for(j in 1:n_traps) {
-            d[i,j] <- abs(s[i] - traplocsA[j])
-            y[i,j] ~ dbin(p[i,j], K)
-            p[i,j] <- z[i]*p0*exp(- alpha1 * d[i,j] * d[i,j])
-      }
-    }
+  model {
+     # alpha1 ~ dgamma(0.1, 0.1) # consider appropriate prior
+     # alpha1 ~ dt(0, 1 / (5^2), 1)I(0, ) 	## implies half-cauchy with scale of 5
+     alpha1 ~ dnorm(0, 1 / (25^2))I(0, ) 	## half normal
+     sigma <- pow(1 / (2*alpha1), 0.5) # sd of half normal
+     psi ~ dunif(0, 1)
 
-N <- sum(z[])
-D <- N/(xlimA[2] - xlimA[1])
+sigma_ind ~ dt(0, 1 / (25^2), 1)I(0, ) 	## implies half-cauchy with scale of 25
+for(i in 1:M) {
+for(k in 1:K) {
+eta[i,k] ~ dnorm(0, 1 / (sigma_ind * sigma_ind))
 }
+}
+
+     for(k in 1:K) {
+     alpha0[k] ~ dnorm(0, 0.1)
+     }
+     for(i in 1:M) {
+     z[i] ~ dbern(psi)
+     s[i] ~ dunif(xlimA[1], xlimA[2])
+     for(j in 1:n_traps) {
+     d[i,j] <- abs(s[i] - traplocsA[j])
+     for(k in 1:K) {
+logit(p0[i,j,k]) <- alpha0[k] + eta[i,k]
+     y[i,j, k] ~ dbern(p[i,j,k])
+     p[i,j, k] <- z[i]*p0[i,j,k]*exp(- alpha1 * d[i,j] * d[i,j])
+     }
+     }
+     }
+     # Derived parameters
+     N <- sum(z[ ])
+     density <- N / (xlimA[2] - xlimA[1]) # divided distances by 100 so calculates turtles per 100 m of canal
+     }
+     
