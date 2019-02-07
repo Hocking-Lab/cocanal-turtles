@@ -15,25 +15,6 @@ head(EDF)
 #Add a new column for integer session values (session = site)
 
 EDF$site_num <- as.integer(as.factor(EDF$site))
-# 
-# EDF$session <- NA
-# head(EDF)
-# EDF$session <- ifelse(EDF$site == "A", 1,
-#                   ifelse(EDF$site == "C", 2,
-#                     ifelse(EDF$site == "D", 3,
-#                       ifelse(EDF$site == "E", 4,
-#                          ifelse(EDF$site == "F", 5,
-#                            ifelse(EDF$site == "G", 6,
-#                              ifelse(EDF$site == "H", 7,
-#                                ifelse(EDF$site == "I", 8,
-#                                  ifelse(EDF$site == "J", 9,
-#                                    ifelse(EDF$site == "K", 10,
-#                                      ifelse(EDF$site == "L", 11,
-#                                        ifelse(EDF$site == "M", 12,
-#                                         ifelse(EDF$site == "N", 13,
-#                                           ifelse(EDF$site == "O", 14, NA)
-#                                         )))))))))))))
-# head(EDF)
 summary(EDF)
 
 ## Creating model for 1 site first
@@ -186,6 +167,7 @@ cat ("
      for(i in 1:M) {
      for(k in 1:K) { ## Would it work to add an extra eta loop here for sex?
      eta[i,k] ~ dnorm(0, 1 / (sigma_ind * sigma_ind))
+     alpha2[i, k] ~ dnorm(0, 0.1)
      } # i
      } # k
      
@@ -204,7 +186,7 @@ cat ("
      
      for(k in 1:K) {
      for(t in 1:2) {
-     logit(p0[i, j, k, t]) <- alpha0[k, t] + alpha2*C[i,k]+ eta[i,k] # alpha2*C to rep. global behav. response
+     logit(p0[i, j, k, t]) <- alpha0[k, t] + (alpha2*C[i,k]) + eta[i,k] # alpha2*C to rep. global behav. response
      } # i
      } # j
      } # k
@@ -234,7 +216,7 @@ cat ("
 jags_data_m4 <- list(y = EM_array, Sex = Sex, traplocsA = traplocsA, K=K, M=M, xlimA=xlimA, n_traps = n_traps, C = C) #, n_ind = n_ind)
 # "initial values for the observed data have to be specified as NA"
 inits <- function() {
-  list(alpha0=matrix(rnorm(K*2,-2,0.5), 4, 2), alpha1=runif(2,1,2), s=as.numeric(sst), z=z, psi = runif(1), psi.sex = runif(1)) #, Sex = c(rep(NA, n_ind))) ## Error = "Invalid parameters for chain 1: non-numeric intial values supplied for variable(s) Sex"
+  list(alpha0=matrix(rnorm(K*2,-2,0.5), 4, 2), alpha1=runif(2,1,2), alpha2=runif(2,1,2), s=as.numeric(sst), z=z, psi = runif(1), psi.sex = runif(1)) #, Sex = c(rep(NA, n_ind))) ## Error = "Invalid parameters for chain 1: non-numeric intial values supplied for variable(s) Sex"   #### ALPHA2????
 }
 
 parameters <- c("sigma", "N", "density", "s", "sigma_ind", "psi", "psi.sex", "C") 
@@ -261,7 +243,7 @@ if(testing) {
 
 # run in parallel explicitly
 
-cl <- makeCluster(nc)                       # Request # cores
+cl <- makeCluster(nc)                        # Request # cores
 clusterExport(cl, c("jags_data_m4", "inits", "parameters", "n_ind", "z", "sst", "Sex", "ni", "na", "nt", "K", "C")) # Make these available
 clusterSetRNGStream(cl = cl, 54354354)
 
@@ -273,6 +255,8 @@ system.time({ # no status bar (% complete) when run in parallel
     return(as.mcmc(out))
   })
 }) #
+
+
 
 stopCluster(cl)
 
