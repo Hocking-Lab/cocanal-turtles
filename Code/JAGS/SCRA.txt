@@ -28,7 +28,7 @@ logit(p0[i,j,k]) <- alpha0[k] + eta[i,k]
      }
      }
      }
-     
+
      # Derived parameters
      N <- sum(z[ ])
      density <- N / (xlimA[2] - xlimA[1]) # divided distances by 100 so calculates turtles per 100 m of canal

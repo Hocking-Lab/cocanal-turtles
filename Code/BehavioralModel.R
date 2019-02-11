@@ -131,21 +131,39 @@ BM <- as.data.frame(BM, stringsAsFactors = FALSE)
 BM$behav <- ifelse(BM$recap == "R", 1, 0)
 BM_less <- select(BM, -recap)
 
+# make Cij with 1 if a recap and 0 otherwise
+C_obs <- BM_less %>%
+  expand(ind, day) %>%
+  left_join(BM_less) %>%
+  group_by(ind) %>%
+  mutate(behav = ifelse(is.na(behav), 0, behav),
+         cumu = cumsum(behav)) %>%
+  mutate(cij = ifelse(cumu > 0, 1, 0)) %>% # if you stop it here you can see what it's doing 
+  select(ind, day, cij) %>%
+  spread(key = day, value = cij, sep = "_") %>% # stop here if you want to see individual ID before dropping it
+  ungroup %>%
+  select(-ind)
+
+# augment unobserved individuals
+C_unobs <- as.data.frame(matrix(0, nrow = M-nrow(C_obs), ncol = 4))
+colnames(C_unobs) <- colnames(C_obs)
+C <- bind_rows(C_obs, C_unobs)
+
 
 #nrow(BM_less[(which(BM_less$day == i)), ])
 
-BM_array <- array(NA, dim = c(M, K))
-for(i in 1:K){
-  df_bm_aug <- as.data.frame(matrix(0, nrow = (M - nrow(BM_less[(which(BM_less$day == i)), ])), ncol = 1), stringsAsFactors = FALSE)
-  foobm <- BM_less[(which(BM_less$day == i)), ]
-  foobm_less <- select(foobm, - ind, - day)
-  colnames(foobm_less) <- colnames(df_bm_aug)
-  foobm_augment <- bind_rows(foobm_less, df_bm_aug)
-  BM_array[1:(M), i] <- as.matrix(foobm_augment)
-  
-}  ## NEED TO ADD IN INDIVIDUALS NOT CAUGHT ON SPECIFIC TRAP DAYS, BUT CAUGHT ON OTHER TRAP OCCASIONS
-
-C <- BM_array
+# BM_array <- array(NA, dim = c(M, K))
+# for(i in 1:K){
+#   df_bm_aug <- as.data.frame(matrix(0, nrow = (M - nrow(BM_less[(which(BM_less$day == i)), ])), ncol = 1), stringsAsFactors = FALSE)
+#   foobm <- BM_less[(which(BM_less$day == i)), ]
+#   foobm_less <- select(foobm, - ind, - day)
+#   colnames(foobm_less) <- colnames(df_bm_aug)
+#   foobm_augment <- bind_rows(foobm_less, df_bm_aug)
+#   BM_array[1:(M), i] <- as.matrix(foobm_augment)
+#   
+# }  ## NEED TO ADD IN INDIVIDUALS NOT CAUGHT ON SPECIFIC TRAP DAYS, BUT CAUGHT ON OTHER TRAP OCCASIONS
+# 
+# C <- BM_array
 
 
 #########
