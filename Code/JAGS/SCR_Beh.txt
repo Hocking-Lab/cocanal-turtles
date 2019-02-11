@@ -1,0 +1,58 @@
+
+     model {
+     # alpha1 ~ dgamma(0.1, 0.1) # consider appropriate prior
+     # alpha1 ~ dt(0, 1 / (5^2), 1)I(0, ) 	## implies half-cauchy with scale of 5
+     psi ~ dunif(0, 1) # giving numbers between 0 and 1, need to change?
+     psi.sex ~ dunif(0, 1)
+     
+     for(t in 1:2){
+     alpha1[t] ~ dnorm(0, 1 / (25^2))I(0, ) 	## half normal
+     sigma[t] <- pow(1 / (2*alpha1[t]), 0.5) # sd of half normal
+     } # t
+     
+     
+     sigma_ind ~ dt(0, 1 / (25^2), 1)I(0, ) 	## implies half-cauchy with scale of 25
+     for(i in 1:M) {
+     for(k in 1:K) { ## Would it work to add an extra eta loop here for sex?
+     eta[i,k] ~ dnorm(0, 1 / (sigma_ind * sigma_ind))
+     alpha2[i, k] ~ dnorm(0, 0.1)
+     } # i
+     } # k
+     
+     for(k in 1:K) {
+     for(t in 1:2) {
+     alpha0[k, t] ~ dnorm(0, 0.1)
+     } # k
+     } # t
+     
+     for(i in 1:M) {
+     z[i] ~ dbern(psi)
+     s[i] ~ dunif(xlimA[1], xlimA[2])
+     
+     for(j in 1:n_traps) {
+     d[i,j] <- abs(s[i] - traplocsA[j])
+     
+     for(k in 1:K) {
+     for(t in 1:2) {
+     logit(p0[i, j, k, t]) <- alpha0[k, t] + (alpha2*C[i,k])+ eta[i,k] # alpha2*C to rep. global behav. response
+     } # i
+     } # j
+     } # k
+     } # t
+     
+     for(i in 1:M) {
+     Sex[i] ~ dbern(psi.sex)
+     Sex2[i] <- Sex[i] + 1
+     for (j in 1:n_traps) {
+     for (k in 1:K) {
+     y[i, j, k] ~ dbern(p[i,j,k])
+     p[i, j, k] <- z[i]*p0[i, j, k, Sex2[i]]* exp(- alpha1[Sex2[i]] * d[i,j] * d[i,j])
+     } # i
+     } # j
+     } # k
+     
+     # Derived parameters
+     N <- sum(z[ ])
+     density <- N / (xlimA[2] - xlimA[1]) # divided distances by 100 so calculates turtles per 100 m of canal
+     }
+     
