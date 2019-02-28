@@ -294,4 +294,3 @@ out2 <- mcmc.list(out)
 plot(out2[ , c("N", "density", "sigma_ind")])
 
 ######################################
-
