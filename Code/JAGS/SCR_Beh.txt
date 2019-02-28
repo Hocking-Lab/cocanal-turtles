@@ -34,7 +34,7 @@
      
      for(k in 1:K) {
      for(t in 1:2) {
-     logit(p0[i, j, k, t]) <- alpha0[k, t] + (alpha2*C[i,j,k]) + eta[i,k] # alpha2*C to rep. global behav. response
+     logit(p0[i, j, k, t]) <- alpha0[k, t] + (alpha2*C[i,k]) + eta[i,k] # alpha2*C to rep. global behav. response
      } # i
      } # j
      } # k
