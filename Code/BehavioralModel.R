@@ -204,7 +204,7 @@ cat ("
      
      for(k in 1:K) {
      for(t in 1:2) {
-     logit(p0[i, j, k, t]) <- alpha0[k, t] + (alpha2*C[i,k]) + eta[i,k] # alpha2*C to rep. global behav. response
+     logit(p0[i, j, k, t]) <- alpha0[k, t] + (alpha2[i, k] * C[i, k]) + eta[i, k] # alpha2*C to rep. global behav. response
      } # i
      } # j
      } # k
@@ -231,10 +231,22 @@ cat ("
 
 ############ Running ITS Model ##############
 
-jags_data_m4 <- list(y = EM_array, Sex = Sex, traplocsA = traplocsA, K=K, M=M, xlimA=xlimA, n_traps = n_traps, C = C) #, n_ind = n_ind)
+jags_data_m4 <- list(y = EM_array, 
+                     Sex = Sex, 
+                     traplocsA = traplocsA, 
+                     K=K, 
+                     M=M, 
+                     xlimA=xlimA, 
+                     n_traps = n_traps, 
+                     C = C) #, n_ind = n_ind)
 # "initial values for the observed data have to be specified as NA"
 inits <- function() {
-  list(alpha0=matrix(rnorm(K*2,-2,0.5), 4, 2), alpha1=runif(2,1,2), alpha2=runif(2,1,2), s=as.numeric(sst), z=z, psi = runif(1), psi.sex = runif(1)) #, Sex = c(rep(NA, n_ind))) ## Error = "Invalid parameters for chain 1: non-numeric intial values supplied for variable(s) Sex"   #### ALPHA2????
+  list(alpha0=matrix(rnorm(K*2,-2,0.5), 4, 2), 
+       alpha1=runif(2,1,2), 
+       alpha2=matrix(runif(K*M, 1, 2), M, K),
+       s=as.numeric(sst), 
+       z=z, psi = runif(1), 
+       psi.sex = runif(1)) #, Sex = c(rep(NA, n_ind))) ## Error = "Invalid parameters for chain 1: non-numeric intial values supplied for variable(s) Sex"   #### ALPHA2????
 }
 
 parameters <- c("sigma", "N", "density", "s", "sigma_ind", "psi", "psi.sex", "C") 
@@ -262,7 +274,7 @@ if(testing) {
 # run in parallel explicitly
 
 cl <- makeCluster(nc)                        # Request # cores
-clusterExport(cl, c("jags_data_m4", "inits", "parameters", "n_ind", "z", "sst", "Sex", "ni", "na", "nt", "K", "C")) # Make these available
+clusterExport(cl, c("jags_data_m4", "inits", "parameters", "n_ind", "z", "sst", "Sex", "ni", "na", "nt", "K", "C", "M")) # Make these available
 clusterSetRNGStream(cl = cl, 54354354)
 
 system.time({ # no status bar (% complete) when run in parallel
