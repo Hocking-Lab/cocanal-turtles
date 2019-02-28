@@ -37,3 +37,34 @@ dist_mat <- dist(as.data.frame(coords_utm))
 summary(dist_mat)
 
 summary(log(dist_mat))
+log_matrix <- log(dist_mat)
+
+################
+
+# Take out sites H and I  **DONE
+# Create a multisession EDF file (1-12 representing sites; pg. 193 and 221) ** DONE
+# Plug multisession EDF (per species) and matrix ("Coordinates.R") into model
+  ## Add site_num onto logit and P?
+# Obtain session estimates and average density overall (pg. 222)
+
+######
+
+library(dplyr)
+library(tidyr)
+library(rjags)
+library(parallel)
+
+EDF <- read.csv(file = "Data/EDF.csv", stringsAsFactors = FALSE)
+head(EDF)
+summary(EDF)
+
+EDF <- EDF %>%
+  filter(site != "H" & site != "I" & species == "CPIC")
+EDF
+
+#Add a new column for integer session values (session = site)
+
+EDF$site_num <- as.integer(as.factor(EDF$site))
+summary(EDF)
+
+
