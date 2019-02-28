@@ -185,16 +185,21 @@ cat ("
      for(i in 1:M) {
      for(k in 1:K) { ## Would it work to add an extra eta loop here for sex?
      eta[i,k] ~ dnorm(0, 1 / (sigma_ind * sigma_ind))
-     alpha2[i, k] ~ dnorm(0, 0.1)
      } # i
      } # k
      
-     for(k in 1:K) {
      for(t in 1:2) {
-     alpha0[k, t] ~ dnorm(0, 0.1)
-     } # k
+     alpha0[t] ~ dnorm(0, 0.1)
      } # t
-     
+    
+
+     for(m in 1:M) {
+     alpha2[m] ~ dnorm(mu_a2, 1 / sd_a2 / sd_a2)
+     }
+    mu_a2 ~ dnorm(0, 0.01)
+    # sd_a2 ~ dt(0, pow(5, -2), 1)T(0, ) # half cauchy prior with scale = 5 (25?)
+     sd_a2 ~ dunif(0, 5)
+
      for(i in 1:M) {
      z[i] ~ dbern(psi)
      s[i] ~ dunif(xlimA[1], xlimA[2])
@@ -204,7 +209,7 @@ cat ("
      
      for(k in 1:K) {
      for(t in 1:2) {
-     logit(p0[i, j, k, t]) <- alpha0[k, t] + (alpha2[i, k] * C[i, k]) + eta[i, k] # alpha2*C to rep. global behav. response
+     logit(p0[i, j, k, t]) <- alpha0[t] + (alpha2[i] * C[i, k]) + eta[i, k] # alpha2*C to rep. global behav. response
      } # i
      } # j
      } # k
@@ -227,6 +232,66 @@ cat ("
      }
      ", file = "Code/JAGS/SCR_Beh.txt")
 
+
+cat ("
+     model {
+     # alpha1 ~ dgamma(0.1, 0.1) # consider appropriate prior
+     # alpha1 ~ dt(0, 1 / (5^2), 1)I(0, ) 	## implies half-cauchy with scale of 5
+     psi ~ dunif(0, 1) # giving numbers between 0 and 1, need to change?
+     psi.sex ~ dunif(0, 1)
+     
+     for(t in 1:2){
+     alpha1[t] ~ dnorm(0, 1 / (25^2))I(0, ) 	## half normal
+     sigma[t] <- pow(1 / (2*alpha1[t]), 0.5) # sd of half normal
+     } # t
+     
+     
+     sigma_ind ~ dt(0, 1 / (25^2), 1)I(0, ) 	## implies half-cauchy with scale of 25
+     for(i in 1:M) {
+     for(k in 1:K) { ## Would it work to add an extra eta loop here for sex?
+     eta[i,k] ~ dnorm(0, 1 / (sigma_ind * sigma_ind))
+     } # i
+     } # k
+     
+     for(t in 1:2) {
+     alpha0[t] ~ dnorm(0, 0.1)
+     } # t
+     
+     alpha2 ~ dnorm(0, 0.01)
+     
+     for(i in 1:M) {
+     z[i] ~ dbern(psi)
+     s[i] ~ dunif(xlimA[1], xlimA[2])
+     
+     for(j in 1:n_traps) {
+     d[i,j] <- abs(s[i] - traplocsA[j])
+     
+     for(k in 1:K) {
+     for(t in 1:2) {
+     logit(p0[i, j, k, t]) <- alpha0[t] + (alpha2 * C[i, k]) + eta[i, k] # alpha2*C to rep. global behav. response
+     } # i
+     } # j
+     } # k
+     } # t
+     
+     for(i in 1:M) {
+     Sex[i] ~ dbern(psi.sex)
+     Sex2[i] <- Sex[i] + 1
+     for (j in 1:n_traps) {
+     for (k in 1:K) {
+     y[i, j, k] ~ dbern(p[i,j,k])
+     p[i, j, k] <- z[i]*p0[i, j, k, Sex2[i]]* exp(- alpha1[Sex2[i]] * d[i,j] * d[i,j])
+     } # i
+     } # j
+     } # k
+     
+     # Derived parameters
+     N <- sum(z[ ])
+     density <- N / (xlimA[2] - xlimA[1]) # divided distances by 100 so calculates turtles per 100 m of canal
+     }
+     ", file = "Code/JAGS/SCR_Beh2.txt")
+
+
 ############## End ITS Model ################
 
 ############ Running ITS Model ##############
@@ -241,15 +306,24 @@ jags_data_m4 <- list(y = EM_array,
                      C = C) #, n_ind = n_ind)
 # "initial values for the observed data have to be specified as NA"
 inits <- function() {
-  list(alpha0=matrix(rnorm(K*2,-2,0.5), 4, 2), 
+  list(alpha0=rnorm(2,-2,0.5), 
        alpha1=runif(2,1,2), 
-       alpha2=matrix(runif(K*M, 1, 2), M, K),
+       alpha2=runif(M, 1, 2),
        s=as.numeric(sst), 
        z=z, psi = runif(1), 
        psi.sex = runif(1)) #, Sex = c(rep(NA, n_ind))) ## Error = "Invalid parameters for chain 1: non-numeric intial values supplied for variable(s) Sex"   #### ALPHA2????
 }
 
-parameters <- c("sigma", "N", "density", "s", "sigma_ind", "psi", "psi.sex", "C") 
+inits2 <- function() {
+  list(alpha0=rnorm(2,-2,0.5), 
+       alpha1=runif(2,1,2), 
+       alpha2=runif(1, 1, 2),
+       s=as.numeric(sst), 
+       z=z, psi = runif(1), 
+       psi.sex = runif(1)) #, Sex = c(rep(NA, n_ind))) ## Error = "Invalid parameters for chain 1: non-numeric intial values supplied for variable(s) Sex"   #### ALPHA2????
+}
+
+parameters <- c("sigma", "N", "density", "s", "sigma_ind", "psi", "psi.sex", "C", "alpha2") 
 
 # cpic_1_mcmc <- jagsUI(model.file = "Code/JAGS/SCRA.txt", parameters.to.save = parameters, data=jags_data, inits=inits, n.iter = 1000, n.chains = 3, n.adapt =500) # jagsUI is nice but the plotting is interactive which is obnoxious 
 
@@ -274,13 +348,13 @@ if(testing) {
 # run in parallel explicitly
 
 cl <- makeCluster(nc)                        # Request # cores
-clusterExport(cl, c("jags_data_m4", "inits", "parameters", "n_ind", "z", "sst", "Sex", "ni", "na", "nt", "K", "C", "M")) # Make these available
+clusterExport(cl, c("jags_data_m4", "inits", "inits2", "parameters", "n_ind", "z", "sst", "Sex", "ni", "na", "nt", "K", "C", "M")) # Make these available
 clusterSetRNGStream(cl = cl, 54354354)
 
 system.time({ # no status bar (% complete) when run in parallel
   out <- clusterEvalQ(cl, {
     library(rjags)
-    jm <- jags.model("Code/JAGS/SCR_Beh.txt", jags_data_m4, inits, n.adapt = na, n.chains = 1) # Compile model and run burnin
+    jm <- jags.model("Code/JAGS/SCR_Beh2.txt", jags_data_m4, inits = inits2, n.adapt = na, n.chains = 1) # Compile model and run burnin
     out <- coda.samples(jm, parameters, n.iter = ni, thin = nt) # Sample from posterior distribution
     return(as.mcmc(out))
   })
@@ -291,7 +365,7 @@ system.time({ # no status bar (% complete) when run in parallel
 stopCluster(cl)
 
 out2 <- mcmc.list(out)
-plot(out2[ , c("N", "density", "sigma_ind")])
+plot(out2[ , c("N", "density", "sigma_ind", "alpha2", "alpha0", "sigma")])
 
 ######################################
 
