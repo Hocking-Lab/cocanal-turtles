@@ -26,13 +26,17 @@ coords_utm <- spTransform(coords_dd, CRS("+init=epsg:26917"))
 trap_locs <- coords_utm
 trap_locs <- as.data.frame(trap_locs)
 trap_locs<- cbind(trap_num, trap_locs)
-colnames(trap_locs) = c("trap", "easting", "northing")
+colnames(trap_locs) = c("trap_id", "easting", "northing")
 
 dist_mat <- dist(as.data.frame(coords_utm))
+str(dist_mat)
 summary(dist_mat)
 
 summary(log(dist_mat))
 head(dist_mat)
+
+dist_mat <- as.matrix(dist_mat)
+str(dist_mat)
 
 ## trap number and row number match... thus row numbers in matrix represent trap numbers -- 121 in matrix though vs. 122 traps?
 
