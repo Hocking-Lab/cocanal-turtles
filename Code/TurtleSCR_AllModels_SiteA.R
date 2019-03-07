@@ -46,6 +46,37 @@ EDFA <- EDF %>%
 EDFA
 
 # Create a Trap Location Matrix (integers = distance apart in m)
+
+
+library(zoo)
+library(rgdal)
+# library(sgeostat)
+# library(seriation)
+
+coords <- read.csv(file = "Data/coords.csv")
+str(coords)
+summary(coords)
+
+
+# convert to utm to have distance in meters
+coords_dd = SpatialPoints(coords[ , c("lon", "lat")], proj4string=CRS("+proj=longlat"))
+coords_utm <- spTransform(coords_dd, CRS("+init=epsg:26917"))
+
+dist_mat <- dist(as.data.frame(coords_utm))
+summary(dist_mat)
+
+summary(log(dist_mat))
+
+
+
+
+
+
+
+
+
+
+
 traplocsA <- c(0,25,50,75,100,125,150,175) # create trap location file
 #this is in a vertical format
 traplocsA
@@ -281,9 +312,9 @@ cat ("
     alpha1 ~ dt(0, 1 / (5^2), 1)I(0, ) 	## implies half-cauchy with scale of 5
     sigma <- pow(1 / (2*alpha1), 0.5) # sd of half normal
     psi ~ dunif(0, 1)
-    for(k in 1:K) {
-      alpha0[k] ~ dnorm(0, 0.1)
-      logit(p0[k]) <- alpha0[k]
+    for(k in 1:K) {  ##
+      alpha0[k] ~ dnorm(0, 0.1) ##
+      logit(p0[k]) <- alpha0[k] ##
     }
     for(i in 1:M) {
       z[i] ~ dbern(psi)
@@ -291,8 +322,8 @@ cat ("
       for(j in 1:n_traps) {
         d[i,j] <- abs(s[i] - traplocsA[j])
         for(k in 1:K) {
-          y[i,j, k] ~ dbern(p[i,j, k])
-          p[i,j, k] <- z[i]*p0[k]*exp(- alpha1 * d[i,j] * d[i,j])
+          y[i,j, k] ~ dbern(p[i,j, k]) ##
+          p[i,j, k] <- z[i]*p0[k]*exp(- alpha1 * d[i,j] * d[i,j])  ##
         }
       }
     }

@@ -21,15 +21,15 @@
      for(t in 1:2) {
      alpha0[t] ~ dnorm(0, 0.1)
      } # t
-    
-
+     
+     
      for(m in 1:M) {
      alpha2[m] ~ dnorm(mu_a2, 1 / sd_a2 / sd_a2)
      }
-    mu_a2 ~ dnorm(0, 0.01)
-    # sd_a2 ~ dt(0, pow(5, -2), 1)T(0, ) # half cauchy prior with scale = 5 (25?)
+     mu_a2 ~ dnorm(0, 0.01)
+     # sd_a2 ~ dt(0, pow(5, -2), 1)T(0, ) # half cauchy prior with scale = 5 (25?)
      sd_a2 ~ dunif(0, 5)
-
+     
      for(i in 1:M) {
      z[i] ~ dbern(psi)
      s[i] ~ dunif(xlimA[1], xlimA[2])
