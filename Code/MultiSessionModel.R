@@ -25,7 +25,7 @@ coords_utm <- spTransform(coords_dd, CRS("+init=epsg:26917"))
 
 trap_locs <- coords_utm
 trap_locs <- as.data.frame(trap_locs)
-trap_locs<- cbind(trap_num, trap_locs)
+trap_locs <- cbind(trap_num, trap_locs)
 colnames(trap_locs) = c("trap_id", "easting", "northing")
 
 dist_mat <- dist(as.data.frame(coords_utm))
