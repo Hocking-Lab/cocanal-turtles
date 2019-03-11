@@ -27,6 +27,9 @@ trap_locs <- coords_utm
 trap_locs <- as.data.frame(trap_locs)
 trap_locs <- cbind(trap_num, trap_locs)
 colnames(trap_locs) = c("trap_id", "easting", "northing")
+# trap_locs as single vector with distance between
+
+
 
 dist_mat <- dist(as.data.frame(coords_utm))
 str(dist_mat)
@@ -38,6 +41,8 @@ head(dist_mat)
 dist_mat <- as.matrix(dist_mat)
 str(dist_mat)
 
+log_dist_mat <- log(dist_mat)
+
 ## trap number and row number match... thus row numbers in matrix represent trap numbers -- 121 in matrix though vs. 122 traps?
 
 ####### EDF FILE ########
@@ -48,19 +53,16 @@ summary(EDF)
 
 #Take out sites H and I
 
-EDF <- EDF %>%
+EDF_CPIC <- EDF %>%
   filter(site != "H" & site != "I" & species == "CPIC")
-EDF
+EDF_CPIC
+
 
 #Add a new column for integer session values (session = site)
 
-EDF$site_num <- as.integer(as.factor(EDF$site))
-summary(EDF)
+EDF_CPIC$site_num <- as.integer(as.factor(EDF_CPIC$site))
+summary(EDF_CPIC)
 
-#Add a new column for integer session values (session = site)
-
-EDF$site_num <- as.integer(as.factor(EDF$site))
-summary(EDF)
 
 ## How to label trap numbers in overall EDF file? esp. as some are "skipped" -- caught 0 turtles
 
@@ -82,58 +84,68 @@ summary(EDF)
 # matrixA[ ,8] <- c(175,150,125,100,75, 50,25,0)
 # matrixA  # will need to use coordinates if use all sites in 1 model! or figure out distance b/w sites
 # 
+
+####### WORK ON THIS SECTION NEXT 3_11_19 ########
+
 # traplocsA <- traplocsA / 100
 # matrixA <- matrixA / 100 # scale for computational purposes
 # 
-# n_traps <- ncol(matrixA) # number of traps
+n_traps <- ncol(dist_mat) # number of traps ########
 # # as.character(EDFA$recap)
-# N <- nrow(EDFA[which(EDFA$recap == "N"), ])
-# K <- max(EDFA$day) # trap nights per session
+N <- nrow(EDF_CPIC[which(EDF_CPIC$recap == "N"), ])
+K <- max(EDF_CPIC$day) # trap nights per session
 # buffer <- 1 # check literature to make sure doesn't need to be larger
 # #xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
 # xlimA <- c(min(matrixA)-buffer, max(matrixA) + buffer)
 # xlimA
-# n_ind <- length(unique(EDFA$ind))
+n_ind <- length(unique(EDF_CPIC$ind)) ## Needs to match up with N? 4 off...
 
 # Make encounter histories with number of times each individual is captured in each trap
 
-str(EDFA)
-EDFA
+str(EDF)
+EDF_CPIC
 
-EM <- EDFA %>%
-  group_by(ind, trap, day) %>%
-  select(ind, trap, day) %>%
+EM_CPIC <- EDF_CPIC %>%
+  group_by(ind, site_num, trap_id, day) %>%
+  select(ind, site_num, trap_id, day) %>%
   mutate(count = 1) %>%
   summarise_all(sum) %>%
-  spread(trap, count, fill = 0) %>%
+  spread(trap_id, count, fill = 0) %>%
   ungroup()
 # EM <- data.frame(select(EM, -ind))
-str(EM)
-EM
+str(EM_CPIC)
+EM_CPIC
 
-full_df <- tidyr::expand(EM, ind, day)
+full_df_CPIC <- tidyr::expand(EM_CPIC, ind, day, site_num)
 
-EM <- left_join(full_df, EM)
-EM <- as.data.frame(EM, stringsAsFactors = FALSE)
-EM[is.na(EM)] <- 0
+EM_CPIC <- left_join(full_df_CPIC, EM_CPIC)
+EM_CPIC <- as.data.frame(EM_CPIC, stringsAsFactors = FALSE)
+EM_CPIC[is.na(EM_CPIC)] <- 0
+head(EM_CPIC)
 
 # Data Augmentation
-M <- 200 # max population size
+M_allsites <- 8000 # max population size
 # J <- n_traps
 # y <- rbind(EM[ , 2], matrix(0, nrow = M-n_ind, ncol = n_ind))
 # y <- rbind(EM, matrix(0, nrow = M - n_ind, ncol = n_traps))
-z <- c(rep(1, n_ind), rep(0, M-n_ind))
-df_aug <- as.data.frame(matrix(0, nrow = (M - n_ind), ncol = n_traps), stringsAsFactors = FALSE)
+z <- c(rep(1, n_ind), rep(0, M_allsites-n_ind))
+df_aug <- as.data.frame(matrix(0, nrow = (M_allsites - n_ind), ncol = n_traps), stringsAsFactors = FALSE)
+num_sites <- max(EDF_CPIC$site_num)
+G <- num_sites
 
 # convert to 3D array (n_individuals + augmented individuals) x n_traps x n_days
-EM_array <- array(NA, dim = c(M, n_traps, K))
-for(i in 1:K){
-  foo <- EM[(which(EM[]$day == i)), ]
+
+EM_array_CPIC <- array(NA, dim = c(M_allsites, n_traps, K, G))
+####????
+for(g in 1:G) {
+for(i in 1:K) {
+  foo <- EM_CPIC[(which(EM_CPIC[]$day == i) & EM_CPIC[]$site_num == g), ]
   foo_less <- select(foo, -ind, -day)
   colnames(foo_less) <- colnames(df_aug)
   foo_augment <- bind_rows(foo_less, df_aug)
-  EM_array[1:(M), 1:n_traps, i] <- as.matrix(foo_augment)
-}
+  EM_array_CPIC[1:(M_allsites), 1:n_traps, i] <- as.matrix(foo_augment)
+} i
+} g
 
 # EM <- cbind(1:n_ind, rowSums(EM))
 # EM <- rowSums(EM)
