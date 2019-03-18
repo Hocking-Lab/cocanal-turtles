@@ -227,6 +227,12 @@ C <- bind_rows(C_obs, C_unobs)
 
 cat ("
      model {
+
+    for(g in 1:Sites) {
+
+
+    }
+
      # alpha1 ~ dgamma(0.1, 0.1) # consider appropriate prior
      # alpha1 ~ dt(0, 1 / (5^2), 1)I(0, ) 	## implies half-cauchy with scale of 5
      psi ~ dunif(0, 1) # giving numbers between 0 and 1, need to change?
