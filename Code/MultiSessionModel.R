@@ -222,57 +222,57 @@ C <- bind_rows(C_obs, C_unobs)
 # 
 # C <- BM_array
 
+Sites <- read.csv(file = "Data/trapids_sites.csv", header = TRUE)
 
 #########
 
 cat ("
      model {
 
-    for(g in 1:Sites) {
+    for(g in 1:length(Sites)) {
 
+     alpha1[g, t] ~ dnorm(mu_a1, 1 / sd_a1 / sd_a1 )
+     mu_a1 ~ dnorm(0, 1 / (25^2))I(0, ) ## half normal
+     sd_a1 ~ dunif(0, 5)
 
-    }
-
-     # alpha1 ~ dgamma(0.1, 0.1) # consider appropriate prior
-     # alpha1 ~ dt(0, 1 / (5^2), 1)I(0, ) 	## implies half-cauchy with scale of 5
-     psi ~ dunif(0, 1) # giving numbers between 0 and 1, need to change?
-     psi.sex ~ dunif(0, 1)
-     
      for(t in 1:2){
-     alpha1[t] ~ dnorm(0, 1 / (25^2))I(0, ) 	## half normal
-     sigma[t] <- pow(1 / (2*alpha1[t]), 0.5) # sd of half normal
+     sigma[g, t] <- pow(1 / (2*alpha1[t]), 0.5) # sd of half normal
      } # t
+
+     psi[g] ~ dunif(0, 1) # giving numbers between 0 and 1, need to change?
+     psi.sex[g] ~ dunif(0, 1)
      
      
-     sigma_ind ~ dt(0, 1 / (25^2), 1)I(0, ) 	## implies half-cauchy with scale of 25
-     for(i in 1:M) {
-     for(k in 1:K) { ## Would it work to add an extra eta loop here for sex?
+     sigma_ind[g] ~ dt(0, 1 / (25^2), 1)I(0, ) 	## implies half-cauchy with scale of 25
+     
+    for(i in 1:M) {
+     for(k in 1:K) {
      eta[i,k] ~ dnorm(0, 1 / (sigma_ind * sigma_ind))
      } # i
      } # k
      
      for(t in 1:2) {
-     alpha0[t] ~ dnorm(0, 0.1)
+     alpha0[g, t] ~ dnorm(0, 0.1)
      } # t
      
      
      for(m in 1:M) {
-     alpha2[m] ~ dnorm(mu_a2, 1 / sd_a2 / sd_a2)
+     alpha2[g, m] ~ dnorm(mu_a2, 1 / sd_a2 / sd_a2) # take out g here? Trap behavior universal b/w sites?
      }
      mu_a2 ~ dnorm(0, 0.01)
      # sd_a2 ~ dt(0, pow(5, -2), 1)T(0, ) # half cauchy prior with scale = 5 (25?)
      sd_a2 ~ dunif(0, 5)
      
      for(i in 1:M) {
-     z[i] ~ dbern(psi)
-     s[i] ~ dunif(xlimA[1], xlimA[2])
+     z[g, i] ~ dbern(psi)
+     s[g, i] ~ dunif(xlim[g, 1], xlim[g, 2]) ##??
      
-     for(j in 1:n_traps) {
-     d[i,j] <- abs(s[i] - traplocsA[j])
+     for(j in 1:n_traps) {  # change n_traps to 122? or 116?
+     d[i,j] <- abs(s[g, i] - traplocsA[g, j])
      
      for(k in 1:K) {
      for(t in 1:2) {
-     logit(p0[i, j, k, t]) <- alpha0[t] + (alpha2[i] * C[i, k]) + eta[i, k] # alpha2*C to rep. global behav. response
+     logit(p0[g, i, j, k, t]) <- alpha0[t] + (alpha2[i] * C[i, k]) + eta[i, k] # alpha2*C to rep. global behav. response
      } # i
      } # j
      } # k
@@ -283,17 +283,18 @@ cat ("
      Sex2[i] <- Sex[i] + 1
      for (j in 1:n_traps) {
      for (k in 1:K) {
-     y[i, j, k] ~ dbern(p[i,j,k])
-     p[i, j, k] <- z[i]*p0[i, j, k, Sex2[i]]* exp(- alpha1[Sex2[i]] * d[i,j] * d[i,j])
+     y[g, i, j, k] ~ dbern(p[g, i,j,k])
+     p[g, i, j, k] <- z[i]*p0[g, i, j, k, Sex2[i]]* exp(- alpha1[Sex2[i]] * d[i,j] * d[i,j])
      } # i
      } # j
      } # k
      
      # Derived parameters
-     N <- sum(z[ ])
-     density <- N / (xlimA[2] - xlimA[1]) # divided distances by 100 so calculates turtles per 100 m of canal
-     }
-     ", file = "Code/JAGS/SCR_Beh.txt")
+     N[g] <- inprod(z[1:M_allsites], sitedummy[ , t]) ## see panel 9.2
+     density[g] <- N[g] / (xlimA[g, 2] - xlimA[g, 1]) # divided distances by 100 so calculates turtles per 100 m of canal
+    }
+}
+     ", file = "Code/JAGS/SCR_Allsites.txt")
 
 jags_data_m4 <- list(y = EM_array, 
                      Sex = Sex, 
