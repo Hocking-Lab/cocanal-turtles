@@ -34,14 +34,14 @@
 33,2,6/9/18,A,5,,5,CPIC,marginata,F,NA,NA,139,139,123,43,290,0,R,47,47,Y,N,N,scar on left bridge
 34,2,6/9/18,A,5,,5,CPIC,marginata,F,NA,NA,145,145,137,52,400,0,R,70,70,Y,N,N,abrasions on rear marginal scutes
 35,2,6/9/18,A,5,,5,CPIC,marginata,M,NA,NA,136,137,123,39,250,0,R,71,71,Y,N,N,plastron blotch faint; divet in right anal scute
-36,2,6/9/18,A,7,,7,CSER,NA,M,105,111,310,321,223,131,6450,7,N,120,,Y,N,N,"back left claws short, scar/coloration mark on tail"
+36,2,6/9/18,A,7,,7,CSER,NA,M,105,111,310,321,223,131,6450,7,N,120,120,Y,N,N,"back left claws short, scar/coloration mark on tail"
 37,2,6/9/18,A,7,,7,CPIC,marginata,F,NA,NA,145,145,134,54,375,4,N,101,101,Y,N,N,
 38,2,6/9/18,A,8,,8,CPIC,marginata,M,NA,NA,104,104,94,36,150,0,N,106,106,Y,N,N,plastron blotch faint
 39,2,6/9/18,A,8,,8,CPIC,marginata,M,NA,NA,115,115,104,39,180,0,R,90,90,Y,N,N,
 40,2,6/10/18,A,5,,5,SODO,NA,F,NA,NA,108,108,83,46,210,11,N,1,1,Y,Y,Y,
 41,2,6/10/18,A,6,,6,CSER,NA,F,97,50,265,274,189,106,4180,0,R,700,700,Y,Y,Y,damage between marginal scutes 100 and 200
 42,2,6/10/18,A,6,,6,CPIC,marginata,F,NA,NA,150,150,140,52,425,0,N,23,23,Y,Y,Y,
-43,2,6/10/18,A,7,,7,CSER,NA,F,96,73,281,293,210,115,4860,0,R,220,220,Y,Y,Y,saw penis everted
+43,2,6/10/18,A,7,,7,CSER,NA,M,96,73,281,293,210,115,4860,0,R,220,220,Y,Y,Y,saw penis everted; Changed sex to M
 44,2,6/10/18,A,7,,7,CPIC,marginata,M,NA,NA,143,145,132,49,330,1,N,18,18,Y,Y,Y,
 45,2,6/10/18,A,7,,7,CPIC,marginata,M,NA,NA,105,105,97,35,150,0,N,26,26,Y,N,N,damage to right most rear/caudal marginal scute and 2000; left of mark 20 indistinct
 46,2,6/10/18,A,7,,7,CPIC,NA,M,NA,NA,127,128,114,46,270,0,N,34,34,Y,N,N,right claw damaged/gone; plastron blotch faint
@@ -905,7 +905,7 @@
 904,30,8/11/18,N,5,,107,CPIC,marginata,F,NA,NA,158,158,146,56,490,0,R,670,670,Y,N,N,tail damage
 905,30,8/11/18,N,5,,107,CPIC,marginata,M,NA,NA,130,131,119,43,260,0,R,624,624,Y,N,N,
 906,30,8/11/18,N,5,,107,CPIC,marginata,M,NA,NA,109,110,100,36,165,0,N,577,577,Y,N,N,
-907,30,8/11/18,N,5,,107,CPIC,marginata,F,NA,NA,111,111,105,38,195,0,N,524,524,Y,N,N,
+907,30,8/11/18,N,5,,107,CPIC,marginata,F,NA,NA,111,111,105,38,195,0,N,524,524B,Y,N,N,Double mark; Changed from 524 to 524B
 908,30,8/11/18,N,5,,107,CPIC,marginata,M,NA,NA,128,129,116,40,220,1,N,299,299,Y,N,N,damage to 400 and 700
 909,30,8/11/18,N,5,,107,CPIC,marginata,M,NA,NA,125,127,120,42,245,0,N,580,580,Y,N,N,
 910,30,8/11/18,N,5,,107,CPIC,marginata,F,NA,NA,145,146,134,52,395,18,N,532,532,Y,N,N,
