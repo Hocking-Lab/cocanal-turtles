@@ -9,6 +9,7 @@ library(rjags)
 library(parallel)
 library(zoo)
 library(rgdal)
+library(sp)
 
 
 coords <- read.csv(file = "Data/coords.csv")
@@ -18,6 +19,31 @@ summary(coords)
 trap_locs_degrees <- coords
 trap_locs_degrees$trap <- 1:nrow(trap_locs_degrees)
 trap_num <- trap_locs_degrees$trap
+
+
+## trap locations per site, manually created (estimated 25m between each trap)
+traplocsA <- c(0,25,50,75,100,125,150,175) # create trap location file
+traplocsC <- c(0,25,50,75,100,125,150,175,200,225)
+traplocsD <- c(0,25,50,75,100,125,150,175)
+traplocsE <- c(0,25,50,75,100,125,150,175,200,225,250,275,300,325)
+traplocsF <- c(0,25,50,75,100,125,150)
+traplocsG <- c(0,25,50,75,100,125,150)
+traplocsJ <- c(0,25,50,75,100,125,150,175,200,225)
+traplocsK <- c(0,25,50,75,100,125,150,175,200,225)
+traplocsL <- c(0,25,50,75,100,125,150,175)
+traplocsM <- c(0,25,50,75,100,125,150,175,200,225,250,275)
+traplocsN <- c(0,25,50,75,100,125,150,175,200,225)
+traplocsO <- c(0,25,50,75,100,125,150,175,200,225)
+#thess are in a vertical format
+
+## List of all trap location vectors ##
+traplocs_list <- list(traplocsA, traplocsC, traplocsD, traplocsE, 
+                   traplocsF, traplocsG, traplocsJ, traplocsK, 
+                   traplocsL, traplocsM, traplocsN, traplocsO)
+
+
+## List of distance matrices (each site = 1 matrix) ##
+
 
 # convert to utm to have distance in meters
 coords_dd = SpatialPoints(coords[ , c("lon", "lat")], proj4string=CRS("+proj=longlat"))
@@ -30,7 +56,7 @@ colnames(trap_locs) = c("trap_id", "easting", "northing")
 # trap_locs as single vector with distance between
 
 
-
+## Full distance matrix with all sites combined ##
 dist_mat <- dist(as.data.frame(coords_utm))
 str(dist_mat)
 summary(dist_mat)
@@ -43,7 +69,50 @@ str(dist_mat)
 
 log_dist_mat <- log(dist_mat)
 
-## trap number and row number match... thus row numbers in matrix represent trap numbers -- 121 in matrix though vs. 122 traps?
+## trap number and row number match... thus row numbers in matrix represent trap numbers --
+
+# Separating distance matrices per site ##
+dist_mat_A <- dist(as.data.frame(coords_utm[1:8, ]))
+#str(dist_mat_A)
+dist_mat_C <- dist(as.data.frame(coords_utm[9:18, ]))
+dist_mat_D <- dist(as.data.frame(coords_utm[19:26, ]))
+dist_mat_E <- dist(as.data.frame(coords_utm[27:40, ]))
+dist_mat_F <- dist(as.data.frame(coords_utm[41:47, ]))
+dist_mat_G <- dist(as.data.frame(coords_utm[48:54, ]))
+dist_mat_J <- dist(as.data.frame(coords_utm[61:70, ]))
+dist_mat_K <- dist(as.data.frame(coords_utm[71:80, ]))
+dist_mat_L <- dist(as.data.frame(coords_utm[81:90, ]))
+dist_mat_M <- dist(as.data.frame(coords_utm[91:102, ]))
+dist_mat_N <- dist(as.data.frame(coords_utm[103:112, ]))
+dist_mat_O <- dist(as.data.frame(coords_utm[113:122, ]))
+
+# List of separated distance matrices ##
+dist_mat_list <- list(dist_mat_A, dist_mat_C, dist_mat_D,
+                      dist_mat_E, dist_mat_F, dist_mat_G,
+                      dist_mat_J, dist_mat_K, dist_mat_L,
+                      dist_mat_M, dist_mat_N, dist_mat_O)
+
+
+
+## Creating trap location vector per site using coordinates (sp package required)
+trap_dist_A <- spDistsN1(coords_utm[1:8, ], coords_utm[1, ])
+trap_dist_C <- spDistsN1(coords_utm[9:18, ], coords_utm[9, ])
+trap_dist_D <- spDistsN1(coords_utm[19:26, ], coords_utm[19, ])
+trap_dist_E <- spDistsN1(coords_utm[27:40, ], coords_utm[27, ])
+trap_dist_F <- spDistsN1(coords_utm[41:47, ], coords_utm[41, ])
+trap_dist_G <- spDistsN1(coords_utm[48:54, ], coords_utm[48, ])
+trap_dist_J <- spDistsN1(coords_utm[61:70, ], coords_utm[61, ])
+trap_dist_K <- spDistsN1(coords_utm[71:80, ], coords_utm[71, ])
+trap_dist_L <- spDistsN1(coords_utm[81:90, ], coords_utm[81, ])
+trap_dist_M <- spDistsN1(coords_utm[91:102, ], coords_utm[91, ])
+trap_dist_N <- spDistsN1(coords_utm[103:112, ], coords_utm[103, ])
+trap_dist_O <- spDistsN1(coords_utm[113:122, ], coords_utm[113, ])
+
+trap_dist_list <- list(trap_dist_A, trap_dist_C, trap_dist_D, trap_dist_E,
+                       trap_dist_F, trap_dist_G, trap_dist_J, trap_dist_K,
+                       trap_dist_L, trap_dist_M, trap_dist_N, trap_dist_O)
+
+
 
 ####### EDF FILE ########
 
@@ -90,7 +159,12 @@ summary(EDF_CPIC)
 # traplocsA <- traplocsA / 100
 # matrixA <- matrixA / 100 # scale for computational purposes
 # 
-n_traps <- ncol(dist_mat) # number of traps ########
+n_traps_site <- read.csv(file = "Data/Max_Traps_Site.csv") # number of traps per site
+n_traps <- n_traps_site$max_traps
+
+########
+
+
 # # as.character(EDFA$recap)
 N <- nrow(EDF_CPIC[which(EDF_CPIC$recap == "N"), ])
 K <- max(EDF_CPIC$day) # trap nights per session
