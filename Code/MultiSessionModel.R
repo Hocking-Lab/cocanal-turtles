@@ -167,12 +167,22 @@ n_traps <- n_traps_site$max_traps
 
 # # as.character(EDFA$recap)
 N <- nrow(EDF_CPIC[which(EDF_CPIC$recap == "N"), ])
+
+traps_per_site <- read.csv(file = "Data/trapids_sites.csv")
+
+
+## Not working
+for(g in 1:12){
+  N_persite <- list(nrow(EDF_CPIC[which(EDF_CPIC$recap == "N"), ] & EDF_CPIC$trap_id > EDF_CPIC$first_trap[g,]))
+}
+
 K <- max(EDF_CPIC$day) # trap nights per session
 # buffer <- 1 # check literature to make sure doesn't need to be larger
 # #xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
 # xlimA <- c(min(matrixA)-buffer, max(matrixA) + buffer)
 # xlimA
-n_ind <- length(unique(EDF_CPIC$ind)) ## Needs to match up with N? 4 off...
+n_ind <- length(unique(EDF_CPIC$ind)) ## Needs to match up with N? 3 off...
+## should't use unique as does not count those that were b/w sites; why counting? Codes are different...
 
 # Make encounter histories with number of times each individual is captured in each trap
 
