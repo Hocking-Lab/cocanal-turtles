@@ -181,7 +181,7 @@ K <- max(EDF_CPIC$day) # trap nights per session
 # #xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
 # xlimA <- c(min(matrixA)-buffer, max(matrixA) + buffer)
 # xlimA
-n_ind <- length(unique(EDF_CPIC$ind)) ## Needs to match up with N? 3 off...
+##n_ind <- length(unique(EDF_CPIC$ind)) ## Needs to match up with N? 3 off...
 ## should't use unique as does not count those that were b/w sites; why counting? Codes are different...
 
 # Make encounter histories with number of times each individual is captured in each trap
@@ -219,17 +219,21 @@ G <- num_sites
 
 # convert to 3D array (n_individuals + augmented individuals) x n_traps x n_days
 
-EM_array_CPIC <- array(NA, dim = c(M_allsites, n_traps, K, G))
+## Create list of EM array per site
+
+EM_array_list_CPIC <- array(NA, dim = c(M, n_traps, K))
+
+#EM_array_CPIC <- array(NA, dim = c(M_allsites, n_traps, K, G))
 ####????
-for(g in 1:G) {
-for(i in 1:K) {
-  foo <- EM_CPIC[(which(EM_CPIC[]$day == i) & EM_CPIC[]$site_num == g), ]
-  foo_less <- select(foo, -ind, -day)
-  colnames(foo_less) <- colnames(df_aug)
-  foo_augment <- bind_rows(foo_less, df_aug)
-  EM_array_CPIC[1:(M_allsites), 1:n_traps, i] <- as.matrix(foo_augment)
-} i
-} g
+# for(g in 1:G) {
+# for(i in 1:K) {
+#   foo <- EM_CPIC[which(EM_CPIC[]$day == i & EM_CPIC$site_num == g), ]
+#   foo_less <- select(foo, -ind, -day)
+#   colnames(foo_less) <- colnames(df_aug)
+#   foo_augment <- bind_rows(foo_less, df_aug)
+#   EM_array_CPIC[1:(M_allsites), 1:n_traps, i] <- as.matrix(foo_augment)
+# } i
+# } g
 
 # EM <- cbind(1:n_ind, rowSums(EM))
 # EM <- rowSums(EM)
