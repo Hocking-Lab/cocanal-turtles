@@ -173,7 +173,7 @@ traps_per_site <- read.csv(file = "Data/trapids_sites.csv")
 
 ## Not working
 for(g in 1:12){
-  N_persite <- list(nrow(EDF_CPIC[which(EDF_CPIC$recap == "N"), ] & EDF_CPIC$trap_id > EDF_CPIC$first_trap[g,]))
+  N_persite[g] <- list(nrow(EDF_CPIC[which(EDF_CPIC$recap == "N" & EDF_CPIC$site_num == g), ]))
 }
 
 K <- max(EDF_CPIC$day) # trap nights per session
