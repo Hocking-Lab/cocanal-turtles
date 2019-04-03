@@ -22,24 +22,24 @@ trap_num <- trap_locs_degrees$trap
 
 
 ## trap locations per site, manually created (estimated 25m between each trap)
-traplocsA <- c(0,25,50,75,100,125,150,175) # create trap location file
-traplocsC <- c(0,25,50,75,100,125,150,175,200,225)
-traplocsD <- c(0,25,50,75,100,125,150,175)
-traplocsE <- c(0,25,50,75,100,125,150,175,200,225,250,275,300,325)
-traplocsF <- c(0,25,50,75,100,125,150)
-traplocsG <- c(0,25,50,75,100,125,150)
-traplocsJ <- c(0,25,50,75,100,125,150,175,200,225)
-traplocsK <- c(0,25,50,75,100,125,150,175,200,225)
-traplocsL <- c(0,25,50,75,100,125,150,175)
-traplocsM <- c(0,25,50,75,100,125,150,175,200,225,250,275)
-traplocsN <- c(0,25,50,75,100,125,150,175,200,225)
-traplocsO <- c(0,25,50,75,100,125,150,175,200,225)
+# traplocsA <- c(0,25,50,75,100,125,150,175) # create trap location file
+# traplocsC <- c(0,25,50,75,100,125,150,175,200,225)
+# traplocsD <- c(0,25,50,75,100,125,150,175)
+# traplocsE <- c(0,25,50,75,100,125,150,175,200,225,250,275,300,325)
+# traplocsF <- c(0,25,50,75,100,125,150)
+# traplocsG <- c(0,25,50,75,100,125,150)
+# traplocsJ <- c(0,25,50,75,100,125,150,175,200,225)
+# traplocsK <- c(0,25,50,75,100,125,150,175,200,225)
+# traplocsL <- c(0,25,50,75,100,125,150,175)
+# traplocsM <- c(0,25,50,75,100,125,150,175,200,225,250,275)
+# traplocsN <- c(0,25,50,75,100,125,150,175,200,225)
+# traplocsO <- c(0,25,50,75,100,125,150,175,200,225)
 #thess are in a vertical format
 
 ## List of all trap location vectors ##
-traplocs_list <- list(traplocsA, traplocsC, traplocsD, traplocsE, 
-                   traplocsF, traplocsG, traplocsJ, traplocsK, 
-                   traplocsL, traplocsM, traplocsN, traplocsO)
+# traplocs_list <- list(traplocsA, traplocsC, traplocsD, traplocsE, 
+#                    traplocsF, traplocsG, traplocsJ, traplocsK, 
+#                    traplocsL, traplocsM, traplocsN, traplocsO)
 
 
 ## List of distance matrices (each site = 1 matrix) ##
@@ -126,6 +126,9 @@ EDF_CPIC <- EDF %>%
   filter(site != "H" & site != "I" & species == "CPIC")
 EDF_CPIC
 
+EDF_CPIC$trap_id_edited <- ifelse(EDF_CPIC$trap_id >= 61, EDF_CPIC$trap_id - 6, EDF_CPIC$trap_id - 0)
+
+## subtract 6 from trap ids > = 61 (Sites H and I)
 
 #Add a new column for integer session values (session = site)
 
@@ -167,6 +170,7 @@ n_traps <- n_traps_site$max_traps
 
 # # as.character(EDFA$recap)
 N <- nrow(EDF_CPIC[which(EDF_CPIC$recap == "N"), ])
+N <- nrow(EDF_CPIC[which(EDF_CPIC$recap == "N" & EDF_CPIC$trap_id_edited == g), ])
 
 traps_per_site <- read.csv(file = "Data/trapids_sites.csv")
 
@@ -184,21 +188,28 @@ K <- max(EDF_CPIC$day) # trap nights per session
 ##n_ind <- length(unique(EDF_CPIC$ind)) ## Needs to match up with N? 3 off...
 ## should't use unique as does not count those that were b/w sites; why counting? Codes are different...
 
+
+
 # Make encounter histories with number of times each individual is captured in each trap
+##### Want EM ARRAY with ijk with index for site ########
 
 str(EDF)
 EDF_CPIC
 
 EM_CPIC <- EDF_CPIC %>%
-  group_by(ind, site_num, trap_id, day) %>%
-  select(ind, site_num, trap_id, day) %>%
+  group_by(ind, site_num, trap_id_edited, day) %>%
+  select(ind, site_num, trap_id_edited, day) %>%
   mutate(count = 1) %>%
   summarise_all(sum) %>%
-  spread(trap_id, count, fill = 0) %>%
+  spread(trap_id_edited, count, fill = 0) %>%
   ungroup()
 # EM <- data.frame(select(EM, -ind))
 str(EM_CPIC)
 EM_CPIC
+
+###### Takes out traps in which no turtles were trapped, not included in the array
+###### Need to have them included as rows w/ all 0's
+###### HOW?
 
 full_df_CPIC <- tidyr::expand(EM_CPIC, ind, day, site_num)
 
@@ -207,15 +218,31 @@ EM_CPIC <- as.data.frame(EM_CPIC, stringsAsFactors = FALSE)
 EM_CPIC[is.na(EM_CPIC)] <- 0
 head(EM_CPIC)
 
+
 # Data Augmentation
 M_allsites <- 8000 # max population size
-# J <- n_traps
+J <- n_traps
 # y <- rbind(EM[ , 2], matrix(0, nrow = M-n_ind, ncol = n_ind))
 # y <- rbind(EM, matrix(0, nrow = M - n_ind, ncol = n_traps))
-z <- c(rep(1, n_ind), rep(0, M_allsites-n_ind))
-df_aug <- as.data.frame(matrix(0, nrow = (M_allsites - n_ind), ncol = n_traps), stringsAsFactors = FALSE)
+z <- c(rep(1, n_ind), rep(0, M_allsites-N))
+df_aug <- as.data.frame(matrix(0, nrow = (M_allsites - N), ncol = n_traps), stringsAsFactors = FALSE)
 num_sites <- max(EDF_CPIC$site_num)
 G <- num_sites
+
+
+EM_array_CPIC <- array(NA, dim = c(M_allsites, n_traps, K))
+#### ERROR -- Vector is too large!!!! WAS IST DAS??????
+### Can use code from "TurtleSCR_PerSite.R" and change traps per site to edited trap ids
+
+for(i in 1:K){
+  foo <- EM_CPIC[(which(EM_CPIC[]$day == i)), ]
+  foo_less <- select(foo, -ind, -day)
+  colnames(foo_less) <- colnames(df_aug)
+  foo_augment <- bind_rows(foo_less, df_aug)
+  EM_array[1:(M), 1:n_traps, i] <- as.matrix(foo_augment)
+}
+
+
 
 # convert to 3D array (n_individuals + augmented individuals) x n_traps x n_days
 
