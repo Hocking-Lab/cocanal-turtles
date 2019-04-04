@@ -10,6 +10,7 @@ library(parallel)
 library(zoo)
 library(rgdal)
 library(sp)
+library(utils)
 
 
 coords <- read.csv(file = "Data/coords.csv")
@@ -175,7 +176,6 @@ N <- nrow(EDF_CPIC[which(EDF_CPIC$recap == "N" & EDF_CPIC$trap_id_edited == g), 
 traps_per_site <- read.csv(file = "Data/trapids_sites.csv")
 
 
-## Not working
 for(g in 1:12){
   N_persite[g] <- list(nrow(EDF_CPIC[which(EDF_CPIC$recap == "N" & EDF_CPIC$site_num == g), ]))
 }
@@ -229,8 +229,16 @@ df_aug <- as.data.frame(matrix(0, nrow = (M_allsites - N), ncol = n_traps), stri
 num_sites <- max(EDF_CPIC$site_num)
 G <- num_sites
 
+M_persite <- list(200,200,200,300,1000,400,500,200,200,800,800,800)
+sum(200,200,200,300,1000,400,500,200,200,800,800,800)
 
-EM_array_CPIC <- array(NA, dim = c(M_allsites, n_traps, K))
+## USE for loop to stack EMs per site? OR have all together
+# for (g in 1:num_sites) {
+#   EM_array_CPIC[g] <- array(NA, dim = c(M_persite[g], n_traps[g], K))
+#   EM_stack <- stack(EM_array_CPIC[g], EM_array_CPIC[g-1])
+# }
+
+EM_stack_CPIC <- stack(array(NA, dim = c(M_allsites, n_traps, K)))
 #### ERROR -- Vector is too large!!!! WAS IST DAS??????
 ### Can use code from "TurtleSCR_PerSite.R" and change traps per site to edited trap ids
 
