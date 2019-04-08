@@ -362,20 +362,23 @@ cat ("
      sigma[g, t] <- pow(1 / (2*alpha1[t]), 0.5) # sd of half normal
      } # t
 
-     psi[g] ~ dunif(0, 1) # giving numbers between 0 and 1, need to change?
+     psi[g] ~ dunif(0, 1) # giving numbers between 0 and 1, 
+# logit(psi[g]) ~ dnorm(mu_psi, 1 / sd_psi / sd_psi) # consider drawing from a normal distribution across sites
+# mu_psi ~ dnorm(0, 0.01)
+# sd_psi ~ dunif(0, 10)
      psi.sex[g] ~ dunif(0, 1)
      
      
-     sigma_ind[g] ~ dt(0, 1 / (25^2), 1)I(0, ) 	## implies half-cauchy with scale of 25
+     sigma_ind[g] ~ dt(0, 1 / (25^2), 1)I(0, ) 	## implies half-cauchy with scale of 25 - maybe reduce to something more reasonable
      
     for(i in 1:M) {
      for(k in 1:K) {
-     eta[i,k] ~ dnorm(0, 1 / (sigma_ind * sigma_ind))
+     eta[g,i,k] ~ dnorm(0, 1 / (sigma_ind * sigma_ind))
      } # i
      } # k
      
      for(t in 1:2) {
-     alpha0[g, t] ~ dnorm(0, 0.1)
+     alpha0[g, t] ~ dnorm(0, 0.04) # sd = 5 - could constrain more potentially
      } # t
      
      
@@ -387,15 +390,15 @@ cat ("
      sd_a2 ~ dunif(0, 5)
      
      for(i in 1:M) {
-     z[g, i] ~ dbern(psi)
+     z[g, i] ~ dbern(psi[g])
      s[g, i] ~ dunif(xlim[g, 1], xlim[g, 2]) ##??
      
-     for(j in 1:n_traps) {  # change n_traps to 122? or 116?
-     d[i,j] <- abs(s[g, i] - traplocsA[g, j])
+     for(j in 1:max_trap[g]) {  # 
+     d[g,i,j] <- abs(s[g, i] - traplocsA[g, j])
      
      for(k in 1:K) {
      for(t in 1:2) {
-     logit(p0[g, i, j, k, t]) <- alpha0[t] + (alpha2[i] * C[i, k]) + eta[i, k] # alpha2*C to rep. global behav. response
+     logit(p0[g, i, j, k, t]) <- alpha0[t] + (alpha2[g, i] * C[g, i, k]) + eta[g, i, k] # alpha2*C to rep. global behav. response
      } # i
      } # j
      } # k
@@ -404,18 +407,19 @@ cat ("
      for(i in 1:M) {
      Sex[i] ~ dbern(psi.sex)
      Sex2[i] <- Sex[i] + 1
-     for (j in 1:n_traps) {
+     for (j in 1:max_trap[g]) {
      for (k in 1:K) {
-     y[g, i, j, k] ~ dbern(p[g, i,j,k])
-     p[g, i, j, k] <- z[i]*p0[g, i, j, k, Sex2[i]]* exp(- alpha1[Sex2[i]] * d[i,j] * d[i,j])
+     y[g, i, j, k] ~ dbern(p[g, i, j, k])
+     p[g, i, j, k] <- z[i]*p0[g, i, j, k, Sex2[i]]* exp(- alpha1[Sex2[i]] * d[g, i,j] * d[g, i,j])
      } # i
      } # j
      } # k
      
      # Derived parameters
-     N[g] <- inprod(z[1:M_allsites], sitedummy[ , t]) ## see panel 9.2
-     density[g] <- N[g] / (xlimA[g, 2] - xlimA[g, 1]) # divided distances by 100 so calculates turtles per 100 m of canal
-    }
+     # N[g] <- inprod(z[1:M_allsites], sitedummy[ , t]) ## see panel 9.2
+     # density[g] <- N[g] / (xlimA[g, 2] - xlimA[g, 1]) # divided distances by 100 so calculates turtles per 100 m of canal
+
+    } # g
 }
      ", file = "Code/JAGS/SCR_Allsites.txt")
 
