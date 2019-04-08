@@ -152,15 +152,15 @@ EDF_CPIC <- EDF %>%
   filter(site != "H" & site != "I" & species == "CPIC")
 EDF_CPIC
 
-EDF_CPIC$trap_id_edited <- ifelse(EDF_CPIC$trap_id >= 61, EDF_CPIC$trap_id - 6, EDF_CPIC$trap_id - 0)
-
 ## subtract 6 from trap ids > = 61 (Sites H and I)
 
 #Add a new column for integer session values (session = site)
+#EDF_CPIC$site_num <- as.integer(as.factor(EDF_CPIC$site))
 
+EDF_CPIC$trap_id_edited <- ifelse(EDF_CPIC$trap_id >= 61, EDF_CPIC$trap_id - 6, EDF_CPIC$trap_id - 0)
 EDF_CPIC$site_num <- as.integer(as.factor(EDF_CPIC$site))
-summary(EDF_CPIC)
 
+summary(EDF_CPIC)
 
 ## How to label trap numbers in overall EDF file? esp. as some are "skipped" -- caught 0 turtles
 
@@ -193,16 +193,13 @@ n_traps <- n_traps_site$max_traps
 
 ########
 
+#N <- nrow(EDF_CPIC[which(EDF_CPIC$recap == "N"), ])
 
-# # as.character(EDFA$recap)
-N <- nrow(EDF_CPIC[which(EDF_CPIC$recap == "N"), ])
-N <- nrow(EDF_CPIC[which(EDF_CPIC$recap == "N" & EDF_CPIC$trap_id_edited == g), ])
-
-traps_per_site <- read.csv(file = "Data/trapids_sites.csv")
-
-
-for(g in 1:12){
-  N_persite[g] <- list(nrow(EDF_CPIC[which(EDF_CPIC$recap == "N" & EDF_CPIC$site_num == g), ]))
+N_persite <- list()
+N <- list()
+for(i in 1:12) {
+  N_persite[[i]] <- nrow(EDF_CPIC[which(EDF_CPIC$recap == "N" & EDF_CPIC$site_num == i), ])
+  N[[i]] <- N_persite[[i]]
 }
 
 K <- max(EDF_CPIC$day) # trap nights per session
@@ -213,6 +210,7 @@ K <- max(EDF_CPIC$day) # trap nights per session
 ##n_ind <- length(unique(EDF_CPIC$ind)) ## Needs to match up with N? 3 off...
 ## should't use unique as does not count those that were b/w sites; why counting? Codes are different...
 
+traps_per_site <- read.csv(file = "Data/trapids_sites.csv")
 
 
 # Make encounter histories with number of times each individual is captured in each trap
@@ -325,8 +323,8 @@ Sex <- c(sex_vector-1, rep(NA, M-n_ind))
 #### Behavior Matrix ######
 
 BM <- EDF_CPIC %>%
-  group_by(ind, day, recap) %>%
-  select(ind, day, recap) %>%
+  group_by(site_num, ind, day, recap) %>%
+  select(site_num, ind, day, recap) %>%
   ungroup()
 
 str(BM)
@@ -336,16 +334,16 @@ BM <- as.data.frame(BM, stringsAsFactors = FALSE)
 BM$behav <- ifelse(BM$recap == "R", 1, 0)
 BM_less <- select(BM, -recap)
 
-# make Cij with 1 if a recap and 0 otherwise
+# make Cgij with 1 if a recap and 0 otherwise
 C_obs <- BM_less %>%
-  expand(ind, day) %>%
+  expand(site_num, ind, day) %>%
   left_join(BM_less) %>%
-  group_by(ind) %>%
+  group_by(site_num) %>%
   mutate(behav = ifelse(is.na(behav), 0, behav),
          cumu = cumsum(behav)) %>%
-  mutate(cij = ifelse(cumu > 0, 1, 0)) %>% # if you stop it here you can see what it's doing 
-  select(ind, day, cij) %>%
-  spread(key = day, value = cij, sep = "_") %>% # stop here if you want to see individual ID before dropping it
+  mutate(cgij = ifelse(cumu > 0, 1, 0)) %>% # if you stop it here you can see what it's doing 
+  select(site_num, ind, day, cgij) %>%
+  spread(key = site_num, value = cgij, sep = "_") %>% # stop here if you want to see individual ID before dropping it
   ungroup %>%
   select(-ind)
 
