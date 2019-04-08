@@ -93,6 +93,12 @@ dist_mat_list <- list(dist_mat_A, dist_mat_C, dist_mat_D,
                       dist_mat_J, dist_mat_K, dist_mat_L,
                       dist_mat_M, dist_mat_N, dist_mat_O)
 
+dist_mat <- dist_mat_list
+
+for (i in 1:length(dist_mat_list)) {
+  dist_mat[[i]] <- log(dist_mat_list[[i]])
+}
+
 
 
 ## Creating trap location vector per site using coordinates (sp package required)
@@ -112,7 +118,26 @@ trap_dist_O <- spDistsN1(coords_utm[113:122, ], coords_utm[113, ])
 trap_dist_list <- list(trap_dist_A, trap_dist_C, trap_dist_D, trap_dist_E,
                        trap_dist_F, trap_dist_G, trap_dist_J, trap_dist_K,
                        trap_dist_L, trap_dist_M, trap_dist_N, trap_dist_O)
+trap_locs <- trap_dist_list
 
+for (i in 1:12) {
+trap_locs[[i]] <- log(trap_dist_list[[i]])
+trap_locs[[i]][1] <- 0
+}
+
+
+
+xlim_pre <- list()
+xlim <- list()
+
+#alter the buffer to better represent home range?
+
+for(i in 1:12){
+  xlim_pre[[i]] <- c(min(trap_dist_list[[i]] + 100), max(trap_dist_list[[i]] + 100))
+  xlim_pre[[i]] <- log(xlim_pre[[i]])
+  xlim_pre[[i]][1] <- xlim_pre[[i]][1]*(-1)
+  xlim[[i]] <- xlim_pre[[i]]
+}
 
 
 ####### EDF FILE ########
@@ -299,7 +324,7 @@ Sex <- c(sex_vector-1, rep(NA, M-n_ind))
 
 #### Behavior Matrix ######
 
-BM <- EDFA %>%
+BM <- EDF_CPIC %>%
   group_by(ind, day, recap) %>%
   select(ind, day, recap) %>%
   ungroup()
@@ -346,6 +371,9 @@ C <- bind_rows(C_obs, C_unobs)
 # C <- BM_array
 
 Sites <- read.csv(file = "Data/trapids_sites.csv", header = TRUE)
+
+max_trap_csv <- read.csv(file = "Data/Max_Traps_Site.csv")
+max_trap <- max_trap_csv$max_traps
 
 #########
 
