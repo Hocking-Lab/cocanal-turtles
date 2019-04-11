@@ -235,7 +235,7 @@ EM_CPIC <- EDF_CPIC %>%
 
 EM_CPIC_split <- split(EM_CPIC, EM_CPIC$site_num)
 #EM_split_array <- as.array(EM_split)
-# EM <- data.frame(select(EM, -ind))
+EM_CPIC_split <- data.frame(select(EM_CPIC_split, -ind, -site_num)) ##????? site_num not found?
 
 
 ## Somehow add 14 - X traps for each site num...
@@ -272,7 +272,7 @@ head(EM_CPIC)
 J <- n_traps
 # y <- rbind(EM[ , 2], matrix(0, nrow = M-n_ind, ncol = n_ind))
 # y <- rbind(EM, matrix(0, nrow = M - n_ind, ncol = n_traps))
-z <- c(rep(1, n_ind), rep(0, M_allsites-N))
+z <- c(rep(1, n_ind), rep(0, M_allsites-N))  ## NEED TO CHANGE TO Z[site]
 df_aug <- as.data.frame(matrix(0, nrow = (M_allsites - N), ncol = n_traps), stringsAsFactors = FALSE)
 num_sites <- max(EDF_CPIC$site_num)
 G <- num_sites
