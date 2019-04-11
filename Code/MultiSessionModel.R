@@ -12,6 +12,10 @@ library(rgdal)
 library(sp)
 library(utils)
 
+Sites <- read.csv(file = "Data/trapids_sites.csv", header = TRUE)
+
+max_trap_csv <- read.csv(file = "Data/Max_Traps_Site.csv")
+max_trap <- max_trap_csv$max_traps
 
 coords <- read.csv(file = "Data/coords.csv")
 str(coords)
@@ -231,7 +235,21 @@ EM_CPIC <- EDF_CPIC %>%
   mutate(count = 1) %>%
   summarise_all(sum) %>%
   #spread(trap_id_edited, count, fill = 0) %>%
-  ungroup()
+  ungroup() %>%
+  mutate(id = as.integer(as.factor(ind)))
+
+site_trap_combos <- expand.grid(site_num = 1:12, site_trap = 1:14, id = 1:500) %>%
+  arrange(site_num, site_trap)
+
+foo <- site_trap_combos %>%
+  left_join(EM_CPIC) %>%
+  left_join(select(max_trap_csv, -site)) %>%
+  # mutate(count = ifelse(site_trap > max_trap, NA_integer_, count)) %>%
+  mutate(count = ifelse(site_trap <= .$max_trap & is.na(count), 0, count))
+
+EM_CPIC$site_trap <- ave(EM_CPIC$trap_id_edited, EM_CPIC$site_num, FUN = function(x) as.numeric(factor(x)))
+
+
 
 EM_CPIC_split <- split(EM_CPIC, EM_CPIC$site_num)
 #EM_split_array <- as.array(EM_split)
@@ -393,10 +411,6 @@ C <- bind_rows(C_obs, C_unobs)
 # 
 # C <- BM_array
 
-Sites <- read.csv(file = "Data/trapids_sites.csv", header = TRUE)
-
-max_trap_csv <- read.csv(file = "Data/Max_Traps_Site.csv")
-max_trap <- max_trap_csv$max_traps
 
 #########
 
