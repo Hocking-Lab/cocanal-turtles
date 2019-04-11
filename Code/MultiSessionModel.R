@@ -216,34 +216,59 @@ traps_per_site <- read.csv(file = "Data/trapids_sites.csv")
 # Make encounter histories with number of times each individual is captured in each trap
 ##### Want EM ARRAY with ijk with index for site ########
 
+
+########
+########
+########
+########
+
 str(EDF)
 EDF_CPIC
 
 EM_CPIC <- EDF_CPIC %>%
-  group_by(ind, site_num, trap_id_edited, day) %>%
-  select(ind, site_num, trap_id_edited, day) %>%
+  group_by(site_num, ind, trap_id_edited, day) %>%
+  select(site_num, ind, trap_id_edited, day) %>%
   mutate(count = 1) %>%
   summarise_all(sum) %>%
-  spread(trap_id_edited, count, fill = 0) %>%
+  #spread(trap_id_edited, count, fill = 0) %>%
   ungroup()
-# EM <- data.frame(select(EM, -ind))
-str(EM_CPIC)
-EM_CPIC
 
+EM_CPIC_split <- split(EM_CPIC, EM_CPIC$site_num)
+#EM_split_array <- as.array(EM_split)
+# EM <- data.frame(select(EM, -ind))
+
+
+## Somehow add 14 - X traps for each site num...
+## Add in traps that turtles were not trapped in
 ###### Takes out traps in which no turtles were trapped, not included in the array
 ###### Need to have them included as rows w/ all 0's
 ###### HOW?
 
-full_df_CPIC <- tidyr::expand(EM_CPIC, ind, day, site_num)
 
-EM_CPIC <- left_join(full_df_CPIC, EM_CPIC)
-EM_CPIC <- as.data.frame(EM_CPIC, stringsAsFactors = FALSE)
-EM_CPIC[is.na(EM_CPIC)] <- 0
+#full_df_CPIC <- tidyr::expand(EM_CPIC, ind, day)
+
+full_df_CPIC <- list()
+
+for(i in 1:12){
+  full_df_CPIC[[i]] <- tidyr::expand(EM_CPIC_split[[i]], ind, day)
+}
+
+EM_CPIC <- list()
+for(i in 1:12){
+  EM_CPIC[[i]] <- left_join(full_df_CPIC[[i]], EM_CPIC_split[[i]])
+  EM_CPIC[[i]] <- as.data.frame(EM_CPIC[[i]], stringsAsFactors = FALSE)
+  EM_CPIC[[i]][is.na(EM_CPIC[[i]])] <- 0
+}
+
+
+# EM_CPIC <- left_join(full_df_CPIC, EM_CPIC_split)
+# EM_CPIC <- as.data.frame(EM_CPIC, stringsAsFactors = FALSE)
+# EM_CPIC[is.na(EM_CPIC)] <- 0
 head(EM_CPIC)
 
 
 # Data Augmentation
-M_allsites <- 8000 # max population size
+#M_allsites <- 8000 # max population size
 J <- n_traps
 # y <- rbind(EM[ , 2], matrix(0, nrow = M-n_ind, ncol = n_ind))
 # y <- rbind(EM, matrix(0, nrow = M - n_ind, ncol = n_traps))
