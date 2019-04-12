@@ -250,10 +250,9 @@ foo <- site_trap_combos %>%
 EM_CPIC$site_trap <- ave(EM_CPIC$trap_id_edited, EM_CPIC$site_num, FUN = function(x) as.numeric(factor(x)))
 
 
-
-EM_CPIC_split <- split(EM_CPIC, EM_CPIC$site_num)
+#EM_CPIC_split <- split(EM_CPIC, EM_CPIC$site_num)
 #EM_split_array <- as.array(EM_split)
-EM_CPIC_split <- data.frame(select(EM_CPIC_split, -ind, -site_num)) ##????? site_num not found?
+#EM_CPIC_split <- data.frame(select(EM_CPIC_split, -ind, -site_num)) ##????? site_num not found?
 
 
 ## Somehow add 14 - X traps for each site num...
