@@ -247,7 +247,10 @@ foo <- site_trap_combos %>%
   # mutate(count = ifelse(site_trap > max_trap, NA_integer_, count)) %>%
   mutate(count = ifelse(site_trap <= .$max_trap & is.na(count), 0, count))
 
+
 EM_CPIC$site_trap <- ave(EM_CPIC$trap_id_edited, EM_CPIC$site_num, FUN = function(x) as.numeric(factor(x)))
+
+#foo_spread <- as.array(foo, dim = c(foo$site_num, foo$id, foo$site_trap, foo$count))
 
 
 #EM_CPIC_split <- split(EM_CPIC, EM_CPIC$site_num)
