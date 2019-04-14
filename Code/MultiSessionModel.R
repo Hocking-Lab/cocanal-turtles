@@ -238,15 +238,20 @@ EM_CPIC <- EDF_CPIC %>%
   ungroup() %>%
   mutate(id = as.integer(as.factor(ind)))
 
-site_trap_combos <- expand.grid(site_num = 1:12, site_trap = 1:14, id = 1:500) %>%
-  arrange(site_num, site_trap)
+site_id_combos <- expand.grid(site_num = 1:12, id = 1:500) %>%
+  arrange(site_num, id)
+site_trap_combos <- expand.grid(site_num = 1:12, site_trap = 1:168)
+  arrange(site_num, site_trap) # ... need to add in extra traps per site, need to go through and label trap ids with 14 trap "gap" per site
 
-foo <- site_trap_combos %>%
+foo <- site_id_combos %>%
   left_join(EM_CPIC) %>%
+  
   left_join(select(max_trap_csv, -site)) %>%
   # mutate(count = ifelse(site_trap > max_trap, NA_integer_, count)) %>%
   mutate(count = ifelse(site_trap <= .$max_trap & is.na(count), 0, count))
 
+#all individuals are going into each trap at the moment.... geesh louise
+#add in augments
 
 EM_CPIC$site_trap <- ave(EM_CPIC$trap_id_edited, EM_CPIC$site_num, FUN = function(x) as.numeric(factor(x)))
 
