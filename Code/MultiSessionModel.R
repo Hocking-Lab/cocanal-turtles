@@ -238,25 +238,60 @@ EM_CPIC <- EDF_CPIC %>%
   ungroup() %>%
   mutate(id = as.integer(as.factor(ind)))
 
-site_id_combos <- expand.grid(site_num = 1:12, id = 1:500) %>%
-  arrange(site_num, id)
-site_trap_combos <- expand.grid(site_num = 1:12, site_trap = 1:168)
-  arrange(site_num, site_trap) # ... need to add in extra traps per site, need to go through and label trap ids with 14 trap "gap" per site
-
-foo <- site_id_combos %>%
-  left_join(EM_CPIC) %>%
-  
-  left_join(select(max_trap_csv, -site)) %>%
-  # mutate(count = ifelse(site_trap > max_trap, NA_integer_, count)) %>%
-  mutate(count = ifelse(site_trap <= .$max_trap & is.na(count), 0, count))
-
-#all individuals are going into each trap at the moment.... geesh louise
-#add in augments
-
 EM_CPIC$site_trap <- ave(EM_CPIC$trap_id_edited, EM_CPIC$site_num, FUN = function(x) as.numeric(factor(x)))
 
-#foo_spread <- as.array(foo, dim = c(foo$site_num, foo$id, foo$site_trap, foo$count))
 
+# site_id_combos <- expand.grid(site_num = 1:12, id = 1:500) %>%
+#   arrange(site_num, id)
+site_trap_combos <- expand.grid(site_num = 1:12, site_trap = 1:14) %>%
+  arrange(site_num, site_trap) # ... need to add in extra traps per site, need to go through and label trap ids with 14 trap "gap" per site
+
+# foo <- site_id_combos %>%
+#    left_join(EM_CPIC)
+  
+######
+
+foo$trap_id_edited <- as.integer(foo$trap_id_edited)
+
+
+foo <- site_trap_combos  %>%
+   left_join(EM_CPIC)
+
+foo <- foo %>%
+left_join(select(max_trap_csv, -site)) %>%
+  # mutate(count = ifelse(site_trap > max_trap, NA_integer_, count)) %>%
+  mutate(count = ifelse(site_trap <= .$max_traps & is.na(count), 0, count))
+
+#add in augments
+
+foo_spread <- foo %>%
+spread(site_trap, count, fill = 0)
+
+full_df <- tidyr::expand(foo_spread, id, day, site_num)
+full_df <- na.omit(full_df)
+
+EM <- left_join(full_df, foo_spread)
+
+
+EM <- as.data.frame(EM, stringsAsFactors = FALSE)
+EM <- na.omit(EM)
+EM <- as.data.frame(EM, stringsAsFactors = FALSE)
+
+M <- 500
+n_traps <- 14
+G <- 12
+
+
+# EM_array <- array(EM, dim = c(M, n_traps, K, G))
+# for(i in 1:K){
+#   for(g in 1:G){
+#     foog <- EM[(which(EM[]$day == i) & (EM[]$site_num == g)), ]
+#     foog_less <- select(foog, -ind, -day)
+#     colnames(foog_less) <- colnames(df_aug)
+#     foo_augment <- bind_rows(foo_less, df_aug)
+#     EM_array[1:(M), 1:n_traps, i] <- as.matrix(foo_augment)
+#   }
+# }
 
 #EM_CPIC_split <- split(EM_CPIC, EM_CPIC$site_num)
 #EM_split_array <- as.array(EM_split)
@@ -272,18 +307,18 @@ EM_CPIC$site_trap <- ave(EM_CPIC$trap_id_edited, EM_CPIC$site_num, FUN = functio
 
 #full_df_CPIC <- tidyr::expand(EM_CPIC, ind, day)
 
-full_df_CPIC <- list()
-
-for(i in 1:12){
-  full_df_CPIC[[i]] <- tidyr::expand(EM_CPIC_split[[i]], ind, day)
-}
-
-EM_CPIC <- list()
-for(i in 1:12){
-  EM_CPIC[[i]] <- left_join(full_df_CPIC[[i]], EM_CPIC_split[[i]])
-  EM_CPIC[[i]] <- as.data.frame(EM_CPIC[[i]], stringsAsFactors = FALSE)
-  EM_CPIC[[i]][is.na(EM_CPIC[[i]])] <- 0
-}
+# full_df_CPIC <- list()
+# 
+# for(i in 1:12){
+#   full_df_CPIC[[i]] <- tidyr::expand(EM_CPIC_split[[i]], ind, day)
+# }
+# 
+# EM_CPIC <- list()
+# for(i in 1:12){
+#   EM_CPIC[[i]] <- left_join(full_df_CPIC[[i]], EM_CPIC_split[[i]])
+#   EM_CPIC[[i]] <- as.data.frame(EM_CPIC[[i]], stringsAsFactors = FALSE)
+#   EM_CPIC[[i]][is.na(EM_CPIC[[i]])] <- 0
+# }
 
 
 # EM_CPIC <- left_join(full_df_CPIC, EM_CPIC_split)
@@ -297,13 +332,14 @@ head(EM_CPIC)
 J <- n_traps
 # y <- rbind(EM[ , 2], matrix(0, nrow = M-n_ind, ncol = n_ind))
 # y <- rbind(EM, matrix(0, nrow = M - n_ind, ncol = n_traps))
-z <- c(rep(1, n_ind), rep(0, M_allsites-N))  ## NEED TO CHANGE TO Z[site]
+z <- c(rep(1, n_ind), rep(0, M_allsites-N))  ## NEED TO CHANGE TO Z[site]  ###### !!!!!!!!
 df_aug <- as.data.frame(matrix(0, nrow = (M_allsites - N), ncol = n_traps), stringsAsFactors = FALSE)
 num_sites <- max(EDF_CPIC$site_num)
 G <- num_sites
 
-M_persite <- list(200,200,200,300,1000,400,500,200,200,800,800,800)
-sum(200,200,200,300,1000,400,500,200,200,800,800,800)
+# M_persite <- list(200,200,200,300,1000,400,500,200,200,800,800,800)
+# sum(200,200,200,300,1000,400,500,200,200,800,800,800)
+M <- 500
 
 ## USE for loop to stack EMs per site? OR have all together
 # for (g in 1:num_sites) {
