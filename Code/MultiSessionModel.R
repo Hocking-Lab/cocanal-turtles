@@ -205,7 +205,8 @@ for(i in 1:12) {
   N_persite[[i]] <- nrow(EDF_CPIC[which(EDF_CPIC$recap == "N" & EDF_CPIC$site_num == i), ])
   N[[i]] <- N_persite[[i]]
 }
-
+n_ind_total <- nrow(EDF_CPIC[which(EDF_CPIC$recap == "N"), ])
+do.call(sum, N)
 K <- max(EDF_CPIC$day) # trap nights per session
 # buffer <- 1 # check literature to make sure doesn't need to be larger
 # #xlimA <- c(min(traplocsA[1,] - buffer), max(traplocs[1,] + buffer))
@@ -277,12 +278,13 @@ EM <- as.data.frame(EM, stringsAsFactors = FALSE)
 EM <- na.omit(EM)
 EM <- as.data.frame(EM, stringsAsFactors = FALSE)
 
-M <- 500
+M <- 6000
 n_traps <- 14
-G <- 12
+num_sites <- max(EDF_CPIC$site_num)
+G <- num_sites
 
 
-# EM_array <- array(EM, dim = c(M, n_traps, K, G))
+#EM_array <- array(NA, dim = c(M, n_traps, K)
 # for(i in 1:K){
 #   for(g in 1:G){
 #     foog <- EM[(which(EM[]$day == i) & (EM[]$site_num == g)), ]
@@ -333,13 +335,10 @@ J <- n_traps
 # y <- rbind(EM[ , 2], matrix(0, nrow = M-n_ind, ncol = n_ind))
 # y <- rbind(EM, matrix(0, nrow = M - n_ind, ncol = n_traps))
 z <- c(rep(1, n_ind), rep(0, M_allsites-N))  ## NEED TO CHANGE TO Z[site]  ###### !!!!!!!!
-df_aug <- as.data.frame(matrix(0, nrow = (M_allsites - N), ncol = n_traps), stringsAsFactors = FALSE)
-num_sites <- max(EDF_CPIC$site_num)
-G <- num_sites
+df_aug <- as.data.frame(matrix(0, nrow = (M - n_ind_total), ncol = J), stringsAsFactors = FALSE)
 
 # M_persite <- list(200,200,200,300,1000,400,500,200,200,800,800,800)
 # sum(200,200,200,300,1000,400,500,200,200,800,800,800)
-M <- 500
 
 ## USE for loop to stack EMs per site? OR have all together
 # for (g in 1:num_sites) {
@@ -359,13 +358,23 @@ for(i in 1:K){
   EM_array[1:(M), 1:n_traps, i] <- as.matrix(foo_augment)
 }
 
-
+  df_aug <- as.data.frame(matrix(0, nrow = (M - n_ind_total), ncol = n_traps + 1), stringsAsFactors = FALSE)
 
 # convert to 3D array (n_individuals + augmented individuals) x n_traps x n_days
 
 ## Create list of EM array per site
 
-EM_array_list_CPIC <- array(NA, dim = c(M, n_traps, K))
+EM_array <- array(NA, dim = c(M, n_traps, K))
+
+# for(i in 1:K){
+#   foo2 <- EM[(which(EM[]$day == i)), ]
+#   foo_less <- select(foo2, -id, -ind, -trap_id_edited, -max_traps, -day)
+#   colnames(foo_less) <- colnames(df_aug)
+#   foo_augment <- bind_rows(foo_less, df_aug)
+#   EM_array[1:(M), 1:n_traps + 1, i] <- as.matrix(foo_augment)
+# }
+
+## getting error due to deleted column names not matching
 
 #EM_array_CPIC <- array(NA, dim = c(M_allsites, n_traps, K, G))
 ####????
