@@ -336,7 +336,7 @@ head(EM_CPIC)
 J <- n_traps
 # y <- rbind(EM[ , 2], matrix(0, nrow = M-n_ind, ncol = n_ind))
 # y <- rbind(EM, matrix(0, nrow = M - n_ind, ncol = n_traps))
-# z <- c(rep(1, n_ind), rep(0, M_allsites-N))  ## NEED TO CHANGE TO Z[site]  ###### !!!!!!!!
+
 df_aug <- as.data.frame(matrix(0, nrow = (M - n_ind_total), ncol = J), stringsAsFactors = FALSE)
 
 # M_persite <- list(200,200,200,300,1000,400,500,200,200,800,800,800)
@@ -369,6 +369,20 @@ for(i in 1:K) {
   EM_array[ , , i, g] <- as.matrix(foo_augment)
   }
 }
+
+# get starting values 1 if indiviudal caught on any day at any trap for each site
+z <- matrix(NA, G, M)
+bar <- matrix(NA, k, M)
+for(g in 1:G) {
+  for(k in 1:K) {
+    foo <- as.matrix(EM_array[ , , k, g])
+    bar[k, ] <- apply(foo, 1, max, na.rm = TRUE)
+  }
+  z[g, ] <- apply(bar, 1, max, na.rm = TRUE)
+}
+
+
+# z <- c(rep(1, n_ind), rep(0, M_allsites-N))  ## NEED TO CHANGE TO Z[site]  ###### !!!!!!!!
 
 #Error in EM_array[1:(M), 1:n_traps, i] <- as.matrix(foo_augment) : 
   #number of items to replace is not a multiple of replacement length
