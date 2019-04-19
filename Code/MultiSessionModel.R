@@ -283,6 +283,8 @@ n_traps <- 14
 num_sites <- max(EDF_CPIC$site_num)
 G <- num_sites
 
+# EM <- EM %>%
+#   select(EM, -c(id, ind, trap_id_edited, max_traps))
 
 #EM_array <- array(NA, dim = c(M, n_traps, K)
 # for(i in 1:K){
@@ -354,10 +356,12 @@ EM_array <- array(NA, dim = c(M, n_traps, K))
 
 for(i in 1:K){
   foo <- EM[(which(EM[]$day == i)), ]
-  foo_less <- select(foo, -ind, -day, -id, -trap_id_edited, -max_traps)
+  foo_less <- select(foo, -c(ind, day, id, trap_id_edited, max_traps))
+  df_aug$site_num <- NA
+  df_aug <- df_aug[ ,c(ncol(df_aug), 1:(ncol(df_aug)-1))]
   colnames(foo_less) <- colnames(df_aug)
   foo_augment <- bind_rows(foo_less, df_aug)
-  EM_array[1:(M), 1:n_traps, i] <- as.matrix(foo_augment)
+  EM_array[1:(M), 1:n_traps+1, i] <- as.matrix(foo_augment)
 }
 
 #Error in EM_array[1:(M), 1:n_traps, i] <- as.matrix(foo_augment) : 
