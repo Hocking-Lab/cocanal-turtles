@@ -336,7 +336,7 @@ head(EM_CPIC)
 J <- n_traps
 # y <- rbind(EM[ , 2], matrix(0, nrow = M-n_ind, ncol = n_ind))
 # y <- rbind(EM, matrix(0, nrow = M - n_ind, ncol = n_traps))
-z <- c(rep(1, n_ind), rep(0, M_allsites-N))  ## NEED TO CHANGE TO Z[site]  ###### !!!!!!!!
+# z <- c(rep(1, n_ind), rep(0, M_allsites-N))  ## NEED TO CHANGE TO Z[site]  ###### !!!!!!!!
 df_aug <- as.data.frame(matrix(0, nrow = (M - n_ind_total), ncol = J), stringsAsFactors = FALSE)
 
 # M_persite <- list(200,200,200,300,1000,400,500,200,200,800,800,800)
@@ -352,16 +352,22 @@ df_aug <- as.data.frame(matrix(0, nrow = (M - n_ind_total), ncol = J), stringsAs
 ###############
 #19_4_19
 
-EM_array <- array(NA, dim = c(M, n_traps, K))
+M <- 500 # look for this earlier
+EM_array <- array(NA, dim = c(M, n_traps, K, G))
 
-for(i in 1:K){
-  foo <- EM[(which(EM[]$day == i)), ]
-  foo_less <- select(foo, -c(ind, day, id, trap_id_edited, max_traps))
-  df_aug$site_num <- NA
-  df_aug <- df_aug[ ,c(ncol(df_aug), 1:(ncol(df_aug)-1))]
+# make 4D array: individual (M) x trap (n_traps) x day (K) x site (G)
+# split by day
+for(i in 1:K) {
+  for(g in 1:G) {
+  foo <- EM[(which(EM[]$day == i & EM$site_num == g)), ]
+  foo_less <- select(foo, -c(site_num, ind, day, id, trap_id_edited, max_traps))
+  df_aug <- as.data.frame(matrix(0, nrow = (M - nrow(foo_less)), ncol = J), stringsAsFactors = FALSE)
+  # df_aug$site_num <- g
+  # df_aug <- df_aug[ , c(ncol(df_aug), 1:(ncol(df_aug)-1))]
   colnames(foo_less) <- colnames(df_aug)
   foo_augment <- bind_rows(foo_less, df_aug)
-  EM_array[1:(M), 1:n_traps+1, i] <- as.matrix(foo_augment)
+  EM_array[ , , i, g] <- as.matrix(foo_augment)
+  }
 }
 
 #Error in EM_array[1:(M), 1:n_traps, i] <- as.matrix(foo_augment) : 
@@ -373,7 +379,7 @@ for(i in 1:K){
 
 ## Create list of EM array per site
 
-EM_array <- array(NA, dim = c(M, n_traps, K))
+# EM_array <- array(NA, dim = c(M, n_traps, K))
 
 # for(i in 1:K){
 #   foo2 <- EM[(which(EM[]$day == i)), ]
