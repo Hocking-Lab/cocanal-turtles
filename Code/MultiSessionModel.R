@@ -346,19 +346,24 @@ df_aug <- as.data.frame(matrix(0, nrow = (M - n_ind_total), ncol = J), stringsAs
 #   EM_stack <- stack(EM_array_CPIC[g], EM_array_CPIC[g-1])
 # }
 
-EM_stack_CPIC <- stack(array(NA, dim = c(M_allsites, n_traps, K)))
-#### ERROR -- Vector is too large!!!! WAS IST DAS??????
-### Can use code from "TurtleSCR_PerSite.R" and change traps per site to edited trap ids
+###############
+###############
+#19_4_19
+
+EM_array <- array(NA, dim = c(M, n_traps, K))
 
 for(i in 1:K){
-  foo <- EM_CPIC[(which(EM_CPIC[]$day == i)), ]
-  foo_less <- select(foo, -ind, -day)
+  foo <- EM[(which(EM[]$day == i)), ]
+  foo_less <- select(foo, -ind, -day, -id, -trap_id_edited, -max_traps)
   colnames(foo_less) <- colnames(df_aug)
   foo_augment <- bind_rows(foo_less, df_aug)
   EM_array[1:(M), 1:n_traps, i] <- as.matrix(foo_augment)
 }
 
-  df_aug <- as.data.frame(matrix(0, nrow = (M - n_ind_total), ncol = n_traps + 1), stringsAsFactors = FALSE)
+#Error in EM_array[1:(M), 1:n_traps, i] <- as.matrix(foo_augment) : 
+  #number of items to replace is not a multiple of replacement length
+
+ # df_aug <- as.data.frame(matrix(0, nrow = (M - n_ind_total), ncol = n_traps + 1), stringsAsFactors = FALSE)
 
 # convert to 3D array (n_individuals + augmented individuals) x n_traps x n_days
 
