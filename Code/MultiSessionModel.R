@@ -11,6 +11,7 @@ library(zoo)
 library(rgdal)
 library(sp)
 library(utils)
+library(reshape)
 
 Sites <- read.csv(file = "Data/trapids_sites.csv", header = TRUE)
 
@@ -23,7 +24,7 @@ summary(coords)
 
 trap_locs_degrees <- coords
 trap_locs_degrees$trap <- 1:nrow(trap_locs_degrees)
-trap_num <- trap_locs_degrees$trap
+trap_num <- trap_locs_degrees$trap ## Change?? 122 right now
 
 
 ## trap locations per site, manually created (estimated 25m between each trap)
@@ -252,7 +253,7 @@ site_trap_combos <- expand.grid(site_num = 1:12, site_trap = 1:14) %>%
   
 ######
 
-foo$trap_id_edited <- as.integer(foo$trap_id_edited)
+#foo$trap_id_edited <- as.integer(foo$trap_id_edited)
 
 
 foo <- site_trap_combos  %>%
@@ -277,6 +278,11 @@ EM <- left_join(full_df, foo_spread)
 EM <- as.data.frame(EM, stringsAsFactors = FALSE)
 EM <- na.omit(EM)
 EM <- as.data.frame(EM, stringsAsFactors = FALSE)
+
+EM_2 <- select(EM, -trap_id_edited, -day, -site_num, -ind, -max_traps)
+EM_2 <- aggregate(.~id, data = EM_2, sum, na.rm = FALSE)
+  
+
 
 M <- 6000
 n_traps <- 14
@@ -337,7 +343,7 @@ J <- n_traps
 # y <- rbind(EM[ , 2], matrix(0, nrow = M-n_ind, ncol = n_ind))
 # y <- rbind(EM, matrix(0, nrow = M - n_ind, ncol = n_traps))
 
-df_aug <- as.data.frame(matrix(0, nrow = (M - n_ind_total), ncol = J), stringsAsFactors = FALSE)
+#df_aug <- as.data.frame(matrix(0, nrow = (M - n_ind_total), ncol = J), stringsAsFactors = FALSE)
 
 # M_persite <- list(200,200,200,300,1000,400,500,200,200,800,800,800)
 # sum(200,200,200,300,1000,400,500,200,200,800,800,800)
@@ -369,6 +375,26 @@ for(i in 1:K) {
   EM_array[ , , i, g] <- as.matrix(foo_augment)
   }
 }
+
+
+# EM_array_2 <- array(NA, dim = c(M, n_traps, G))
+# 
+# # make 4D array: individual (M) x trap (n_traps) x day (K) x site (G)
+# # split by day
+# 
+#   for(g in 1:G) {
+#     foo <- EM[(which(EM$site_num == g)), ]
+#     foo_less <- select(foo, -c(site_num, ind, day, id, trap_id_edited, max_traps))
+#     df_aug <- as.data.frame(matrix(0, nrow = (M - nrow(foo_less)), ncol = J), stringsAsFactors = FALSE)
+#     # df_aug$site_num <- g
+#     # df_aug <- df_aug[ , c(ncol(df_aug), 1:(ncol(df_aug)-1))]
+#     colnames(foo_less) <- colnames(df_aug)
+#     foo_augment <- bind_rows(foo_less, df_aug)
+#     EM_array_2[ , , g] <- as.matrix(foo_augment)
+#   }
+
+
+## EM_array_2 --> collapsed day so could make sst vector with all unique individuals caught per site; now getting both News and recaps as separate individuals...
 
 # get starting values 1 if indiviudal caught on any day at any trap for each site
 z <- matrix(NA, G, M)
@@ -430,8 +456,22 @@ for(g in 1:G) {
 # Now populated by starting positions uniformally placed within state space
 # For every individual that is not 0, change starting x point to mean of traps associated with encounters for that individual; leaves 0's there from the augmented population and also puts in activity center for augmented individuals that were randomly given an encounter history (caught at least 1 time)
 
-sum_caps <- apply(EM_array, c(1,2), sum)
-sst <- (sum_caps %*% traplocsA) / (ifelse(rowSums(sum_caps) > 0, rowSums(sum_caps), 1))
+sum_caps <- apply(EM_array, c(1,2,4), sum)  ## c(1,2): dimensions to apply function to; 1 = rows, 2 = columns; collapsed day in this instance
+## this is wrong, it doesn't distinguish rows per day as different individuals thus the max number of individuals caught one day becomes the total number of caught inviduals here...
+
+traplocsE <- as.matrix(trap_locs[[4]])
+row.names(traplocsE) <- NULL
+colnames(traplocsE) <- NULL
+
+sst <- array(dim = c(500, 14, 12))
+
+for(g in 1:G){
+  sst[ , , g] <- (sum_caps[ , , g] %*% traplocsE) / (ifelse(rowSums(sum_caps[ , , g]) > 0, rowSums(sum_caps[ , , g]), 1))
+}
+
+sst <- apply(sst, c(1,3), mean)
+
+#sst <- (sum_caps %*% traplocsE) / (ifelse(rowSums(sum_caps) > 0, rowSums(sum_caps), 1))  ## Using the trap locs from site with max traps for ssts for all sites...?
 
 for(i in (n_ind+1):M) {
   sst[i] <- c(runif(1, xlimA[1], xlimA[2])) #parameters, n, max, min
