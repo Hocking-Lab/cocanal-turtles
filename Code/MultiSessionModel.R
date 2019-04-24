@@ -388,19 +388,20 @@ for(i in 1:K) {
 
 #### 500 per day per site? or 500 per site (500/4 per day?), also it does not keep the same id for the same indiiduals between days... so recap calc will not work?
 
-EM_array_2 <- array(NA, dim = c(M, n_traps, G))
+EM_array_2 <- array(NA, dim = c(M, n_traps + 1, G))
 
 # make 4D array: individual (M) x trap (n_traps) x day (K) x site (G)
 # split by day
 
 for(g in 1:G) {
     foo <- EM_2[(which(EM_2$site_num == g)), ]
-    foo_less <- select(foo, -c(site_num, id, EM_2.id, EM_2.site_num))
-    df_aug <- as.data.frame(matrix(0, nrow = (M - nrow(foo_less)), ncol = J), stringsAsFactors = FALSE)
+    foo_less <- select(foo, -c(site_num, EM_2.id, EM_2.site_num))
+    df_aug <- as.data.frame(matrix(0, nrow = (M - nrow(foo_less)), ncol = J + 1), stringsAsFactors = FALSE)
     # df_aug$site_num <- g
     # df_aug <- df_aug[ , c(ncol(df_aug), 1:(ncol(df_aug)-1))]
-    colnames(foo_less) <- colnames(df_aug)
+    colnames(df_aug) <- colnames(foo_less)
     foo_augment <- bind_rows(foo_less, df_aug)
+    foo_augment$id <- ifelse(foo_augment$id == 0, NA, foo_augment$id)
     EM_array_2[ , , g] <- as.matrix(foo_augment)
   }
 
@@ -410,7 +411,7 @@ for(g in 1:G) {
 
 
 z <- matrix(NA, G, M)
-bar <- matrix(NA, k, M)
+bar <- matrix(NA, K, M)
 for(g in 1:G) {
   for(k in 1:K) {
     foo <- as.matrix(EM_array[ , , k, g])
@@ -419,7 +420,7 @@ for(g in 1:G) {
   z[g, ] <- apply(bar, 1, max, na.rm = TRUE)
 }
 
-#### NOT working....   subscript out of bounds
+####?
 
 
 # z <- c(rep(1, n_ind), rep(0, M_allsites-N))
@@ -465,7 +466,7 @@ for(g in 1:G) {
 # Now populated by starting positions uniformally placed within state space
 # For every individual that is not 0, change starting x point to mean of traps associated with encounters for that individual; leaves 0's there from the augmented population and also puts in activity center for augmented individuals that were randomly given an encounter history (caught at least 1 time)
 
-sum_caps <- apply(EM_array_2, c(1,2), sum)  ## c(1,2): dimensions to apply function to; 1 = rows, 2 = columns; collapsed day in this instance
+sum_caps <- apply(EM_array_2, c(1,2,3), sum)  ## c(1,2): dimensions to apply function to; 1 = rows, 2 = columns; collapsed day in this instance
 ## this is wrong, it doesn't distinguish rows per day as different individuals thus the max number of individuals caught one day becomes the total number of caught inviduals here...
 
 traplocsE <- as.matrix(trap_locs[[4]])
