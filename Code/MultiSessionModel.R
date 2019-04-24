@@ -279,17 +279,27 @@ EM <- as.data.frame(EM, stringsAsFactors = FALSE)
 EM <- na.omit(EM)
 EM <- as.data.frame(EM, stringsAsFactors = FALSE)
 
+#### INCLUDES 790 entries... should be 676 (-3: changed dispersers to new individuals) Ns and 114 (+3) Rs (total = 790)
+
+###########
+
 EM_2 <- select(EM, -trap_id_edited, -day, -site_num, -ind, -max_traps)
 EM_2 <- aggregate(.~id, data = EM_2, sum, na.rm = FALSE)
 
 extra_info <- as.data.frame(cbind(id = EM$id, site_num = EM$site_num))
-left_join(EM_2, extra_info)
+EM_2 <- merge(EM_2, transform(extra_info, EM_2 = extra_info), all.x = TRUE)
+EM_2 <- EM_2 %>% 
+  distinct
 
+############
 
 M <- 6000
 n_traps <- 14
+J <- n_traps
 num_sites <- max(EDF_CPIC$site_num)
 G <- num_sites
+
+###########
 
 # EM <- EM %>%
 #   select(EM, -c(id, ind, trap_id_edited, max_traps))
@@ -336,12 +346,10 @@ G <- num_sites
 # EM_CPIC <- left_join(full_df_CPIC, EM_CPIC_split)
 # EM_CPIC <- as.data.frame(EM_CPIC, stringsAsFactors = FALSE)
 # EM_CPIC[is.na(EM_CPIC)] <- 0
-head(EM_CPIC)
 
 
 # Data Augmentation
 #M_allsites <- 8000 # max population size
-J <- n_traps
 # y <- rbind(EM[ , 2], matrix(0, nrow = M-n_ind, ncol = n_ind))
 # y <- rbind(EM, matrix(0, nrow = M - n_ind, ncol = n_traps))
 
@@ -378,27 +386,29 @@ for(i in 1:K) {
   }
 }
 
+#### 500 per day per site? or 500 per site (500/4 per day?), also it does not keep the same id for the same indiiduals between days... so recap calc will not work?
 
-# EM_array_2 <- array(NA, dim = c(M, n_traps, G))
-# 
-# # make 4D array: individual (M) x trap (n_traps) x day (K) x site (G)
-# # split by day
-# 
-#   for(g in 1:G) {
-#     foo <- EM[(which(EM$site_num == g)), ]
-#     foo_less <- select(foo, -c(site_num, ind, day, id, trap_id_edited, max_traps))
-#     df_aug <- as.data.frame(matrix(0, nrow = (M - nrow(foo_less)), ncol = J), stringsAsFactors = FALSE)
-#     # df_aug$site_num <- g
-#     # df_aug <- df_aug[ , c(ncol(df_aug), 1:(ncol(df_aug)-1))]
-#     colnames(foo_less) <- colnames(df_aug)
-#     foo_augment <- bind_rows(foo_less, df_aug)
-#     EM_array_2[ , , g] <- as.matrix(foo_augment)
-#   }
+EM_array_2 <- array(NA, dim = c(M, n_traps, G))
 
+# make 4D array: individual (M) x trap (n_traps) x day (K) x site (G)
+# split by day
 
-## EM_array_2 --> collapsed day so could make sst vector with all unique individuals caught per site; now getting both News and recaps as separate individuals...
+for(g in 1:G) {
+    foo <- EM_2[(which(EM_2$site_num == g)), ]
+    foo_less <- select(foo, -c(site_num, id, EM_2.id, EM_2.site_num))
+    df_aug <- as.data.frame(matrix(0, nrow = (M - nrow(foo_less)), ncol = J), stringsAsFactors = FALSE)
+    # df_aug$site_num <- g
+    # df_aug <- df_aug[ , c(ncol(df_aug), 1:(ncol(df_aug)-1))]
+    colnames(foo_less) <- colnames(df_aug)
+    foo_augment <- bind_rows(foo_less, df_aug)
+    EM_array_2[ , , g] <- as.matrix(foo_augment)
+  }
+
+## EM_array_2 --> collapsed day so could make sst vector with all unique individuals caught per site; made sure each individual was only counted (recaps not counted)
 
 # get starting values 1 if indiviudal caught on any day at any trap for each site
+
+
 z <- matrix(NA, G, M)
 bar <- matrix(NA, k, M)
 for(g in 1:G) {
@@ -409,15 +419,12 @@ for(g in 1:G) {
   z[g, ] <- apply(bar, 1, max, na.rm = TRUE)
 }
 
+#### NOT working....   subscript out of bounds
 
-# z <- c(rep(1, n_ind), rep(0, M_allsites-N))  ## NEED TO CHANGE TO Z[site]  ###### !!!!!!!!
 
-#Error in EM_array[1:(M), 1:n_traps, i] <- as.matrix(foo_augment) : 
-  #number of items to replace is not a multiple of replacement length
+# z <- c(rep(1, n_ind), rep(0, M_allsites-N))
 
  # df_aug <- as.data.frame(matrix(0, nrow = (M - n_ind_total), ncol = n_traps + 1), stringsAsFactors = FALSE)
-
-# convert to 3D array (n_individuals + augmented individuals) x n_traps x n_days
 
 ## Create list of EM array per site
 
@@ -458,7 +465,7 @@ for(g in 1:G) {
 # Now populated by starting positions uniformally placed within state space
 # For every individual that is not 0, change starting x point to mean of traps associated with encounters for that individual; leaves 0's there from the augmented population and also puts in activity center for augmented individuals that were randomly given an encounter history (caught at least 1 time)
 
-sum_caps <- apply(EM_array, c(1,2,4), sum)  ## c(1,2): dimensions to apply function to; 1 = rows, 2 = columns; collapsed day in this instance
+sum_caps <- apply(EM_array_2, c(1, 2), sum)  ## c(1,2): dimensions to apply function to; 1 = rows, 2 = columns; collapsed day in this instance
 ## this is wrong, it doesn't distinguish rows per day as different individuals thus the max number of individuals caught one day becomes the total number of caught inviduals here...
 
 traplocsE <- as.matrix(trap_locs[[4]])
