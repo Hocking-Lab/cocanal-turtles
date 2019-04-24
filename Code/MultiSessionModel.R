@@ -281,7 +281,9 @@ EM <- as.data.frame(EM, stringsAsFactors = FALSE)
 
 EM_2 <- select(EM, -trap_id_edited, -day, -site_num, -ind, -max_traps)
 EM_2 <- aggregate(.~id, data = EM_2, sum, na.rm = FALSE)
-  
+
+extra_info <- as.data.frame(cbind(id = EM$id, site_num = EM$site_num))
+left_join(EM_2, extra_info)
 
 
 M <- 6000
