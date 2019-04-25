@@ -386,7 +386,7 @@ for(k in 1:K) {
   }
 }
 
-foob <- array(NA, dim = c(M, n_traps, K, G))
+foob <- EM_array[ , -1, , ]
 
 target <- c(1:700)
 
@@ -425,12 +425,12 @@ EM_array <- foob
 #     EM_array_2[ , , g] <- as.matrix(foo_augment)
 #   }
 
-foo <- EM_2
-foo_less <- select(foo, -c(site_num, EM_2.id, EM_2.site_num))
-df_aug <- as.data.frame(matrix(0, nrow = (6000 - nrow(foo_less)), ncol = J + 1), stringsAsFactors = FALSE)
-colnames(df_aug) <- colnames(foo_less)
-foo_augment$id <- ifelse(foo_augment$id == 0, NA, foo_augment$id)
-EM_array_2 <- select(foo_augment, -id)
+# foo <- EM_2
+# foo_less <- select(foo, -c(site_num, EM_2.id, EM_2.site_num))
+# df_aug <- as.data.frame(matrix(0, nrow = (6000 - nrow(foo_less)), ncol = J + 1), stringsAsFactors = FALSE)
+# colnames(df_aug) <- colnames(foo_less)
+# foo_augment$id <- ifelse(foo_augment$id == 0, NA, foo_augment$id)
+# EM_array_2 <- select(foo_augment, -id)
 
 
 ## EM_array_2 --> collapsed day so could make sst vector with all unique individuals caught per site; made sure each individual was only counted (recaps not counted)
@@ -445,7 +445,7 @@ for(g in 1:G) {
     foog <- as.matrix(EM_array[ , , k, g])
     bar[k, ] <- apply(foog, 1, max, na.rm = TRUE)
   }
-  z[g, ] <- apply(bar, 1, max, na.rm = TRUE)
+  z[g, ] <- apply(bar, 2, max, na.rm = TRUE)
 }
 
 ####? isn't adding up correctly...
