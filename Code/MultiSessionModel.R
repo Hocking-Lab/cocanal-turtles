@@ -494,22 +494,50 @@ for(g in 1:G) {
 # Now populated by starting positions uniformally placed within state space
 # For every individual that is not 0, change starting x point to mean of traps associated with encounters for that individual; leaves 0's there from the augmented population and also puts in activity center for augmented individuals that were randomly given an encounter history (caught at least 1 time)
 
-sum_caps <- apply(EM_array, c(1,2), sum)  ## c(1,2): dimensions to apply function to; 1 = rows, 2 = columns; collapsed day in this instance
+sum_caps <- apply(EM_array, c(1,2,4), sum)  ## c(1,2): dimensions to apply function to; 1 = rows, 2 = columns; collapsed day in this instance
 ## this is wrong, it doesn't distinguish rows per day as different individuals thus the max number of individuals caught one day becomes the total number of caught inviduals here... Need to sum each individual per for each site
+
 
 traplocsE <- as.matrix(trap_locs[[4]])
 row.names(traplocsE) <- NULL
 colnames(traplocsE) <- NULL
 
+sst <- matrix(NA, M, G)
 
-sst <- (sum_caps %*% traplocsE) / (ifelse(rowSums(sum_caps) > 0, rowSums(sum_caps), 1))
+  for(g in 1:G){
+    sst[ , g] <- (sum_caps[ , , g] %*% traplocsE) / (ifelse(rowSums(sum_caps[ , , g]) > 0, rowSums(sum_caps[ , , g]), 1))
+    sst[, g] <- ifelse(sst[, g] == 0, NA, sst[, g])
+    # sst[i, g] <- ifelse(sst[i , g] == 0, c(runif(1, min = xlim[[g]][1], max = xlim[[g]][2])), sst[i, g])
+  }
+
+
+
+################## 25_4_19  #####################
+#########
+#######
+#####
+###
+#
+
+sst <- matrix(NA, M, G)
+
+for(i in 1:M){
+for(g in 1:G){
+  sst[ , g] <- (sum_caps[ , , g] %*% traplocsE) / (ifelse(rowSums(sum_caps[ , , g]) > 0, rowSums(sum_caps[ , , g]), 1))
+  sst[i, g] <- ifelse(sst[i, g] == 0, c(runif(1, min = xlim[[g]][1], max = xlim[[g]][2])), sst[i, g])
+  # sst[i, g] <- ifelse(sst[i , g] == 0, c(runif(1, min = xlim[[g]][1], max = xlim[[g]][2])), sst[i, g])
+}
+}
+
+
 
 #sst <- (sum_caps %*% traplocsE) / (ifelse(rowSums(sum_caps) > 0, rowSums(sum_caps), 1))  ## Using the trap locs from site with max traps for ssts for all sites...?
 
-for(i in (n_ind + 1):M) {
-  sst[i] <- c(runif(1, xlimA[1], xlimA[2])) #parameters, n, max, min
-}
-sst
+#   for (g in 1:G) {
+#       sst[, g] <- ifelse(sst[ , g] == NA, c(runif(1, xlim[[g]], xlim[[g]])), sst[i, g])
+#   } #parameters, n, max, min
+# 
+# sst
 
 ## how to change xlim to match site?
 
