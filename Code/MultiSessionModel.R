@@ -293,7 +293,6 @@ EM_2 <- EM_2 %>%
 
 ############
 
-M <- 6000
 n_traps <- 14
 J <- n_traps
 num_sites <- max(EDF_CPIC$site_num)
@@ -368,42 +367,71 @@ G <- num_sites
 ###############
 #19_4_19
 
-M <- 500 # look for this earlier
-EM_array <- array(NA, dim = c(M, n_traps, K, G))
+M <- 700 # look for this earlier
+EM_array <- array(NA, dim = c(M, n_traps + 1, K, G))
 
 # make 4D array: individual (M) x trap (n_traps) x day (K) x site (G)
 # split by day
-for(i in 1:K) {
+for(k in 1:K) {
   for(g in 1:G) {
-  foo <- EM[(which(EM[]$day == i & EM$site_num == g)), ]
-  foo_less <- select(foo, -c(site_num, ind, day, id, trap_id_edited, max_traps))
-  df_aug <- as.data.frame(matrix(0, nrow = (M - nrow(foo_less)), ncol = J), stringsAsFactors = FALSE)
+  foo <- EM[(which(EM[]$day == k & EM$site_num == g)), ]
+  foo_less <- select(foo, -c(site_num, ind, day, trap_id_edited, max_traps))
+  df_aug <- as.data.frame(matrix(0, nrow = (M - nrow(foo_less)), ncol = J + 1), stringsAsFactors = FALSE)
   # df_aug$site_num <- g
   # df_aug <- df_aug[ , c(ncol(df_aug), 1:(ncol(df_aug)-1))]
-  colnames(foo_less) <- colnames(df_aug)
+  colnames(df_aug) <- colnames(foo_less)
   foo_augment <- bind_rows(foo_less, df_aug)
-  EM_array[ , , i, g] <- as.matrix(foo_augment)
+  foo_augment$id <- ifelse(foo_augment$id == 0, NA, foo_augment$id)
+  EM_array[ , , k, g] <- as.matrix(foo_augment)
   }
 }
 
+foob <- array(NA, dim = c(M, n_traps, K, G))
+
+target <- c(1:700)
+
+  for (k in 1:K) {
+    for (g in 1:G) {
+    food <- EM_array[ , , k, g]
+    foob_arranged <- food[match(target, food[ ,1]), ]
+    foob_arranged[is.na(foob_arranged)] <- 0
+    foob_arranged[ , 1] <- ifelse(foob_arranged[ , 1] == 0, NA, foob_arranged[ ,1])
+    foob_arranged <- foob_arranged[ , -1]
+    #foob_arranged <- select()
+    #foob_arranged <- food[order(food[ , 1]), ]
+    foob[ , , k, g] <- as.matrix(foob_arranged)
+    }
+  }
+
+EM_array <- foob
+
+## Need to divide M by 4, thus change ids?
 #### 500 per day per site? or 500 per site (500/4 per day?), also it does not keep the same id for the same indiiduals between days... so recap calc will not work?
 
-EM_array_2 <- array(NA, dim = c(M, n_traps + 1, G))
+#EM_array_2 <- array(NA, dim = c(M, n_traps + 1, G))
 
 # make 4D array: individual (M) x trap (n_traps) x day (K) x site (G)
 # split by day
 
-for(g in 1:G) {
-    foo <- EM_2[(which(EM_2$site_num == g)), ]
-    foo_less <- select(foo, -c(site_num, EM_2.id, EM_2.site_num))
-    df_aug <- as.data.frame(matrix(0, nrow = (M - nrow(foo_less)), ncol = J + 1), stringsAsFactors = FALSE)
-    # df_aug$site_num <- g
-    # df_aug <- df_aug[ , c(ncol(df_aug), 1:(ncol(df_aug)-1))]
-    colnames(df_aug) <- colnames(foo_less)
-    foo_augment <- bind_rows(foo_less, df_aug)
-    foo_augment$id <- ifelse(foo_augment$id == 0, NA, foo_augment$id)
-    EM_array_2[ , , g] <- as.matrix(foo_augment)
-  }
+# for(g in 1:G) {
+#     foo <- EM_2[(which(EM_2$site_num == g)), ]
+#     foo_less <- select(foo, -c(site_num, EM_2.id, EM_2.site_num))
+#     df_aug <- as.data.frame(matrix(0, nrow = (M - nrow(foo_less)), ncol = J + 1), stringsAsFactors = FALSE)
+#     # df_aug$site_num <- g
+#     # df_aug <- df_aug[ , c(ncol(df_aug), 1:(ncol(df_aug)-1))]
+#     colnames(df_aug) <- colnames(foo_less)
+#     foo_augment <- bind_rows(foo_less, df_aug)
+#     foo_augment$id <- ifelse(foo_augment$id == 0, NA, foo_augment$id)
+#     EM_array_2[ , , g] <- as.matrix(foo_augment)
+#   }
+
+foo <- EM_2
+foo_less <- select(foo, -c(site_num, EM_2.id, EM_2.site_num))
+df_aug <- as.data.frame(matrix(0, nrow = (6000 - nrow(foo_less)), ncol = J + 1), stringsAsFactors = FALSE)
+colnames(df_aug) <- colnames(foo_less)
+foo_augment$id <- ifelse(foo_augment$id == 0, NA, foo_augment$id)
+EM_array_2 <- select(foo_augment, -id)
+
 
 ## EM_array_2 --> collapsed day so could make sst vector with all unique individuals caught per site; made sure each individual was only counted (recaps not counted)
 
@@ -414,13 +442,13 @@ z <- matrix(NA, G, M)
 bar <- matrix(NA, K, M)
 for(g in 1:G) {
   for(k in 1:K) {
-    foo <- as.matrix(EM_array[ , , k, g])
-    bar[k, ] <- apply(foo, 1, max, na.rm = TRUE)
+    foog <- as.matrix(EM_array[ , , k, g])
+    bar[k, ] <- apply(foog, 1, max, na.rm = TRUE)
   }
   z[g, ] <- apply(bar, 1, max, na.rm = TRUE)
 }
 
-####?
+####? doesn't recognize individuals across days...
 
 
 # z <- c(rep(1, n_ind), rep(0, M_allsites-N))
@@ -466,7 +494,7 @@ for(g in 1:G) {
 # Now populated by starting positions uniformally placed within state space
 # For every individual that is not 0, change starting x point to mean of traps associated with encounters for that individual; leaves 0's there from the augmented population and also puts in activity center for augmented individuals that were randomly given an encounter history (caught at least 1 time)
 
-sum_caps <- apply(EM_array_2, c(1,3), sum)  ## c(1,2): dimensions to apply function to; 1 = rows, 2 = columns; collapsed day in this instance
+sum_caps <- apply(EM_array_2, c(1), sum)  ## c(1,2): dimensions to apply function to; 1 = rows, 2 = columns; collapsed day in this instance
 ## this is wrong, it doesn't distinguish rows per day as different individuals thus the max number of individuals caught one day becomes the total number of caught inviduals here... Need to sum each individual per for each site
 
 traplocsE <- as.matrix(trap_locs[[4]])
