@@ -448,7 +448,7 @@ for(g in 1:G) {
   z[g, ] <- apply(bar, 1, max, na.rm = TRUE)
 }
 
-####? doesn't recognize individuals across days...
+####? isn't adding up correctly...
 
 
 # z <- c(rep(1, n_ind), rep(0, M_allsites-N))
@@ -494,18 +494,15 @@ for(g in 1:G) {
 # Now populated by starting positions uniformally placed within state space
 # For every individual that is not 0, change starting x point to mean of traps associated with encounters for that individual; leaves 0's there from the augmented population and also puts in activity center for augmented individuals that were randomly given an encounter history (caught at least 1 time)
 
-sum_caps <- apply(EM_array_2, c(1), sum)  ## c(1,2): dimensions to apply function to; 1 = rows, 2 = columns; collapsed day in this instance
+sum_caps <- apply(EM_array, c(1), sum)  ## c(1,2): dimensions to apply function to; 1 = rows, 2 = columns; collapsed day in this instance
 ## this is wrong, it doesn't distinguish rows per day as different individuals thus the max number of individuals caught one day becomes the total number of caught inviduals here... Need to sum each individual per for each site
 
 traplocsE <- as.matrix(trap_locs[[4]])
 row.names(traplocsE) <- NULL
 colnames(traplocsE) <- NULL
 
-sst <- array(dim = c(500, 14, 12))
 
-for(g in 1:G){
-  sst[ , , g] <- (sum_caps[ , , g] %*% traplocsE) / (ifelse(rowSums(sum_caps[ , , g]) > 0, rowSums(sum_caps[ , , g]), 1))
-}
+  sst <- (sum_caps %*% traplocsE) / (ifelse(rowSums(sum_caps[ , , g]) > 0, rowSums(sum_caps), 1))
 
 sst <- apply(sst, c(1,3), mean)
 
