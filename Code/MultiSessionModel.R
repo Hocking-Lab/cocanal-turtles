@@ -543,9 +543,33 @@ for(g in 1:G){
 
 ##### SEX VECTOR with sex (as a random variable) indicated for caught individuals and NA for augmented individuals #####
 
-sex_list <- EDFA$sex
-sex_vector <- ifelse(sex_list == "F", 1, 2)
-Sex <- c(sex_vector-1, rep(NA, M-n_ind))
+
+# sex_list <- EDF_CPIC$sex
+# sex_vector <- ifelse(sex_list == "F", 1, 2)
+# Sex <- c(sex_vector-1, rep(NA, M - n_ind_total))
+
+
+
+##### Sex vector divided by site
+
+sex <- array(NA, dim = c(M, G))
+
+for (k in 1:K){
+for (g in 1:G){
+  sex_site <- EDF_CPIC[(which(EDF_CPIC[]$day == k & EDF_CPIC$site_num == g)), ]$sex
+  sex_aug <- as.data.frame(matrix(NA, nrow = (M - length(sex_site)), 1), stringsAsFactors = FALSE)
+  colnames(sex_aug) <- "sex_site"
+  # df_aug$site_num <- g
+  # df_aug <- df_aug[ , c(ncol(df_aug), 1:(ncol(df_aug)-1))]
+  sex_site <- as.data.frame(sex_site)
+  sex_full <- bind_rows(sex_site, sex_aug)
+  #sex_full[sex_full == "<NA>"] <- "NA"
+  #EM_array[ , , k, g] <- as.matrix(foo_augment)
+}
+}
+
+foo <- EM[(which(EM[]$day == k & EM$site_num == g)), ]
+
 
 #### Behavior Matrix ######
 
