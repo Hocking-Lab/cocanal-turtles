@@ -552,7 +552,51 @@ for(g in 1:G){
 
 ##### Sex vector divided by site
 
-sex <- array(NA, dim = c(M, G))
+sex_array <- array(NA, dim = c(M, G))
+
+# make 4D array: individual (M) x trap (n_traps) x day (K) x site (G)
+# split by day
+EM_CPIC_sex <- EDF_CPIC %>%
+  group_by(site_num, ind, trap_id_edited, day, sex) %>%
+  select(site_num, ind, trap_id_edited, day, sex) %>%
+  mutate(count = 1) %>%
+  summarise_all(sum) %>%
+  #spread(trap_id_edited, count, fill = 0) %>%
+  ungroup() %>%
+  mutate(id = as.integer(as.factor(ind)))
+
+sex_id <- select(EM_CPIC_sex, sex, id)
+
+
+
+
+######
+EM_array <- array(NA, dim = c(M, n_traps + 1, K, G))
+target <- c(1:700)
+
+# make 4D array: individual (M) x trap (n_traps) x day (K) x site (G)
+# split by day
+for(k in 1:K) {
+  for(g in 1:G) {
+    foo <- EM_CPIC_sex[(which(EM_CPIC_sex[]$day == k & EM_CPIC$site_num == g)), ]
+    foo_less <- select(foo, -c(site_num, ind, day, trap_id_edited, count))
+    df_aug <- as.data.frame(matrix(NA, nrow = (M - nrow(foo_less)), ncol = 2), stringsAsFactors = FALSE)
+    # df_aug$site_num <- g
+    # df_aug <- df_aug[ , c(ncol(df_aug), 1:(ncol(df_aug)-1))]
+    colnames(df_aug) <- colnames(foo_less)
+    foo_augment <- bind_rows(foo_less, df_aug)
+    foob_arranged <- foo_augment[match(target, foo_augment[ , 2]), ]
+    
+    #EM_array[ , , k, g] <- as.matrix(foo_augment)
+  }
+}
+
+
+######
+
+
+
+sex_array <- array(NA, dim = c(M, G))
 
 for (k in 1:K){
 for (g in 1:G){
@@ -561,14 +605,13 @@ for (g in 1:G){
   colnames(sex_aug) <- "sex_site"
   # df_aug$site_num <- g
   # df_aug <- df_aug[ , c(ncol(df_aug), 1:(ncol(df_aug)-1))]
+  sex_site <- ifelse(sex_site == "F", 1, 2)
   sex_site <- as.data.frame(sex_site)
   sex_full <- bind_rows(sex_site, sex_aug)
-  #sex_full[sex_full == "<NA>"] <- "NA"
-  #EM_array[ , , k, g] <- as.matrix(foo_augment)
+  sex_full <- ifelse(sex_full$sex_site == 1 | sex_full$sex_site == 2, sex_full$sex_site, NA)
+  sex_array[ , g] <- as.matrix(sex_full)
 }
 }
-
-foo <- EM[(which(EM[]$day == k & EM$site_num == g)), ]
 
 
 #### Behavior Matrix ######
