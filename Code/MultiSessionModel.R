@@ -567,11 +567,14 @@ EM_CPIC_sex <- EDF_CPIC %>%
 
 sex_id <- select(EM_CPIC_sex, sex, id)
 
+sex_id <- sex_id %>% 
+  distinct
+
 
 
 
 ######
-EM_array <- array(NA, dim = c(M, n_traps + 1, K, G))
+EM_array2 <- array(NA, dim = c(M, G))
 target <- c(1:700)
 
 # make 4D array: individual (M) x trap (n_traps) x day (K) x site (G)
@@ -587,9 +590,12 @@ for(k in 1:K) {
     foo_augment <- bind_rows(foo_less, df_aug)
     foob_arranged <- foo_augment[match(target, foo_augment[ , 2]), ]
     
-    #EM_array[ , , k, g] <- as.matrix(foo_augment)
+    #EM_array2[ , g] <- as.matrix(foo_augment)
   }
 }
+
+# food <- EM_array[ , , k, g]
+# foob_arranged <- food[match(target, food[ ,1]), ]
 
 
 ######
