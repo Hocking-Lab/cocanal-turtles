@@ -12,6 +12,7 @@ library(rgdal)
 library(sp)
 library(utils)
 library(reshape)
+library(plyr)
 
 Sites <- read.csv(file = "Data/trapids_sites.csv", header = TRUE)
 
@@ -581,44 +582,32 @@ target <- c(1:700)
 # split by day
 for(k in 1:K) {
   for(g in 1:G) {
-    foo <- EM_CPIC_sex[(which(EM_CPIC_sex[]$day == k & EM_CPIC$site_num == g)), ]
+    foo <- EM_CPIC_sex[(which(EM_CPIC$site_num == g)), ]
     foo_less <- select(foo, -c(site_num, ind, day, trap_id_edited, count))
+    foo_less <- foo_less %>%
+      distinct
     df_aug <- as.data.frame(matrix(NA, nrow = (M - nrow(foo_less)), ncol = 2), stringsAsFactors = FALSE)
     # df_aug$site_num <- g
     # df_aug <- df_aug[ , c(ncol(df_aug), 1:(ncol(df_aug)-1))]
     colnames(df_aug) <- colnames(foo_less)
     foo_augment <- bind_rows(foo_less, df_aug)
-    foob_arranged <- foo_augment[match(target, foo_augment[ , 2]), ]
-    
-    #EM_array2[ , g] <- as.matrix(foo_augment)
+    target <- as.data.frame(1:700)
+    colnames(target) <- "id"
+    foo_augment <- left_join(target, foo_augment)
+    foo_augment <- select(foo_augment, -id)
+    #foob_arranged <- foo_augment[match(target, foo_augment[ , 2]), ]
+    EM_array2[ , g] <- as.matrix(foo_augment)
   }
 }
 
-# food <- EM_array[ , , k, g]
-# foob_arranged <- food[match(target, food[ ,1]), ]
+EM_array2 <- ifelse(EM_array2 == "U", NA, EM_array2)
+EM_array2 <- ifelse(EM_array2 == "M", 1, EM_array2)
+sex_array <- ifelse(EM_array2 == "F", 2, EM_array2)
 
-
-######
-
-
-
-sex_array <- array(NA, dim = c(M, G))
-
-for (k in 1:K){
-for (g in 1:G){
-  sex_site <- EDF_CPIC[(which(EDF_CPIC[]$day == k & EDF_CPIC$site_num == g)), ]$sex
-  sex_aug <- as.data.frame(matrix(NA, nrow = (M - length(sex_site)), 1), stringsAsFactors = FALSE)
-  colnames(sex_aug) <- "sex_site"
-  # df_aug$site_num <- g
-  # df_aug <- df_aug[ , c(ncol(df_aug), 1:(ncol(df_aug)-1))]
-  sex_site <- ifelse(sex_site == "F", 1, 2)
-  sex_site <- as.data.frame(sex_site)
-  sex_full <- bind_rows(sex_site, sex_aug)
-  sex_full <- ifelse(sex_full$sex_site == 1 | sex_full$sex_site == 2, sex_full$sex_site, NA)
-  sex_array[ , g] <- as.matrix(sex_full)
-}
-}
-
+##############
+#############
+#######
+####
 
 #### Behavior Matrix ######
 
@@ -633,6 +622,7 @@ BM
 BM <- as.data.frame(BM, stringsAsFactors = FALSE)
 BM$behav <- ifelse(BM$recap == "R", 1, 0)
 BM_less <- select(BM, -recap)
+
 
 # make Cgij with 1 if a recap and 0 otherwise
 C_obs <- BM_less %>%
@@ -651,6 +641,10 @@ C_obs <- BM_less %>%
 C_unobs <- as.data.frame(matrix(0, nrow = M-nrow(C_obs), ncol = 4))
 colnames(C_unobs) <- colnames(C_obs)
 C <- bind_rows(C_obs, C_unobs)
+
+
+######## Error in expand(., site_num, ind, day) : unused arguments (site_num, ind, day)
+
 
 
 #nrow(BM_less[(which(BM_less$day == i)), ])
