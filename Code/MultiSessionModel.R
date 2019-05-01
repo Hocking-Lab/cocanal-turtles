@@ -525,35 +525,6 @@ sst[i, g] <- ifelse(sst[i , g] == 0, unif_array[i, g], sst[i, g])
 
 
 
-################## 25_4_19  #####################
-#########
-#######
-#####
-###
-#
-
-sst <- matrix(NA, M, G)
-
-for(i in 1:M){
-for(g in 1:G){
-  sst[ , g] <- (sum_caps[ , , g] %*% traplocsE) / (ifelse(rowSums(sum_caps[ , , g]) > 0, rowSums(sum_caps[ , , g]), 1))
-  sst[i, g] <- ifelse(sst[i, g] == 0, c(runif(1, min = xlim[[g]][1], max = xlim[[g]][2])), sst[i, g])
-  # sst[i, g] <- ifelse(sst[i , g] == 0, c(runif(1, min = xlim[[g]][1], max = xlim[[g]][2])), sst[i, g])
-}
-}
-
-
-
-#sst <- (sum_caps %*% traplocsE) / (ifelse(rowSums(sum_caps) > 0, rowSums(sum_caps), 1))  ## Using the trap locs from site with max traps for ssts for all sites...?
-
-#   for (g in 1:G) {
-#       sst[, g] <- ifelse(sst[ , g] == NA, c(runif(1, xlim[[g]], xlim[[g]])), sst[i, g])
-#   } #parameters, n, max, min
-# 
-# sst
-
-## how to change xlim to match site?
-
 ##### SEX VECTOR with sex (as a random variable) indicated for caught individuals and NA for augmented individuals #####
 
 
