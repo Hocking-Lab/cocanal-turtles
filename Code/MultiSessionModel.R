@@ -586,6 +586,7 @@ for(k in 1:K) {
 EM_array2 <- ifelse(EM_array2 == "U", NA, EM_array2)
 EM_array2 <- ifelse(EM_array2 == "M", 1, EM_array2)
 sex_array <- ifelse(EM_array2 == "F", 2, EM_array2)
+Sex <- sex_array
 
 ##############
 #############
@@ -662,7 +663,7 @@ for (k in 1:K) {
 }
 
 B_array <- foob
-
+C <- B_array
 
 #########
 
@@ -742,10 +743,10 @@ cat ("
 
 jags_data_m4 <- list(y = EM_array, 
                      Sex = Sex, 
-                     traplocsA = traplocsA, 
+                     traplocs = traplocs, 
                      K=K, 
                      M=M, 
-                     xlimA=xlimA, 
+                     xlim=xlim, 
                      n_traps = n_traps, 
                      C = C) #, n_ind = n_ind)
 # "initial values for the observed data have to be specified as NA"
