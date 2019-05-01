@@ -700,8 +700,8 @@ cat ("
      } # t
      
      
-     for(m in 1:M) {
-     alpha2[g, m] ~ dnorm(mu_a2, 1 / sd_a2 / sd_a2) # take out g here? Trap behavior universal b/w sites?
+     for(i in 1:M) {
+     alpha2[g, i] ~ dnorm(mu_a2, 1 / sd_a2 / sd_a2) # take out g here? Trap behavior universal b/w sites?
      } # m
      mu_a2 ~ dnorm(0, 0.01)
      # sd_a2 ~ dt(0, pow(5, -2), 1)T(0, ) # half cauchy prior with scale = 5 (25?)
@@ -716,11 +716,11 @@ cat ("
      
      for(k in 1:K) {
      for(t in 1:2) {
-     logit(p0[g, i, j, k, t]) <- alpha0[t] + (alpha2[g, i] * C[g, i, k]) + eta[g, i, k]  # alpha2*C to rep. global behav. response
+     logit(p0[g, i, j, k, t]) <- alpha0[t] + (alpha2[g, i] * C[i, k, g]) + eta[g, i, k]  # alpha2*C to rep. global behav. response
      } # i
      } # j
      } # k 
-     } # t    #### error?
+     } # t    #### syntax error?
      
      for(i in 1:M) {
      Sex[i] ~ dbern(psi.sex)
