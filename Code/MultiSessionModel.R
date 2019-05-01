@@ -294,7 +294,7 @@ EM <- as.data.frame(EM, stringsAsFactors = FALSE)
 
 ############
 
-n_traps <- 14
+#n_traps <- 14
 J <- n_traps
 num_sites <- max(EDF_CPIC$site_num)
 G <- num_sites
@@ -369,7 +369,7 @@ G <- num_sites
 #19_4_19
 
 M <- 700 # look for this earlier
-EM_array <- array(NA, dim = c(M, n_traps + 1, K, G))
+EM_array <- array(NA, dim = c(M, (max(max_trap) + 1), K, G))
 
 # make 4D array: individual (M) x trap (n_traps) x day (K) x site (G)
 # split by day
@@ -377,7 +377,7 @@ for(k in 1:K) {
   for(g in 1:G) {
   foo <- EM[(which(EM[]$day == k & EM$site_num == g)), ]
   foo_less <- select(foo, -c(site_num, ind, day, trap_id_edited, max_traps))
-  df_aug <- as.data.frame(matrix(0, nrow = (M - nrow(foo_less)), ncol = J + 1), stringsAsFactors = FALSE)
+  df_aug <- as.data.frame(matrix(0, nrow = (M - nrow(foo_less)), ncol = (max(max_trap) + 1)), stringsAsFactors = FALSE)
   # df_aug$site_num <- g
   # df_aug <- df_aug[ , c(ncol(df_aug), 1:(ncol(df_aug)-1))]
   colnames(df_aug) <- colnames(foo_less)
@@ -448,8 +448,6 @@ for(g in 1:G) {
   }
   z[g, ] <- apply(bar, 2, max, na.rm = TRUE)
 }
-
-####? isn't adding up correctly...
 
 
 # z <- c(rep(1, n_ind), rep(0, M_allsites-N))
@@ -586,7 +584,7 @@ for(k in 1:K) {
 EM_array2 <- ifelse(EM_array2 == "U", NA, EM_array2)
 EM_array2 <- ifelse(EM_array2 == "M", 1, EM_array2)
 sex_array <- ifelse(EM_array2 == "F", 2, EM_array2)
-Sex <- sex_array
+Sex <- as.numeric(sex_array)
 
 ##############
 #############
@@ -611,7 +609,7 @@ BM_less <- select(BM, -recap)
 
 # make Cgik with 1 if a recap and 0 otherwise
 # C_obs <- BM_less %>%
-#   expand(site_num, ind, day) %>%
+#   tidyr::expand(site_num, ind, day) %>%
 #   left_join(BM_less) %>%
 #   group_by(site_num) %>%
 #   mutate(behav = ifelse(is.na(behav), 0, behav),
@@ -628,6 +626,7 @@ BM_less <- select(BM, -recap)
 # C <- bind_rows(C_obs, C_unobs)
 
 ## Error: couldn't find arguments (site_num, ind, day)
+## Fixed error
 
 B_array <- array(NA, dim = c(M, 2, K, G))
 
@@ -734,8 +733,9 @@ cat ("
      } # k
      
      # Derived parameters
+    N[g] <- sum(z[ , g])
      # N[g] <- inprod(z[1:M_allsites], sitedummy[ , t]) ## see panel 9.2
-     # density[g] <- N[g] / (xlimA[g, 2] - xlimA[g, 1]) # divided distances by 100 so calculates turtles per 100 m of canal
+     density[g] <- N[g] / (xlim[[g]][2] - xlim[[g]][1]) # divided distances by 100 so calculates turtles per 100 m of canal
 
     } # g
 }
@@ -747,7 +747,7 @@ jags_data_m4 <- list(y = EM_array,
                      K=K, 
                      M=M, 
                      xlim=xlim, 
-                     n_traps = n_traps, 
+                     max_trap = max_trap, 
                      C = C) #, n_ind = n_ind)
 # "initial values for the observed data have to be specified as NA"
 inits <- function() {
@@ -775,7 +775,7 @@ if(testing) {
 }
 
 cl <- makeCluster(nc)                        # Request # cores
-clusterExport(cl, c("jags_data_m4", "inits", "inits2", "parameters", "n_ind", "z", "sst", "Sex", "ni", "na", "nt", "K", "C", "M")) # Make these available
+clusterExport(cl, c("jags_data_m4", "inits", "parameters", "n_ind", "z", "sst", "Sex", "ni", "na", "nt", "K", "C", "M")) # Make these available
 clusterSetRNGStream(cl = cl, 54354354)
 
 system.time({ # no status bar (% complete) when run in parallel

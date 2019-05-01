@@ -133,7 +133,7 @@ BM_less <- select(BM, -recap)
 
 # make Cij with 1 if a recap and 0 otherwise
 C_obs <- BM_less %>%
-  expand(ind, day) %>%
+  tidyr::expand(ind, day) %>%
   left_join(BM_less) %>%
   group_by(ind) %>%
   mutate(behav = ifelse(is.na(behav), 0, behav),
