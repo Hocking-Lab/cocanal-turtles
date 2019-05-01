@@ -597,7 +597,8 @@ sex_array <- ifelse(EM_array2 == "F", 2, EM_array2)
 BM <- EDF_CPIC %>%
   group_by(site_num, ind, day, recap) %>%
   select(site_num, ind, day, recap) %>%
-  ungroup()
+  ungroup() %>%
+  mutate(id = as.integer(as.factor(ind)))
 
 str(BM)
 BM
@@ -607,43 +608,60 @@ BM$behav <- ifelse(BM$recap == "R", 1, 0)
 BM_less <- select(BM, -recap)
 
 
-# make Cgij with 1 if a recap and 0 otherwise
-C_obs <- BM_less %>%
-  expand(site_num, ind, day) %>%
-  left_join(BM_less) %>%
-  group_by(site_num) %>%
-  mutate(behav = ifelse(is.na(behav), 0, behav),
-         cumu = cumsum(behav)) %>%
-  mutate(cgij = ifelse(cumu > 0, 1, 0)) %>% # if you stop it here you can see what it's doing 
-  select(site_num, ind, day, cgij) %>%
-  spread(key = site_num, value = cgij, sep = "_") %>% # stop here if you want to see individual ID before dropping it
-  ungroup %>%
-  select(-ind)
-
-# augment unobserved individuals
-C_unobs <- as.data.frame(matrix(0, nrow = M-nrow(C_obs), ncol = 4))
-colnames(C_unobs) <- colnames(C_obs)
-C <- bind_rows(C_obs, C_unobs)
-
-
-######## Error in expand(., site_num, ind, day) : unused arguments (site_num, ind, day)
-
-
-
-#nrow(BM_less[(which(BM_less$day == i)), ])
-
-# BM_array <- array(NA, dim = c(M, K))
-# for(i in 1:K){
-#   df_bm_aug <- as.data.frame(matrix(0, nrow = (M - nrow(BM_less[(which(BM_less$day == i)), ])), ncol = 1), stringsAsFactors = FALSE)
-#   foobm <- BM_less[(which(BM_less$day == i)), ]
-#   foobm_less <- select(foobm, - ind, - day)
-#   colnames(foobm_less) <- colnames(df_bm_aug)
-#   foobm_augment <- bind_rows(foobm_less, df_bm_aug)
-#   BM_array[1:(M), i] <- as.matrix(foobm_augment)
-#   
-# }  ## NEED TO ADD IN INDIVIDUALS NOT CAUGHT ON SPECIFIC TRAP DAYS, BUT CAUGHT ON OTHER TRAP OCCASIONS
+# make Cgik with 1 if a recap and 0 otherwise
+# C_obs <- BM_less %>%
+#   expand(site_num, ind, day) %>%
+#   left_join(BM_less) %>%
+#   group_by(site_num) %>%
+#   mutate(behav = ifelse(is.na(behav), 0, behav),
+#          cumu = cumsum(behav)) %>%
+#   mutate(cgij = ifelse(cumu > 0, 1, 0)) %>% # if you stop it here you can see what it's doing 
+#   select(site_num, ind, day, cgij) %>%
+#   spread(key = site_num, value = cgij, sep = "_") %>% # stop here if you want to see individual ID before dropping it
+#   ungroup %>%
+#   select(-ind)
 # 
-# C <- BM_array
+# # augment unobserved individuals
+# C_unobs <- as.data.frame(matrix(0, nrow = M-nrow(C_obs), ncol = 4))
+# colnames(C_unobs) <- colnames(C_obs)
+# C <- bind_rows(C_obs, C_unobs)
+
+## Error: couldn't find arguments (site_num, ind, day)
+
+B_array <- array(NA, dim = c(M, 2, K, G))
+
+for (i in 1:M){
+  for(k in 1:K){
+    for(g in 1:G){
+      foo <- BM_less[(which(BM_less[]$day == k & BM_less$site_num == g)), ]
+      foo_less <- select(foo, -c(site_num, ind, day))
+      df_aug <- as.data.frame(matrix(0, nrow = (M - nrow(foo_less)), ncol = 2), stringsAsFactors = FALSE)
+      colnames(df_aug) <- colnames(foo_less)
+      foo_augment <- bind_rows(foo_less, df_aug)
+      foo_augment$id <- ifelse(foo_augment$id == 0, NA, foo_augment$id)
+      B_array[ , , k, g] <- as.matrix(foo_augment)
+    }
+  }
+}
+
+foob <- array(NA, dim = c(M, K, G))
+
+target <- c(1:700)
+
+for (k in 1:K) {
+  for (g in 1:G) {
+    food <- B_array[ , , k, g]
+    foob_arranged <- food[match(target, food[ ,1]), ]
+    foob_arranged <- foob_arranged[ , -1]
+    foob_arranged[is.na(foob_arranged)] <- 0
+    #foob_arranged[ , 1] <- ifelse(foob_arranged[ , 1] == 0, NA, foob_arranged[ ,1])
+    #foob_arranged <- select()
+    #foob_arranged <- food[order(food[ , 1]), ]
+    foob[ , k, g] <- as.matrix(foob_arranged)
+  }
+}
+
+B_array <- foob
 
 
 #########
