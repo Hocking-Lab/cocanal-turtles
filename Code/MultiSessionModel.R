@@ -284,13 +284,13 @@ EM <- as.data.frame(EM, stringsAsFactors = FALSE)
 
 ###########
 
-EM_2 <- select(EM, -trap_id_edited, -day, -site_num, -ind, -max_traps)
-EM_2 <- aggregate(.~id, data = EM_2, sum, na.rm = FALSE)
-
-extra_info <- as.data.frame(cbind(id = EM$id, site_num = EM$site_num))
-EM_2 <- merge(EM_2, transform(extra_info, EM_2 = extra_info), all.x = TRUE)
-EM_2 <- EM_2 %>% 
-  distinct
+# EM_2 <- select(EM, -trap_id_edited, -day, -site_num, -ind, -max_traps)
+# EM_2 <- aggregate(.~id, data = EM_2, sum, na.rm = FALSE)
+# 
+# extra_info <- as.data.frame(cbind(id = EM$id, site_num = EM$site_num))
+# EM_2 <- merge(EM_2, transform(extra_info, EM_2 = extra_info), all.x = TRUE)
+# EM_2 <- EM_2 %>% 
+#   distinct
 
 ############
 
@@ -503,13 +503,25 @@ traplocsE <- as.matrix(trap_locs[[4]])
 row.names(traplocsE) <- NULL
 colnames(traplocsE) <- NULL
 
+unif_array <- array(NA, dim = c(M, G))
+
+for (g in 1:G){
+x <- runif(700, min = xlim[[g]][1], max = xlim[[g]][2])
+unif_array[ , g] <- as.matrix(x)
+}
+
+
 sst <- matrix(NA, M, G)
 
-  for(g in 1:G){
+for(g in 1:G){
     sst[ , g] <- (sum_caps[ , , g] %*% traplocsE) / (ifelse(rowSums(sum_caps[ , , g]) > 0, rowSums(sum_caps[ , , g]), 1))
-    sst[, g] <- ifelse(sst[, g] == 0, NA, sst[, g])
-    # sst[i, g] <- ifelse(sst[i , g] == 0, c(runif(1, min = xlim[[g]][1], max = xlim[[g]][2])), sst[i, g])
+}
+
+for(i in 1:M){
+  for(g in 1:G){
+sst[i, g] <- ifelse(sst[i , g] == 0, unif_array[i, g], sst[i, g])
   }
+}
 
 
 
@@ -566,10 +578,10 @@ EM_CPIC_sex <- EDF_CPIC %>%
   ungroup() %>%
   mutate(id = as.integer(as.factor(ind)))
 
-sex_id <- select(EM_CPIC_sex, sex, id)
+# sex_id <- select(EM_CPIC_sex, sex, id)
 
-sex_id <- sex_id %>% 
-  distinct
+# sex_id <- sex_id %>% 
+#   distinct
 
 
 
