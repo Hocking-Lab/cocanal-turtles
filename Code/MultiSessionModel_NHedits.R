@@ -11,8 +11,10 @@ library(zoo)
 library(rgdal)
 library(sp)
 library(utils)
-library(reshape)
-library(plyr)
+# library(reshape)
+# library(plyr)
+
+n_traps <- 14
 
 Sites <- read.csv(file = "Data/trapids_sites.csv", header = TRUE)
 
@@ -124,25 +126,30 @@ trap_dist_O <- spDistsN1(coords_utm[113:122, ], coords_utm[113, ])
 trap_dist_list <- list(trap_dist_A, trap_dist_C, trap_dist_D, trap_dist_E,
                        trap_dist_F, trap_dist_G, trap_dist_J, trap_dist_K,
                        trap_dist_L, trap_dist_M, trap_dist_N, trap_dist_O)
-trap_locs <- trap_dist_list
+# trap_locs <- trap_dist_list
 
+trap_locs <- matrix(NA, 12, max(max_trap))
 for (i in 1:12) {
-trap_locs[[i]] <- log(trap_dist_list[[i]])
-trap_locs[[i]][1] <- 0
+trap_locs[i, 1:max_trap[i]] <- trap_dist_list[[i]] / 100
 }
 
 
 
-xlim_pre <- list()
-xlim <- list()
+# xlim_pre <- list()
+# xlim <- list()
 
 #alter the buffer to better represent home range?
 
+# for(i in 1:12){
+#   xlim_pre[[i]] <- c(min(trap_dist_list[[i]] + 100), max(trap_dist_list[[i]] + 100))
+#   xlim_pre[[i]] <- log(xlim_pre[[i]])
+#   xlim_pre[[i]][1] <- xlim_pre[[i]][1]*(-1)
+#   xlim[[i]] <- xlim_pre[[i]]
+# }
+
+xlim <- matrix(NA, 12, 2)
 for(i in 1:12){
-  xlim_pre[[i]] <- c(min(trap_dist_list[[i]] + 100), max(trap_dist_list[[i]] + 100))
-  xlim_pre[[i]] <- log(xlim_pre[[i]])
-  xlim_pre[[i]][1] <- xlim_pre[[i]][1]*(-1)
-  xlim[[i]] <- xlim_pre[[i]]
+  xlim[i, 1:2] <- c(min(trap_dist_list[[i]]), max(trap_dist_list[[i]])) / 100
 }
 
 
@@ -498,14 +505,14 @@ sum_caps <- apply(EM_array, c(1,2,4), sum)  ## c(1,2): dimensions to apply funct
 ## this is wrong, it doesn't distinguish rows per day as different individuals thus the max number of individuals caught one day becomes the total number of caught inviduals here... Need to sum each individual per for each site
 
 
-traplocsE <- as.matrix(trap_locs[[4]])
+traplocsE <- as.matrix(trap_locs[4, ])
 row.names(traplocsE) <- NULL
 colnames(traplocsE) <- NULL
 
 unif_array <- array(NA, dim = c(M, G))
 
 for (g in 1:G){
-x <- runif(700, min = xlim[[g]][1], max = xlim[[g]][2])
+x <- runif(700, min = xlim[g, ], max = xlim[g, ])
 unif_array[ , g] <- as.matrix(x)
 }
 
@@ -557,7 +564,7 @@ EM_CPIC_sex <- EDF_CPIC %>%
 
 
 ######
-EM_array2 <- array(NA, dim = c(M, G))
+EM_array2 <- matrix(NA_integer_, M, G)
 target <- c(1:700)
 
 # make 4D array: individual (M) x trap (n_traps) x day (K) x site (G)
@@ -567,25 +574,26 @@ for(k in 1:K) {
     foo <- EM_CPIC_sex[(which(EM_CPIC$site_num == g)), ]
     foo_less <- select(foo, -c(site_num, ind, day, trap_id_edited, count))
     foo_less <- foo_less %>%
-      distinct
-    df_aug <- as.data.frame(matrix(NA, nrow = (M - nrow(foo_less)), ncol = 2), stringsAsFactors = FALSE)
+      distinct %>%
+      mutate(sex = ifelse(sex == "U", NA, sex),
+             sex = ifelse(sex == "M", 0, sex),
+             sex = ifelse(sex == "F", 1, sex)) %>%
+      mutate(sex = as.integer(sex))
+    df_aug <- as.data.frame(matrix(NA_integer_, nrow = (M - nrow(foo_less)), ncol = 2), stringsAsFactors = FALSE)
     # df_aug$site_num <- g
     # df_aug <- df_aug[ , c(ncol(df_aug), 1:(ncol(df_aug)-1))]
     colnames(df_aug) <- colnames(foo_less)
     foo_augment <- bind_rows(foo_less, df_aug)
     target <- as.data.frame(1:700)
     colnames(target) <- "id"
-    foo_augment <- left_join(target, foo_augment)
+    foo_augment <- left_join(target, foo_augment, by = "id")
     foo_augment <- select(foo_augment, -id)
     #foob_arranged <- foo_augment[match(target, foo_augment[ , 2]), ]
     EM_array2[ , g] <- as.matrix(foo_augment)
   }
 }
 
-EM_array2 <- ifelse(EM_array2 == "U", NA, EM_array2)
-EM_array2 <- ifelse(EM_array2 == "M", 1, EM_array2)
-sex_array <- ifelse(EM_array2 == "F", 2, EM_array2)
-Sex <- as.numeric(sex_array)
+Sex <- t(EM_array2)
 
 ##############
 #############
@@ -670,17 +678,26 @@ C <- B_array
 cat ("
      model {
 
-    for(g in 1:length(Sites)) {
-
-     alpha1[g, t] ~ dnorm(mu_a1, 1 / sd_a1 / sd_a1 )
      mu_a1 ~ dnorm(0, 1 / (25^2))I(0, ) ## half normal
      sd_a1 ~ dunif(0, 5)
+     mu_a2 ~ dnorm(0, 0.01)
+     # sd_a2 ~ dt(0, pow(5, -2), 1)T(0, ) # half cauchy prior with scale = 5 (25?)
+     sd_a2 ~ dunif(0, 5)
+
+    for(g in 1:n_sites) {
+
+for(i in 1:M) {
+     Sex[g, i] ~ dbern(psi.sex[g])
+     Sex2[g, i] <- Sex[g, i] + 1
+}
 
      for(t in 1:2){
-     sigma[g, t] <- pow(1 / (2*alpha1[t]), 0.5) # sd of half normal
+      alpha1[g, t] ~ dnorm(0, 1 / (25^2))I(0, ) ## half normal independent across sites and sexes
+     # alpha1[g, t] ~ dnorm(mu_a1, 1 / sd_a1 / sd_a1 )I(0, ) # BUGS I(,) notation is only allowed if all parameters are fixed
+      sigma[g, t] <- pow(1 / (2*alpha1[g, t]), 0.5) # sd of half normal
      } # t
 
-     psi[g] ~ dunif(0, 1) # giving numbers between 0 and 1, 
+     psi[g] ~ dunif(0, 1) # prob of individual being in the population (for augmentation since N unknown)
 # logit(psi[g]) ~ dnorm(mu_psi, 1 / sd_psi / sd_psi) # consider drawing from a normal distribution across sites
 # mu_psi ~ dnorm(0, 0.01)
 # sd_psi ~ dunif(0, 10)
@@ -691,7 +708,7 @@ cat ("
      
     for(i in 1:M) {
      for(k in 1:K) {
-     eta[g,i,k] ~ dnorm(0, 1 / (sigma_ind * sigma_ind))
+     eta[g,i,k] ~ dnorm(0, 1 / (sigma_ind[g] * sigma_ind[g]))
      } # i
      } # k
      
@@ -703,9 +720,6 @@ cat ("
      for(i in 1:M) {
      alpha2[g, i] ~ dnorm(mu_a2, 1 / sd_a2 / sd_a2) # take out g here? Trap behavior universal b/w sites?
      } # m
-     mu_a2 ~ dnorm(0, 0.01)
-     # sd_a2 ~ dt(0, pow(5, -2), 1)T(0, ) # half cauchy prior with scale = 5 (25?)
-     sd_a2 ~ dunif(0, 5)
      
      for(i in 1:M) {
      z[g, i] ~ dbern(psi[g])
@@ -716,31 +730,31 @@ cat ("
      
      for(k in 1:K) {
      for(t in 1:2) {
-     logit(p0[g, i, j, k, t]) <- alpha0[t] + (alpha2[g, i] * C[i, k, g]) + eta[g, i, k]  # alpha2*C to rep. global behav. response
-     } # i
+     logit(p0[g, i, j, k, t]) <- alpha0[g, t] + (alpha2[g, i] * C[i, k, g]) + eta[g, i, k]  # alpha2*C to rep. global behav. response
+     } # t
+     } # k
      } # j
-     } # k 
-     } # t    #### syntax error?
+     } # i    
      
      for(i in 1:M) {
-     Sex[i] ~ dbern(psi.sex)
-     Sex2[i] <- Sex[i] + 1
      for (j in 1:max_trap[g]) {
      for (k in 1:K) {
-     y[g, i, j, k] ~ dbern(p[g, i, j, k])
-     p[g, i, j, k] <- z[i]*p0[g, i, j, k, Sex2[i]* exp(- alpha1[Sex2[i]] * d[g, i,j] * d[g, i,j])
+     y[i, j, k, g] ~ dbern(p[g, i, j, k])
+     p[g, i, j, k] <- z[g, i] * p0[g, i, j, k, Sex2[g, i]] * exp(- alpha1[g, Sex2[g, i]] * d[g, i,j] * d[g, i,j])
      } # i
      } # j
      } # k
      
      # Derived parameters
-    N[g] <- sum(z[ , g])
+    N[g] <- sum(z[g , ])
      # N[g] <- inprod(z[1:M_allsites], sitedummy[ , t]) ## see panel 9.2
-     density[g] <- N[g] / (xlim[[g]][2] - xlim[[g]][1]) # divided distances by 100 so calculates turtles per 100 m of canal
+     density[g] <- N[g] / (xlim[g, 2] - xlim[g, 1]) # divided distances by 100 so calculates turtles per 100 m of canal
 
     } # g
 }
      ", file = "Code/JAGS/SCR_Allsites.txt")
+
+n_sites <- G
 
 jags_data_site <- list(y = EM_array, 
                      Sex = Sex, 
@@ -749,25 +763,27 @@ jags_data_site <- list(y = EM_array,
                      M=M, 
                      xlim=xlim, 
                      max_trap = max_trap, 
-                     C = C) #, n_ind = n_ind)
+                     C = C, 
+                     n_sites = G) #, n_ind = n_ind)
 # "initial values for the observed data have to be specified as NA"
 inits <- function() {
-  list(alpha0=rnorm(2,-2,0.5), 
-       alpha1=runif(2,1,2), 
-       alpha2=runif(M, 1, 2),
-       s=as.numeric(sst), 
-       z=z, psi = runif(1), 
-       psi.sex = runif(1)) #, Sex = c(rep(NA, n_ind))) ## Error = "Invalid parameters for chain 1: non-numeric intial values supplied for variable(s) Sex"   #### ALPHA2????
+  list(alpha0 = matrix(rnorm(n_sites * 2, -2, 0.5), n_sites, 2), 
+       alpha1 = matrix(abs(rnorm(n_sites * 2, 1, 2)), n_sites, 2),
+       alpha2 = matrix(rnorm(n_sites * 2, 1, 2), n_sites, M),
+       s = t(sst), 
+       z = z, 
+       psi = runif(n_sites), 
+       psi.sex = runif(n_sites)) #, Sex = c(rep(NA, n_ind))) ## Error = "Invalid parameters for chain 1: non-numeric intial values supplied for variable(s) Sex"   #### ALPHA2????
 }
 
-parameters <- c("sigma", "N", "density", "s", "sigma_ind", "psi", "psi.sex", "C", "alpha2", "alpha", "sigma")
+parameters <- c("sigma", "N", "density", "s", "sigma_ind", "alpha2", "alpha0", "alpha1", "sigma") # "C", maybe C or a summary stat
 
 testing <- TRUE
 if(testing) {
   na = 500
-  ni = 500
+  ni = 100
   nt = 1
-  nc = 3
+  nc = 2
 } else {
   na = 100000
   ni = 600000
@@ -776,7 +792,7 @@ if(testing) {
 }
 
 cl <- makeCluster(nc)                        # Request # cores
-clusterExport(cl, c("jags_data_site", "inits", "parameters", "n_ind", "z", "sst", "Sex", "ni", "na", "nt", "K", "C", "M")) # Make these available
+clusterExport(cl, c("jags_data_site", "inits", "parameters", "n_ind", "z", "sst", "Sex", "ni", "na", "nt", "K", "C", "M", "n_sites")) # Make these available
 clusterSetRNGStream(cl = cl, 54354354)
 
 system.time({ # no status bar (% complete) when run in parallel

@@ -1,0 +1,78 @@
+
+     model {
+
+     mu_a1 ~ dnorm(0, 1 / (25^2))I(0, ) ## half normal
+     sd_a1 ~ dunif(0, 5)
+     mu_a2 ~ dnorm(0, 0.01)
+     # sd_a2 ~ dt(0, pow(5, -2), 1)T(0, ) # half cauchy prior with scale = 5 (25?)
+     sd_a2 ~ dunif(0, 5)
+
+    for(g in 1:n_sites) {
+
+for(i in 1:M) {
+     Sex[g, i] ~ dbern(psi.sex[g])
+     Sex2[g, i] <- Sex[g, i] + 1
+}
+
+     for(t in 1:2){
+      alpha1[g, t] ~ dnorm(0, 1 / (25^2))I(0, ) ## half normal independent across sites and sexes
+     # alpha1[g, t] ~ dnorm(mu_a1, 1 / sd_a1 / sd_a1 )I(0, ) # BUGS I(,) notation is only allowed if all parameters are fixed
+      sigma[g, t] <- pow(1 / (2*alpha1[g, t]), 0.5) # sd of half normal
+     } # t
+
+     psi[g] ~ dunif(0, 1) # prob of individual being in the population (for augmentation since N unknown)
+# logit(psi[g]) ~ dnorm(mu_psi, 1 / sd_psi / sd_psi) # consider drawing from a normal distribution across sites
+# mu_psi ~ dnorm(0, 0.01)
+# sd_psi ~ dunif(0, 10)
+     psi.sex[g] ~ dunif(0, 1)
+     
+     
+     sigma_ind[g] ~ dt(0, 1 / (25^2), 1)I(0, ) 	## implies half-cauchy with scale of 25 - maybe reduce to something more reasonable
+     
+    for(i in 1:M) {
+     for(k in 1:K) {
+     eta[g,i,k] ~ dnorm(0, 1 / (sigma_ind[g] * sigma_ind[g]))
+     } # i
+     } # k
+     
+     for(t in 1:2) {
+     alpha0[g, t] ~ dnorm(0, 0.04) # sd = 5 - could constrain more potentially
+     } # t
+     
+     
+     for(i in 1:M) {
+     alpha2[g, i] ~ dnorm(mu_a2, 1 / sd_a2 / sd_a2) # take out g here? Trap behavior universal b/w sites?
+     } # m
+     
+     for(i in 1:M) {
+     z[g, i] ~ dbern(psi[g])
+     s[g, i] ~ dunif(xlim[g, 1], xlim[g, 2]) ##??
+     
+     for(j in 1:max_trap[g]) { 
+     d[g,i,j] <- abs(s[g, i] - trap_locs[g, j])
+     
+     for(k in 1:K) {
+     for(t in 1:2) {
+     logit(p0[g, i, j, k, t]) <- alpha0[g, t] + (alpha2[g, i] * C[i, k, g]) + eta[g, i, k]  # alpha2*C to rep. global behav. response
+     } # t
+     } # k
+     } # j
+     } # i    
+     
+     for(i in 1:M) {
+     for (j in 1:max_trap[g]) {
+     for (k in 1:K) {
+     y[i, j, k, g] ~ dbern(p[g, i, j, k])
+     p[g, i, j, k] <- z[g, i] * p0[g, i, j, k, Sex2[g, i]] * exp(- alpha1[g, Sex2[g, i]] * d[g, i,j] * d[g, i,j])
+     } # i
+     } # j
+     } # k
+     
+     # Derived parameters
+    N[g] <- sum(z[g , ])
+     # N[g] <- inprod(z[1:M_allsites], sitedummy[ , t]) ## see panel 9.2
+     density[g] <- N[g] / (xlim[g, 2] - xlim[g, 1]) # divided distances by 100 so calculates turtles per 100 m of canal
+
+    } # g
+}
+     
