@@ -149,7 +149,7 @@ trap_locs[i, 1:max_trap[i]] <- trap_dist_list[[i]] / 100
 
 xlim <- matrix(NA, 12, 2)
 for(i in 1:12){
-  xlim[i, 1:2] <- c(min(trap_dist_list[[i]]), max(trap_dist_list[[i]])) / 100
+  xlim[i, 1:2] <- c(min(trap_dist_list[[i]]), max(trap_dist_list[[i]]) + 50) / 100 # need to have buffer on each side without being negative. Just added 50 to the end for testing but will have to think through
 }
 
 
@@ -809,5 +809,66 @@ system.time({ # no status bar (% complete) when run in parallel
 stopCluster(cl)
 
 out2 <- mcmc.list(out)
-plot(out2[ , c("N", "density", "sigma_ind", "alpha2", "alpha0", "sigma")])
+plot(out2[ , c("N[1]", "density[1]", "sigma_ind[1]", "alpha2[1,1]", "alpha0[1,1]")])
+plot(out2[ , c("N[2]", "density[2]", "sigma_ind[2]", "alpha2[2,1]", "alpha0[2,1]")])
+
+
+########## Behavioral model but without individual responses #############
+# Complicated model doesn't look like it will converge based on very short test (non-identifiabilies)
+
+jags_data_site <- list(y = EM_array, 
+                       Sex = Sex, 
+                       trap_locs = trap_locs, 
+                       K=K, 
+                       M=M, 
+                       xlim=xlim, 
+                       max_trap = max_trap, 
+                       C = C, 
+                       n_sites = G) #, n_ind = n_ind)
+# "initial values for the observed data have to be specified as NA"
+inits <- function() {
+  list(alpha0 = rnorm(n_sites, -2, 0.5), 
+       alpha1 = matrix(abs(rnorm(n_sites * 2, 1, 2)), n_sites, 2),
+       alpha2 = matrix(rnorm(n_sites * 2, 1, 2), n_sites, M),
+       s = t(sst), 
+       z = z, 
+       psi = runif(n_sites), 
+       psi.sex = runif(n_sites)) #, Sex = c(rep(NA, n_ind))) ## Error = "Invalid parameters for chain 1: non-numeric intial values supplied for variable(s) Sex"   #### ALPHA2????
+}
+
+parameters <- c("sigma", "density", "s", "alpha2", "alpha0", "mu0", "sigma0", "mu_a2") # "C", maybe C or a summary stat
+
+testing <- TRUE
+if(testing) {
+  na = 500
+  ni = 500
+  nt = 1
+  nc = 2
+} else {
+  na = 100000
+  ni = 600000
+  nt = 60
+  nc = 4
+}
+
+cl <- makeCluster(nc)                        # Request # cores
+clusterExport(cl, c("jags_data_site", "inits", "parameters", "n_ind", "z", "sst", "Sex", "ni", "na", "nt", "K", "C", "M", "n_sites")) # Make these available
+clusterSetRNGStream(cl = cl, 54354354)
+
+system.time({ # no status bar (% complete) when run in parallel
+  out <- clusterEvalQ(cl, {
+    library(rjags)
+    jm <- jags.model("Code/JAGS/scr_all_sites_simple.txt", jags_data_site, inits = inits, n.adapt = na, n.chains = 1) # Compile model and run burnin
+    out <- coda.samples(jm, parameters, n.iter = ni, thin = nt) # Sample from posterior distribution
+    return(as.mcmc(out))
+  })
+}) #
+
+
+
+stopCluster(cl)
+
+scr_simple <- mcmc.list(out)
+plot(scr_simple[ , c("N[1]", "density[1]", "sigma_ind[1]", "alpha2[1,1]", "alpha0[1,1]")])
+plot(scr_simple[ , c("N[2]", "density[2]", "sigma_ind[2]", "alpha2[2,1]", "alpha0[2,1]")])
 
