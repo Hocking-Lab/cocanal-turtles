@@ -29,6 +29,8 @@ library(tibble)
 library(spatstat)
 library(spThin)
 library(ggplot2)
+library(plotrix)
+library(reshape2)
 ```
 
 I first downloaded my raw data from the summer.
@@ -452,6 +454,7 @@ hist(centers_cpic_A[]) # activity centers for individuals caught at least once
 #### Obtaining Density and N For Site A and CPICS from MCMC Output ####
 
 densities_cpic_A <- df_mcmc_cpic_A$density[501:1000] #densities per iteration after burnin
+stderror_cpic_A <- std.error(as.vector(densities_cpic_A))
 mean_density_cpic_A <- mean(densities_cpic_A) # Mean # turtles per 100 meters
 
 estimated_N_cpic_A <- df_mcmc_cpic_A$N[501:1000]
@@ -483,6 +486,7 @@ hist(centers_cser_A) # activity centers for individuals caught at least once
 #### Obtaining Density and N For Site A and CSER from MCMC Output ####
 
 densities_cser_A <- df_mcmc_cser_A$density[501:1000] #densities per iteration after burnin
+stderror_cser_A <- std.error(as.vector(densities_cser_A))
 mean_density_cser_A <- mean(densities_cser_A) # Mean # turtles per 100 meters
 
 estimated_N_cser_A <- df_mcmc_cser_A$N[501:1000]
@@ -515,6 +519,7 @@ hist(centers_cpic_C) # activity centers for individuals caught at least once
 #### Obtaining Density and N
 
 densities_cpic_C <- df_mcmc_cpic_C$density[501:1000] #densities per iteration after burnin
+stderror_cpic_C <- std.error(as.vector(densities_cpic_C))
 mean_density_cpic_C <- mean(densities_cpic_C) # Mean # turtles per 100 meters
 
 estimated_N_cpic_C <- df_mcmc_cpic_C$N[501:1000]
@@ -546,6 +551,7 @@ hist(centers_cser_C) # activity centers for individuals caught at least once
 #### Obtaining Density For Site 1 and CPICS from MCMC Output ####
 
 densities_cser_C <- df_mcmc_cser_C$density[501:1000] #densities per iteration after burnin
+stderror_cser_C <- std.error(as.vector(densities_cser_C))
 mean_density_cser_C <- mean(densities_cser_C) # Mean # turtles per 100 meters
 
 estimated_N_cser_C <- df_mcmc_cser_C$N[501:1000]
@@ -577,6 +583,7 @@ hist(centers_cpic_D) # activity centers for individuals caught at least once
 #### Obtaining Density For Site 1 and CPICS from MCMC Output ####
 
 densities_cpic_D <- df_mcmc_cpic_D$density[501:1000] #densities per iteration after burnin
+stderror_cpic_D <- std.error(as.vector(densities_cpic_D))
 mean_density_cpic_D <- mean(densities_cpic_D) # Mean # turtles per 100 meters
 
 estimated_N_cpic_D <- df_mcmc_cpic_D$N[501:1000]
@@ -607,6 +614,7 @@ hist(centers_cpic_E) # activity centers for individuals caught at least once
 #### Obtaining Density and N
 
 densities_cpic_E <- df_mcmc_cpic_E$density[501:1000] #densities per iteration after burnin
+stderror_cpic_E <- std.error(as.vector(densities_cpic_E))
 mean_density_cpic_E <- mean(densities_cpic_E) # Mean # turtles per 100 meters
 
 estimated_N_cpic_E <- df_mcmc_cpic_E$N[501:1000]
@@ -638,6 +646,7 @@ hist(centers_cser_E) # activity centers for individuals caught at least once
 #### Obtaining Density and N
 
 densities_cser_E <- df_mcmc_cser_E$density[501:1000] #densities per iteration after burnin
+stderror_cser_E <- std.error(as.vector(densities_cser_E))
 mean_density_cser_E <- mean(densities_cser_E) # Mean # turtles per 100 meters
 
 estimated_N_cser_E <- df_mcmc_cser_E$N[501:1000]
@@ -669,6 +678,7 @@ hist(centers_cser_F) # activity centers for individuals caught at least once
 #### Obtaining Density and N
 
 densities_cser_F <- df_mcmc_cser_F$density[501:1000] #densities per iteration after burnin
+stderror_cser_F <- std.error(as.vector(densities_cser_F))
 mean_density_cser_F <- mean(densities_cser_F) # Mean # turtles per 100 meters
 
 estimated_N_cser_F <- df_mcmc_cser_F$N[501:1000]
@@ -700,6 +710,7 @@ hist(centers_cpic_F) # activity centers for individuals caught at least once
 #### Obtaining Density and N
 
 densities_cpic_F <- df_mcmc_cpic_F$density[501:1000] #densities per iteration after burnin
+stderror_cpic_F <- std.error(as.vector(densities_cpic_F))
 mean_density_cpic_F <- mean(densities_cpic_F) # Mean # turtles per 100 meters
 
 estimated_N_cpic_F <- df_mcmc_cpic_F$N[501:1000]
@@ -731,6 +742,7 @@ hist(centers_cpic_G) # activity centers for individuals caught at least once
 #### Obtaining Density and N
 
 densities_cpic_G <- df_mcmc_cpic_G$density[501:1000] #densities per iteration after burnin
+stderror_cpic_G <- std.error(as.vector(densities_cpic_G))
 mean_density_cpic_G <- mean(densities_cpic_G) # Mean # turtles per 100 meters
 
 estimated_N_cpic_G <- df_mcmc_cpic_G$N[501:1000]
@@ -762,6 +774,7 @@ hist(centers_cser_G) # activity centers for individuals caught at least once
 #### Obtaining Density and N
 
 densities_cser_G <- df_mcmc_cser_G$density[501:1000] #densities per iteration after burnin
+stderror_cser_G <- std.error(as.vector(densities_cser_G))
 mean_density_cser_G <- mean(densities_cser_G) # Mean # turtles per 100 meters
 
 estimated_N_cser_G <- df_mcmc_cser_G$N[501:1000]
@@ -793,6 +806,7 @@ hist(centers_cpic_J) # activity centers for individuals caught at least once
 #### Obtaining Density and N
 
 densities_cpic_J <- df_mcmc_cpic_J$density[501:1000] #densities per iteration after burnin
+stderror_cpic_J <- std.error(as.vector(densities_cpic_J))
 mean_density_cpic_J <- mean(densities_cpic_J) # Mean # turtles per 100 meters
 
 estimated_N_cpic_J <- df_mcmc_cpic_J$N[501:1000]
@@ -824,6 +838,7 @@ hist(centers_cser_J) # activity centers for individuals caught at least once
 #### Obtaining Density and N
 
 densities_cser_J <- df_mcmc_cser_J$density[501:1000] #densities per iteration after burnin
+stderror_cser_J <- std.error(as.vector(densities_cser_J))
 mean_density_cser_J <- mean(densities_cser_J) # Mean # turtles per 100 meters
 
 estimated_N_cser_J <- df_mcmc_cser_J$N[501:1000]
@@ -855,6 +870,7 @@ hist(centers_cpic_K) # activity centers for individuals caught at least once
 #### Obtaining Density and N
 
 densities_cpic_K <- df_mcmc_cpic_K$density[501:1000] #densities per iteration after burnin
+stderror_cpic_K <- std.error(as.vector(densities_cpic_K))
 mean_density_cpic_K <- mean(densities_cpic_K) # Mean # turtles per 100 meters
 
 estimated_N_cpic_K <- df_mcmc_cpic_K$N[501:1000]
@@ -886,6 +902,7 @@ hist(centers_cpic_L) # activity centers for individuals caught at least once
 #### Obtaining Density and N
 
 densities_cpic_L <- df_mcmc_cpic_L$density[501:1000] #densities per iteration after burnin
+stderror_cpic_L <- std.error(as.vector(densities_cpic_L))
 mean_density_cpic_L <- mean(densities_cpic_L) # Mean # turtles per 100 meters
 
 estimated_N_cpic_L <- df_mcmc_cpic_L$N[501:1000]
@@ -917,6 +934,7 @@ hist(centers_cpic_M) # activity centers for individuals caught at least once
 #### Obtaining Density and N
 
 densities_cpic_M <- df_mcmc_cpic_M$density[501:1000] #densities per iteration after burnin
+stderror_cpic_M <- std.error(as.vector(densities_cpic_M))
 mean_density_cpic_M <- mean(densities_cpic_M) # Mean # turtles per 100 meters
 
 estimated_N_cpic_M <- df_mcmc_cpic_M$N[501:1000]
@@ -948,6 +966,7 @@ hist(centers_cser_M) # activity centers for individuals caught at least once
 #### Obtaining Density and N
 
 densities_cser_M <- df_mcmc_cser_M$density[501:1000] #densities per iteration after burnin
+stderror_cser_M <- std.error(as.vector(densities_cser_M))
 mean_density_cser_M <- mean(densities_cser_M) # Mean # turtles per 100 meters
 
 estimated_N_cser_M <- df_mcmc_cser_M$N[501:1000]
@@ -978,6 +997,7 @@ hist(centers_cpic_N) # activity centers for individuals caught at least once
 #### Obtaining Density and N
 
 densities_cpic_N <- df_mcmc_cpic_N$density[501:1000] #densities per iteration after burnin
+stderror_cpic_N <- std.error(as.vector(densities_cpic_N))
 mean_density_cpic_N <- mean(densities_cpic_N) # Mean # turtles per 100 meters
 
 estimated_N_cpic_N <- df_mcmc_cpic_N$N[501:1000]
@@ -1008,6 +1028,7 @@ hist(centers_cser_N) # activity centers for individuals caught at least once
 #### Obtaining Density and N
 
 densities_cser_N <- df_mcmc_cser_N$density[501:1000] #densities per iteration after burnin
+stderror_cser_N <- std.error(as.vector(densities_cser_N))
 mean_density_cser_N <- mean(densities_cser_N) # Mean # turtles per 100 meters
 
 estimated_N_cser_N <- df_mcmc_cser_N$N[501:1000]
@@ -1038,6 +1059,7 @@ hist(centers_cpic_O) # activity centers for individuals caught at least once
 #### Obtaining Density and N
 
 densities_cpic_O <- df_mcmc_cpic_O$density[501:1000] #densities per iteration after burnin
+stderror_cpic_O <- std.error(as.vector(densities_cpic_O))
 mean_density_cpic_O <- mean(densities_cpic_O) # Mean # turtles per 100 meters
 
 estimated_N_cpic_O <- df_mcmc_cpic_O$N[501:1000]
@@ -1069,6 +1091,7 @@ hist(centers_cser_O) # activity centers for individuals caught at least once
 #### Obtaining Density and N
 
 densities_cser_O <- df_mcmc_cser_O$density[501:1000] #densities per iteration after burnin
+stderror_cser_O <- std.error(as.vector(densities_cser_O))
 mean_density_cser_O <- mean(densities_cser_O) # Mean # turtles per 100 meters
 
 estimated_N_cser_O <- df_mcmc_cser_O$N[501:1000]
@@ -1447,8 +1470,51 @@ knitr::include_graphics(filepaths)
 
 x <- c("A","C","D","E","F","G","J","K","L","M","N","O")
 density_list <- c(mean_density_cpic_A, mean_density_cpic_C, mean_density_cpic_D, mean_density_cpic_E, mean_density_cpic_F, mean_density_cpic_G, mean_density_cpic_J, mean_density_cpic_K, mean_density_cpic_L, mean_density_cpic_M, mean_density_cpic_N, mean_density_cpic_O)
+stderror_list_cpic <- c(stderror_cpic_A, stderror_cpic_C, stderror_cpic_D, stderror_cpic_E, stderror_cpic_F, stderror_cpic_G, stderror_cpic_J, stderror_cpic_K, stderror_cpic_L, stderror_cpic_M, stderror_cpic_N, stderror_cpic_O)
 
-barplot(density_list, names.arg = c("A","C","E","F","G","J","M","N","O"), main = "CSER Density by Site", col = "brown", xlab = "Site", ylab = "Density")
+# barplot(density_list, names.arg = c("A","C","D","E","F","G","J","K","L","M","N","O"), main = "CPIC Density by Site", col = "brown", xlab = "Site", ylab = "Density")
+
+cbind_cpic <- cbind(data.frame(site = x, density = density_list, stderror = stderror_list_cpic))
+
+p <- ggplot(cbind_cpic, aes(x=site, y=density)) + 
+  geom_bar(stat="identity", color="darkorange3", fill = "darkorange3", 
+           position=position_dodge()) +
+  geom_errorbar(aes(ymin=density-stderror, ymax=density+stderror), width=.2,
+                 position=position_dodge(.9)) 
+print(p)
+
+p + labs(x="Site", y = "Density (Individuals Per 100m)")+
+   theme_classic() +
+   scale_fill_manual(values=c('#999999','#E69F00')) +
+  ggtitle("CPIC Site Densities") +
+  theme(plot.title = element_text(hjust = 0.5, size = 16),
+        axis.title.x = element_text(size=14),
+        axis.title.y = element_text(size=14)
+)
+
+x <- c("A","C","E","F","G","J","M","N","O")
+density_list_cser <- c(mean_density_cser_A, mean_density_cser_C, mean_density_cser_E, mean_density_cser_F, mean_density_cser_G, mean_density_cser_J, mean_density_cser_M, mean_density_cser_N, mean_density_cser_O)
+stderror_list_cser <- c(stderror_cser_A, stderror_cser_C, stderror_cser_E, stderror_cser_F, stderror_cser_G, stderror_cser_J, stderror_cser_M, stderror_cser_N, stderror_cser_O)
+
+# barplot(density_list_cser, names.arg = c("A","C","E","F","G","J","M","N","O"), main = "CSER Density by Site", col = "brown", xlab = "Site", ylab = "Density")
+
+cbind_cser <- cbind(data.frame(site = x, density = density_list_cser, stderror = stderror_list_cser))
+
+p <- ggplot(cbind_cser, aes(x=site, y=density)) + 
+  geom_bar(stat="identity", color="darkorange3", fill = "darkorange3", 
+           position=position_dodge()) +
+  geom_errorbar(aes(ymin=density-stderror, ymax=density+stderror), width=.2,
+                 position=position_dodge(.9)) 
+print(p)
+
+p + labs(x="Site", y = "Density (Individuals Per 100m)")+
+   theme_classic() +
+   scale_fill_manual(values=c('#999999','#E69F00')) +
+  ggtitle("Snapping Turtle Site Densities") +
+  theme(plot.title = element_text(hjust = 0.5, size = 16),
+        axis.title.x = element_text(size=14),
+        axis.title.y = element_text(size=14)
+)
 
 ```
 

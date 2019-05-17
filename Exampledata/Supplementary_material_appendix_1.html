@@ -1,0 +1,287 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title>Breeding in a dry wetland. Demographic drought response in the common reed-warbler</title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="1561.6">
+  <style type="text/css">
+    p.p4 {margin: 0.0px 0.0px 10.0px 0.0px; line-height: 20.0px; font: 14.0px 'Helvetica Neue'; color: #333333; -webkit-text-stroke: #333333}
+    p.p6 {margin: 0.0px 0.0px 0.0px 0.0px; line-height: 18.0px; font: 13.0px Courier; color: #333333; -webkit-text-stroke: #333333; background-color: #f5f5f5}
+    p.p7 {margin: 0.0px 0.0px 0.0px 0.0px; line-height: 18.0px; font: 13.0px Courier; color: #333333; -webkit-text-stroke: #333333; background-color: #ffffff}
+    p.p8 {margin: 0.0px 0.0px 0.0px 0.0px; line-height: 20.0px; font: 14.0px 'Helvetica Neue'; color: #333333; -webkit-text-stroke: #333333; min-height: 16.0px}
+    p.p9 {margin: 0.0px 0.0px 0.0px 0.0px; line-height: 18.0px; font: 13.0px Courier; color: #333333; -webkit-text-stroke: #333333; background-color: #f5f5f5; min-height: 16.0px}
+    span.s1 {font-kerning: none}
+    span.s2 {font: 18.0px 'Lucida Grande'; font-kerning: none}
+    span.s3 {font: 14.0px 'Lucida Grande'; font-kerning: none}
+    span.s4 {font: 14.0px 'Helvetica Neue'; font-kerning: none; color: #337ab7; -webkit-text-stroke: 0px #337ab7}
+  </style>
+</head>
+<body>
+<h1 style="margin: 0.0px 0.0px 10.0px 0.0px; line-height: 41.0px; font: 38.0px 'Helvetica Neue'; color: #333333; -webkit-text-stroke: #333333"><span class="s1">Breeding in a dry wetland. Demographic drought response in the common reed-warbler</span></h1>
+<h4 style="margin: 0.0px 0.0px 10.0px 0.0px; line-height: 19.0px; font: 18.0px 'Helvetica Neue'; color: #333333; -webkit-text-stroke: #333333"><span class="s1"><i>13 de enero de 2018</i></span></h4>
+<h1 style="margin: 0.0px 0.0px 10.0px 0.0px; line-height: 37.0px; font: 34.0px 'Helvetica Neue'; color: #333333; -webkit-text-stroke: #333333"><span class="s1">Supplementary material appendix 1</span></h1>
+<h4 style="margin: 0.0px 0.0px 10.0px 0.0px; line-height: 19.0px; font: 18.0px 'Helvetica Neue'; color: #333333; -webkit-text-stroke: #333333"><span class="s1"><b>Jos</b></span><span class="s2"><b>��</b></span><span class="s1"><b> Jim</b></span><span class="s2"><b>��</b></span><span class="s1"><b>nez\(^1\)</b>, <b>Jose Manuel Hern</b></span><span class="s2"><b>��</b></span><span class="s1"><b>ndez\(^2\)</b>, <b>Jordi Feliu\(^1\)</b>, <b>Manuel Carrasco\(^3\)</b>,<b>Rub</b></span><span class="s2"><b>��</b></span><span class="s1"><b>n Moreno-Opo\(^4\)</b></span></h4>
+<p class="p4"><span class="s1">\(^1\) Instituto de Investigaci</span><span class="s3">��</span><span class="s1">n en Recursos Cineg</span><span class="s3">��</span><span class="s1">ticos (IREC, CSIC-UCLM-JCCM), Ronda de Toledo 12, 13071 Ciudad Real, Spain.<br>
+\(^2\) C/ Plaza de Espa</span><span class="s3">��</span><span class="s1">a, 3, 6</span><span class="s3">��</span><span class="s1"> 13003 - Ciudad Real, Spain.<br>
+\(^3\) Tablas de Daimiel National Park. Organismo Aut</span><span class="s3">��</span><span class="s1">nomo Parques Nacionales, Paseo del Carmen s/n., 13250 Daimiel, Spain<br>
+\(^4\) Evolution and Conservation Biology Research Group. Universidad Complutense de Madrid. C/Jos</span><span class="s3">��</span><span class="s1"> Antonio Novais 2. 28040. Madrid.</span></p>
+<h2 style="margin: 0.0px 0.0px 10.0px 0.0px; line-height: 33.0px; font: 30.0px 'Helvetica Neue'; color: #333333; -webkit-text-stroke: #333333"><span class="s1">Data</span></h2>
+<p class="p4"><span class="s1">We used the ringing data from Common Reed-Warbler in El Morenillo (Tablas de Daimiel National Park) 2010-2013 for sigma calculation.</span></p>
+<p class="p6"><span class="s1">setwd('C:/Users/Jose/OneDrive/Carricero/REVISION_1/')</span></p>
+<p class="p6"><span class="s1">library(data.table)</span></p>
+<p class="p6"><span class="s1">library(DT)</span></p>
+<p class="p6"><span class="s1">carricero&lt;-read.table("TOT_EMdata.txt", header=TRUE)</span></p>
+<p class="p6"><span class="s1">traps&lt;-read.table("trapEMdata.txt", header=TRUE)</span></p>
+<p class="p6"><span class="s1"># To use as data, make a txt files ("trapEM.txt").<span class="Apple-converted-space"> </span></span></p>
+<p class="p6"><span class="s1"># Use as header: #trapID<span class="Apple-converted-space">    </span>x <span class="Apple-converted-space">  </span>y (3 cols)</span></p>
+<p class="p6"><span class="s1">traps</span></p>
+<p class="p7"><span class="s1">##<span class="Apple-converted-space">    </span>trapID<span class="Apple-converted-space">        </span>x <span class="Apple-converted-space">      </span>y</span></p>
+<p class="p7"><span class="s1">## 1<span class="Apple-converted-space">    </span>EM01 437115.2 4331507</span></p>
+<p class="p7"><span class="s1">## 2<span class="Apple-converted-space">    </span>EM02 437079.4 4331554</span></p>
+<p class="p7"><span class="s1">## 3<span class="Apple-converted-space">    </span>EM03 437090.5 4331588</span></p>
+<p class="p7"><span class="s1">## 4<span class="Apple-converted-space">    </span>EM04 437077.5 4331584</span></p>
+<p class="p7"><span class="s1">## 5<span class="Apple-converted-space">    </span>EM05 437087.4 4331643</span></p>
+<p class="p7"><span class="s1">## 6<span class="Apple-converted-space">    </span>EM06 437302.7 4331614</span></p>
+<p class="p7"><span class="s1">## 7<span class="Apple-converted-space">    </span>EM07 437314.7 4331615</span></p>
+<p class="p7"><span class="s1">## 8<span class="Apple-converted-space">    </span>EM08 437326.6 4331615</span></p>
+<p class="p7"><span class="s1">## 9<span class="Apple-converted-space">    </span>EM09 437197.5 4331535</span></p>
+<p class="p7"><span class="s1">## 10 <span class="Apple-converted-space">  </span>EM10 437136.5 4331532</span></p>
+<p class="p7"><span class="s1">## 11 <span class="Apple-converted-space">  </span>EM11 437314.5 4331654</span></p>
+<p class="p7"><span class="s1">## 12 <span class="Apple-converted-space">  </span>EM12 437257.4 4331561</span></p>
+<p class="p7"><span class="s1">## 13 <span class="Apple-converted-space">  </span>EM13 437129.6 4331641</span></p>
+<p class="p6"><span class="s1">datatable(carricero)<span class="Apple-converted-space"> </span></span></p>
+<p class="p8"><span class="s1"></span><br></p>
+<p class="p6"><span class="s1"># To use as data, make a txt files ("TOT_EM.txt").</span></p>
+<p class="p6"><span class="s1"># Use as a header: #Session animalID<span class="Apple-converted-space">    </span>occasion<span class="Apple-converted-space">    </span>trapID<span class="Apple-converted-space">  </span>Sexo (5 cols)</span></p>
+<p class="p6"><span class="s1">setwd('C:/Users/Jose/OneDrive/Carricero/REVISION_1/')</span></p>
+<p class="p6"><span class="s1">library(secr) <span class="Apple-converted-space">    </span># This the 2.10.4 version</span></p>
+<p class="p7"><span class="s1">## This is secr 2.10.4. For overview type ?secr</span></p>
+<p class="p7"><span class="s1">##<span class="Apple-converted-space"> </span></span></p>
+<p class="p7"><span class="s1">## Attaching package: 'secr'</span></p>
+<p class="p7"><span class="s1">## The following object is masked from 'package:data.table':</span></p>
+<p class="p7"><span class="s1">##<span class="Apple-converted-space"> </span></span></p>
+<p class="p7"><span class="s1">## <span class="Apple-converted-space">    </span>shift</span></p>
+<p class="p6"><span class="s1">library(scrbook)</span></p>
+<p class="p6"><span class="s1">carr.cc &lt;- read.capthist("TOT_EM.txt", "trapEM.txt", noccasions=7)</span></p>
+<p class="p7"><span class="s1">## No errors found :-)</span></p>
+<p class="p4"><span class="s1">This management of data is from Royle &amp; Sutherland (2014) <a href="https://www.mbr-pwrc.usgs.gov/workshops/scrFeb2014/"><span class="s4">https://www.mbr-pwrc.usgs.gov/workshops/scrFeb2014/</span></a></span></p>
+<p class="p6"><span class="s1">get.3d&lt;- function(M=5000){</span></p>
+<p class="p9"><span class="s1"></span><br></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>set.seed(2013)</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>traplocs&lt;-as.matrix(traps(carr.cc )[[1]])</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>ntraps&lt;- nrow(traplocs)</span></p>
+<p class="p9"><span class="s1"></span><br></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>Y&lt;-carr.cc<span class="Apple-converted-space">  </span># Historial of captures</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>K&lt;-7<span class="Apple-converted-space">        </span># Number of occasions</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>T&lt;-4<span class="Apple-converted-space">        </span># Number of years</span></p>
+<p class="p9"><span class="s1"></span><br></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>Ymat&lt;-NULL</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>died&lt;-NULL</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>nind&lt;-rep(NA, 4)</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">   </span># Occasions of capture changes every year. We use:</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>Y[[1]][,c(6,7)]&lt;-NA</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>Y[[2]]</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>Y[[3]][,7]&lt;-NA</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>Y[[4]][,c(6,7)]&lt;-NA</span></p>
+<p class="p9"><span class="s1"></span><br></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>Y&lt;- list(unclass(Y[[1]]),unclass(Y[[2]]),unclass(Y[[3]]),unclass(Y[[4]]))</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>ind.id &lt;- unique(c(unlist(dimnames(Y[[1]])[1]),</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">                     </span>unlist(dimnames(Y[[2]])[1]),</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">                     </span>unlist(dimnames(Y[[3]])[1]),<span class="Apple-converted-space"> </span></span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">                     </span>unlist(dimnames(Y[[4]])[1])))</span></p>
+<p class="p9"><span class="s1"></span><br></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>Yarr&lt;- Yarr.binary&lt;- Darr&lt;- array(NA,dim=c(M,K,4))</span></p>
+<p class="p9"><span class="s1"></span><br></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>for(t in 1:4){</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">   </span>nind[t]&lt;- nrow(Y[[t]])</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">   </span>tmp&lt;-matrix(0,nrow=M,ncol=K)</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">   </span>dimnames(tmp)&lt;- list(c(ind.id,rep("uncaptured",M-length(ind.id))), 1:K)</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">   </span>######tmp&lt;- rbind(Y[[t]], matrix(0,nrow= (M-nind[t]),ncol=K ) )</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">   </span>tmp[ dimnames(Y[[t]])[[1]],1:K]&lt;- Y[[t]][1:nind[t],1:K]</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">   </span>Yarr[,,t]&lt;- tmp</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">   </span>tmp.binary&lt;- tmp</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">   </span>tmp.binary[tmp&gt;0 &amp;!is.na(tmp)]&lt;- 1</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">   </span>Yarr.binary[,,t]&lt;- tmp.binary</span></p>
+<p class="p9"><span class="s1"></span><br></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">   </span># Dead in the capture:</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">   </span>D &lt;- matrix(0,nrow=nrow(tmp),ncol=ncol(tmp))</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">   </span>D[tmp&lt;0 &amp; !is.na(tmp)]&lt;- 1</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">   </span>for(i in 1:nrow(tmp)){</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">      </span>if(sum(D[i,])&gt;0){</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">      </span>first&lt;- (1:ncol(D))[D[i,]==1]</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">      </span>D[i,(first+1):ncol(D)]&lt;-1</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">      </span>D[i,first]&lt;-0</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">      </span>}</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">    </span>} # fin i</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">   </span>Darr[,,t]&lt;- D</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>} # fin t</span></p>
+<p class="p9"><span class="s1"></span><br></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>Yarr[Yarr&lt;0]&lt;- 0</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>Yarr[Yarr==0]&lt;- ntraps+1</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>Yarr.binary[Yarr.binary&lt;0]&lt;- 0</span></p>
+<p class="p9"><span class="s1"></span><br></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>list(nind=nind, Yarr.binary=Yarr.binary, Yarr=Yarr, isdead=Darr,M=M, K=K,</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">    </span>traplocs=traplocs,ntraps=ntraps)</span></p>
+<p class="p6"><span class="s1">}</span></p>
+<p class="p4"><span class="s1">We get the dataset and assign new names:</span></p>
+<p class="p6"><span class="s1">dlist&lt;-get.3d(M=5000)</span></p>
+<p class="p9"><span class="s1"></span><br></p>
+<p class="p6"><span class="s1">Yarr&lt;- dlist$Yarr</span></p>
+<p class="p6"><span class="s1">Yarr[,c(6,7),1]&lt;- NA</span></p>
+<p class="p6"><span class="s1">Yarr[,<span class="Apple-converted-space">    </span>7 ,3]&lt;- NA</span></p>
+<p class="p6"><span class="s1">Yarr[,c(6,7),4]&lt;- NA</span></p>
+<p class="p9"><span class="s1"></span><br></p>
+<p class="p6"><span class="s1">Yarr.binary&lt;- dlist$Yarr.binary</span></p>
+<p class="p6"><span class="s1">nind&lt;-dlist$nind</span></p>
+<p class="p6"><span class="s1">M&lt;- dlist$M</span></p>
+<p class="p6"><span class="s1">isdead&lt;-dlist$isdead</span></p>
+<p class="p6"><span class="s1">traplocs&lt;- dlist$traplocs</span></p>
+<p class="p6"><span class="s1">ntraps&lt;-dlist$ntraps</span></p>
+<p class="p6"><span class="s1">K&lt;- dlist$K</span></p>
+<p class="p6"><span class="s1">Y2d&lt;- apply(Yarr.binary,c(1,3),sum,na.rm=TRUE)</span></p>
+<p class="p4"><span class="s1">Traps data:</span></p>
+<p class="p6"><span class="s1">X&lt;-as.matrix(traps(carr.cc )[[1]])/10</span></p>
+<p class="p6"><span class="s1">X[,1]&lt;-(X[,1]-mean(X[,1]))</span></p>
+<p class="p6"><span class="s1">X[,2]&lt;-(X[,2]-mean(X[,2]))</span></p>
+<p class="p6"><span class="s1">traplocs&lt;-X</span></p>
+<h2 style="margin: 0.0px 0.0px 10.0px 0.0px; line-height: 33.0px; font: 30.0px 'Helvetica Neue'; color: #333333; -webkit-text-stroke: #333333"><span class="s1">Spatial Jolly-Seber</span></h2>
+<p class="p6"><span class="s1">library(nimble)</span></p>
+<p class="p7"><span class="s1">## nimble version 0.6-9 is loaded.</span></p>
+<p class="p7"><span class="s1">## For more information on NIMBLE and a User Manual,</span></p>
+<p class="p7"><span class="s1">## please visit http://R-nimble.org.</span></p>
+<p class="p7"><span class="s1">##<span class="Apple-converted-space"> </span></span></p>
+<p class="p7"><span class="s1">## Attaching package: 'nimble'</span></p>
+<p class="p7"><span class="s1">## The following object is masked from 'package:secr':</span></p>
+<p class="p7"><span class="s1">##<span class="Apple-converted-space"> </span></span></p>
+<p class="p7"><span class="s1">## <span class="Apple-converted-space">    </span>logit</span></p>
+<p class="p7"><span class="s1">## The following object is masked from 'package:stats':</span></p>
+<p class="p7"><span class="s1">##<span class="Apple-converted-space"> </span></span></p>
+<p class="p7"><span class="s1">## <span class="Apple-converted-space">    </span>simulate</span></p>
+<p class="p6"><span class="s1">## Modelo</span></p>
+<p class="p6"><span class="s1">code &lt;- nimbleCode({</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>for (i in 1:M){</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">    </span>for (t in 1:(T-1)){</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">      </span>phi[i,t] &lt;- mean.phi</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">    </span>} #t</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>} #i</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>mean.phi ~ dunif(0, 1)</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>for (t in 1:T){</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">    </span>gamma[t] ~ dunif(0, 1)</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>} #t</span></p>
+<p class="p9"><span class="s1"></span><br></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>alpha0 ~ dnorm(0,.1)</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>sigma ~ dunif(0,200)</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>alpha1&lt;- (1/(2*sigma*sigma))</span></p>
+<p class="p9"><span class="s1"></span><br></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>for (i in 1:M){</span></p>
+<p class="p9"><span class="s1"></span><br></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">    </span># Static activity centers</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">    </span>s[i,1] ~ dunif(xlim[1],xlim[2])</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">    </span>s[i,2] ~ dunif(ylim[1],ylim[2])</span></p>
+<p class="p9"><span class="s1"><span class="Apple-converted-space">    </span></span></p>
+<p class="p9"><span class="s1"><span class="Apple-converted-space">    </span></span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">    </span>## Observation model</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">    </span>for(t in 1:T){</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">    </span>d2[i,1:ntraps,t] &lt;- pow(pow(s[i,1]-X[1:ntraps,1],2) + pow(s[i,2]-X[1:ntraps,2],2),1)</span></p>
+<p class="p9"><span class="s1"><span class="Apple-converted-space">    </span></span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">      </span>for(k in 1:K){</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">        </span>mu[i,k,1:ntraps,t] &lt;- exp(alpha0 - alpha1*d2[i,1:ntraps,t])*z[i,t]</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">        </span>cp[i,k,1:ntraps,t] &lt;- mu[i,k,1:ntraps,t]/(1+sum(mu[i,k,1:ntraps,t]))</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">        </span>cp[i,k,ntraps2,t] &lt;- 1-sum(cp[i,k,1:ntraps,t]) <span class="Apple-converted-space">  </span># last cell = not captured</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">        </span>Ycat[i,k,t] ~ dcat(cp[i,k,1:ntraps2,t])</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">      </span>}<span class="Apple-converted-space">  </span># k</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">    </span>}<span class="Apple-converted-space">  </span># t</span></p>
+<p class="p9"><span class="s1"></span><br></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">    </span>## Demographic process model</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">    </span>z[i,1] ~ dbern(gamma[1])</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">    </span>for (t in 2:T){</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">      </span># State process</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">      </span>q[i,t-1] &lt;- 1-z[i,t-1]<span class="Apple-converted-space">        </span># Availability for recruitment</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">      </span>available[i,t-1]&lt;- prod(q[i,1:(t-1)])</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">      </span>mu2[i,t] &lt;- phi[i,t-1] * z[i,t-1] + gamma[t] * available[i,t-1]</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">      </span>z[i,t] ~ dbern(mu2[i,t])</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">    </span>} #t</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>} #i</span></p>
+<p class="p9"><span class="s1"></span><br></p>
+<p class="p9"><span class="s1"></span><br></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span># Derived population parameters</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>for (t in 1:T){</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">    </span>qgamma[t] &lt;- 1-gamma[t]</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>cprob[1] &lt;- gamma[1]</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>for (t in 2:T){</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">    </span>cprob[t] &lt;- gamma[t] * prod(qgamma[1:(t-1)])</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>} #t</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>psi &lt;- sum(cprob[1:T])<span class="Apple-converted-space">        </span># Inclusion probability</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>for (t in 1:T){</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">    </span>b[t] &lt;- cprob[t] / psi<span class="Apple-converted-space">      </span># Entry probability</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>} #t</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>for (i in 1:M){</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">    </span>recruit[i,1] &lt;- z[i,1]</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">    </span>for (t in 2:T){</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">      </span>recruit[i,t] &lt;- (1-z[i,t-1]) * z[i,t]</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">    </span>} #t</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>} #i</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>for (t in 1:T){</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">    </span>N[t] &lt;- sum(z[1:M,t])<span class="Apple-converted-space">        </span># Population size</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">    </span>B[t] &lt;- sum(recruit[1:M,t])<span class="Apple-converted-space">  </span># Number of entries</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">    </span>D[t] &lt;- 100*D[t]/area</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>} #t</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>for (i in 1:M){</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">    </span>Nind[i] &lt;- sum(z[i,1:T])</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">    </span>Nalive[i] &lt;- 1-(Nind[i]==0)</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>} #i</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>Nsuper &lt;- sum(Nalive[1:M]) <span class="Apple-converted-space">    </span># Superpopulation size</span></p>
+<p class="p6"><span class="s1">})</span></p>
+<p class="p4"><span class="s1">We create init values:</span></p>
+<p class="p6"><span class="s1">## Inits values for activity centres using traps location</span></p>
+<p class="p6"><span class="s1">Sst&lt;- traplocs[sample(1:ntraps,nrow(Yarr),replace=TRUE),]</span></p>
+<p class="p6"><span class="s1">ncaps&lt;- apply(apply(Yarr.binary,c(1,3),sum,na.rm=TRUE),1,sum)</span></p>
+<p class="p6"><span class="s1">for(i in 1:dim(Yarr)[1]){</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space"> </span>if(ncaps[i]==0) next</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space"> </span>traps.caught&lt;- c(Yarr[i,,1],Yarr[i,,2],Yarr[i,,3],Yarr[i,,4])</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space"> </span>traps.caught&lt;- table(traps.caught[!is.na(traps.caught) &amp; traps.caught &lt;= ntraps])</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>tmp&lt;- <span class="Apple-converted-space">  </span>traplocs[ as.numeric(names(traps.caught)), ]</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>Sst[i,]&lt;- apply(matrix(tmp,ncol=2,byrow=FALSE),2,mean)</span></p>
+<p class="p6"><span class="s1">}</span></p>
+<p class="p9"><span class="s1"></span><br></p>
+<p class="p9"><span class="s1"></span><br></p>
+<p class="p6"><span class="s1">zst&lt;- Y2d</span></p>
+<p class="p6"><span class="s1">zst[zst&gt;0 &amp; !is.na(zst)]&lt;- 1</span></p>
+<p class="p6"><span class="s1">### To avoid zeros in inits values for z</span></p>
+<p class="p6"><span class="s1">first&lt;-last&lt;-rep(NA,nrow(zst))</span></p>
+<p class="p6"><span class="s1">for(i in 1:nrow(zst)){</span></p>
+<p class="p6"><span class="s1">if(sum(zst[i,])==0) next</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>first[i]&lt;- min( (1:4)[zst[i,]==1] )</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>last[i]&lt;-<span class="Apple-converted-space">  </span>max( (1:4)[zst[i,]==1] )</span></p>
+<p class="p6"><span class="s1"><span class="Apple-converted-space">  </span>zst[i,first[i]:last[i]]&lt;- 1</span></p>
+<p class="p6"><span class="s1">}</span></p>
+<p class="p4"><span class="s1">Limits of the space state</span></p>
+<p class="p6"><span class="s1">## Trap grid and a buffer=15 (150m)</span></p>
+<p class="p6"><span class="s1">xlim&lt;-c(min(X[,1])-15,max(X[,1])+15)</span></p>
+<p class="p6"><span class="s1">ylim&lt;-c(min(X[,2])-15,max(X[,2])+15)</span></p>
+<p class="p6"><span class="s1">area&lt;-(xlim[2]-xlim[1])*(ylim[2]-ylim[1])</span></p>
+<p class="p4"><span class="s1">Setup data and constants:</span></p>
+<p class="p6"><span class="s1">ntraps2&lt;-ntraps+1</span></p>
+<p class="p6"><span class="s1">data &lt;- list(Ycat = Yarr,<span class="Apple-converted-space">  </span>X=traplocs)</span></p>
+<p class="p6"><span class="s1">constants&lt;-list(T=4, K=K, M = dim(Yarr)[1], ntraps=ntraps, ntraps2=ntraps2, ylim=ylim, xlim=xlim, area=area)</span></p>
+<p class="p4"><span class="s1">Inits:</span></p>
+<p class="p6"><span class="s1">inits &lt;- list (z=zst, s=Sst, alpha0=-2)</span></p>
+<p class="p6"><span class="s1">load("outCarrMorenillo.RData")</span></p>
+<p class="p6"><span class="s1">library(coda)</span></p>
+<p class="p6"><span class="s1">library(lattice)</span></p>
+<p class="p9"><span class="s1"></span><br></p>
+<p class="p6"><span class="s1">samples1&lt;-res33[[1]]</span></p>
+<p class="p6"><span class="s1">samples2&lt;-res33[[2]]</span></p>
+<p class="p6"><span class="s1">samples3&lt;-res33[[3]]</span></p>
+<p class="p6"><span class="s1">samplesn&lt;-rbind(samples1,samples2,samples3)</span></p>
+<p class="p6"><span class="s1">hist(samplesn[,'sigma'], col="lightgrey")</span></p>
+<p class="p4"><span class="s1"><img src="file:///unknown.png" alt="unknown.png"></span></p>
+<p class="p6"><span class="s1">mean(samplesn[,'sigma'])</span></p>
+<p class="p7"><span class="s1">## [1] 6.878555</span></p>
+<p class="p6"><span class="s1">sd(samplesn[,'sigma'])</span></p>
+<p class="p7"><span class="s1">## [1] 0.6870541</span></p>
+</body>
+</html>

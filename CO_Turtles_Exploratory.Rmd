@@ -35,14 +35,38 @@ par(mfrow = c(1,1))
 
 ```{r}
 scr.mf <- scr.data[which(scr.data$sex != "U" & !is.na(scr.data$sex)), ]
-ggplot(data = scr.mf, aes(carapace)) + geom_histogram(aes(fill = species)) + facet_wrap(~sex) + theme_bw()
+ggplot(data = scr.mf, aes(carapace)) + geom_histogram(aes(fill = species)) + facet_wrap(~sex) +
+  ggtitle("Frequency of Turtles Caught by Size, Sex, and Species") +
+  theme(plot.title = element_text(hjust = 0.5, size = 16),
+        axis.title.x = element_text(size=14),
+        axis.title.y = element_text(size=14))
+
+ # scale_color_manual(values=c("lightgodlenrod4", "#darkorange3", "rosybrown3", "wheat2", "bisque2", "grey50"))+
+ # scale_fill_manual(values=c("lightgodlenrod4", "#darkorange3", "rosybrown3", "wheat2", "bisque2", "grey50"))
+
+
 ggplot(data = scr.mf, aes(carapace)) + geom_histogram(aes(fill = sex)) + facet_wrap(~species)
 ```
 
 ```{r, recap rate histogram}
 
-recaps <- read.csv(file = "recaprates_9_1_18.csv")
-hist(recaps$prop_recap, breaks = 10, xlab = "Proportion of Recaps", main = "Proportion of Recaptures Across C&O Sites")
+recaps <- read.csv(file = "Data/recaprates_9_1_18.csv")
+hist(recaps$prop_recap, breaks = 10, xlab = "Proportion of Recaps", main = "Proportion of Recaptures Across C&O Sites", col = "darkorange3")
+
+
+
+p <- ggplot(recaps, aes(x=prop_recap)) + 
+  geom_histogram(binwidth = 0.05, color="darkorange3", fill = "darkorange3", position = position_dodge())
+print(p)
+
+p + labs(x ="Proportion of Recaps", y = "Frequency")+
+   theme_classic() +
+   scale_fill_manual(values=c('#999999','#E69F00')) +
+  ggtitle("Proportion of Recaptures Across C&O Sites") +
+  theme(plot.title = element_text(hjust = 0.5, size = 16),
+        axis.title.x = element_text(size=14),
+        axis.title.y = element_text(size=14)
+)
 
 
 ```

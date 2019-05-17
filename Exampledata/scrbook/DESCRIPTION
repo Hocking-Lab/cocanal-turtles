@@ -1,0 +1,14 @@
+Package: scrbook
+Type: Package
+Title: Companion to the book: Spatial Capture Recapture (2014).
+Version: 0.30-0
+Suggests: raster, rjags, R2Cuba, gdistance
+Date: 2018-06-25
+Author: Andy Royle, Richard Chandler, Rahel Sollmann, and Beth Gardner
+Maintainer: Andy Royle <aroyle@usgs.gov>
+Description: Supports the book "Spatial Capture Recapture" (2014, Academic Press, published Aug. 2013). Functions are meant for education purposes.
+License: What license is it under?
+LazyLoad: yes
+NeedsCompilation: no
+Packaged: 2018-06-25 13:29:16 UTC; aroyle
+Built: R 3.4.2; ; 2018-06-25 13:31:12 UTC; windows

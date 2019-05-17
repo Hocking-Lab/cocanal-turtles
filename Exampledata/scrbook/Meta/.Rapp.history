@@ -1,0 +1,4 @@
+load("/Users/nataliehaydt/Desktop/Thesis/cocanal-turtles/Exampledata/scrbook/Meta/package.rds")
+load("/Users/nataliehaydt/Desktop/Thesis/cocanal-turtles/Exampledata/scrbook/Meta/Rd.rds")
+load("/Users/nataliehaydt/Desktop/Thesis/cocanal-turtles/Exampledata/scrbook/Meta/features.rds")
+load("/Users/nataliehaydt/Desktop/Thesis/cocanal-turtles/Exampledata/scrbook/Meta/links.rds")
