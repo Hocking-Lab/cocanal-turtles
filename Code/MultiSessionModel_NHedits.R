@@ -149,7 +149,7 @@ trap_locs[i, 1:max_trap[i]] <- trap_dist_list[[i]] / 100
 
 xlim <- matrix(NA, 12, 2)
 for(i in 1:12){
-  xlim[i, 1:2] <- c(min(trap_dist_list[[i]]), max(trap_dist_list[[i]]) + 50) / 100 # need to have buffer on each side without being negative. Just added 50 to the end for testing but will have to think through
+  xlim[i, 1:2] <- c(min(trap_dist_list[[i]]) - 400, max(trap_dist_list[[i]]) + 400) / 100 # need to have buffer on each side without being negative. Just added 50 to the end for testing but will have to think through
 }
 
 
