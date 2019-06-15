@@ -149,7 +149,7 @@ trap_locs[i, 1:max_trap[i]] <- trap_dist_list[[i]] / 100
 
 xlim <- matrix(NA, 12, 2)
 for(i in 1:12){
-  xlim[i, 1:2] <- c(min(trap_dist_list[[i]]) - 400, max(trap_dist_list[[i]]) + 400) / 100 # need to have buffer on each side without being negative. Just added 50 to the end for testing but will have to think through
+  xlim[i, 1:2] <- c(min(trap_dist_list[[i]]) - 300, max(trap_dist_list[[i]]) + 300) / 100 # need to have buffer on each side without being negative. Just added 50 to the end for testing but will have to think through
 }
 
 
@@ -673,7 +673,17 @@ for (k in 1:K) {
 B_array <- foob
 C <- B_array
 
+n_sites <- G
+
+########## SAVE ALL OBJECTS NEEDED FOR MODEL ##########
+
+if(!dir.exists("Data/Derived")) dir.create("Data/Derived", recursive = TRUE)
+
+save(z, sst, n_sites, EM_array, Sex, trap_locs, K, M, xlim, max_trap, C, G, file = "Data/Derived/all_site.RData") # other objects needed?
+
 #########
+
+##### separate into separate model scripts
 
 cat ("
      model {
@@ -754,7 +764,6 @@ for(i in 1:M) {
 }
      ", file = "Code/JAGS/SCR_Allsites.txt")
 
-n_sites <- G
 
 jags_data_site <- list(y = EM_array, 
                      Sex = Sex, 
