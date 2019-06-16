@@ -75,3 +75,6 @@ saveRDS(out2, "Results/JAGS/all_site_reg.rds")
 plot(out2[ , c("N[1]", "density[1]", "sigma_ind[1]", "alpha2[1,1]", "alpha0[1,1]")])
 plot(out2[ , c("N[2]", "density[2]", "sigma_ind[2]", "alpha2[2,1]", "alpha0[2,1]")])
 
+
+
+#---------- crazy slow in JAGS - try NIMBLE to see if get faster mixing ------------
