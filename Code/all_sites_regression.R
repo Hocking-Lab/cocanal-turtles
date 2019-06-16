@@ -1,6 +1,11 @@
 ######### Load Libraries #########
 
+library(dplyr)
+library(rjags)
+
 ######### Load Data from Previous script #########
+
+load(file = "Data/Derived/all_site.RData")
 
 ######### Set data and MCMC Conditions ########
 
@@ -24,7 +29,7 @@ jags_data_site <- list(y = EM_array,
                        n_sites = G) #, n_ind = n_ind)
 # "initial values for the observed data have to be specified as NA"
 inits <- function() {
-  list(alpha0 = matrix(rnorm(n_sites * 2, -2, 0.5), n_sites, 2), 
+  list(alpha0 = rnorm(n_sites * 2, -2, 0.5), 
        alpha1 = matrix(abs(rnorm(n_sites * 2, 1, 2)), n_sites, 2),
        alpha2 = matrix(rnorm(n_sites * 2, 1, 2), n_sites, M),
        s = t(sst), 
@@ -33,7 +38,7 @@ inits <- function() {
        psi.sex = runif(n_sites)) #, Sex = c(rep(NA, n_ind))) ## Error = "Invalid parameters for chain 1: non-numeric intial values supplied for variable(s) Sex"   #### ALPHA2????
 }
 
-parameters <- c("sigma", "N", "density", "s", "sigma_ind", "alpha2", "alpha0", "alpha1", "sigma", "beta1", "beta2") # "C", maybe C or a summary stat
+parameters <- c("sigma", "N", "density", "sigma_ind", "alpha2", "alpha0", "alpha1", "sigma", "beta1", "beta2") # "C", maybe C or a summary stat, might blow up if saving each activity center "s". 
 
 testing <- TRUE
 if(testing) {
@@ -50,6 +55,14 @@ if(testing) {
 
 
 ######### Run model ##########
+
+# testing single chain not in parallel
+if(FALSE) {
+  jm <- jags.model("Code/JAGS/scr_all_sites_simple_regression.txt", jags_data_site, inits = inits, n.adapt = 10, n.chains = 1)
+
+}
+#
+
 
 cl <- makeCluster(nc)                        # Request # cores
 clusterExport(cl, c("jags_data_site", "inits", "parameters", "n_ind", "z", "sst", "Sex", "ni", "na", "nt", "K", "C", "M", "n_sites")) # Make these available
