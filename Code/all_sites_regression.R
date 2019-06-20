@@ -29,16 +29,16 @@ jags_data_site <- list(y = EM_array,
                        n_sites = G) #, n_ind = n_ind)
 # "initial values for the observed data have to be specified as NA"
 inits <- function() {
-  list(alpha0 = rnorm(n_sites * 2, -2, 0.5), 
-       alpha1 = matrix(abs(rnorm(n_sites * 2, 1, 2)), n_sites, 2),
-       alpha2 = matrix(rnorm(n_sites * 2, 1, 2), n_sites, M),
+  list(alpha0 = rnorm(n_sites, -2, 0.5), 
+       # alpha1 = matrix(abs(rnorm(n_sites * 2, 1, 2)), n_sites, 2),
+       alpha2 = matrix(rnorm(n_sites * M, 1, 2), n_sites, M),
        s = t(sst), 
        z = z, 
        psi = runif(n_sites), 
        psi.sex = runif(n_sites)) #, Sex = c(rep(NA, n_ind))) ## Error = "Invalid parameters for chain 1: non-numeric intial values supplied for variable(s) Sex"   #### ALPHA2????
 }
 
-parameters <- c("sigma", "N", "density", "sigma_ind", "alpha2", "alpha0", "alpha1", "sigma", "beta1", "beta2") # "C", maybe C or a summary stat, might blow up if saving each activity center "s". 
+parameters <- c("sigma", "N", "density", "sigma_ind", "alpha2", "alpha0", "alpha1", "beta1", "beta2", "alpha1_mean") # "C", maybe C or a summary stat, might blow up if saving each activity center "s". 
 
 testing <- TRUE
 if(testing) {
@@ -58,8 +58,8 @@ if(testing) {
 
 # testing single chain not in parallel
 if(FALSE) {
-  jm <- jags.model("Code/JAGS/scr_all_sites_simple_regression.txt", jags_data_site, inits = inits, n.adapt = 10, n.chains = 1)
-
+  jm <- jags.model("Code/JAGS/scr_all_sites_simple_regression.txt", jags_data_site, inits = inits, n.adapt = 100, n.chains = 1)
+  out <- coda.samples(jm, parameters, n.iter = 100, thin = 1) 
 }
 #
 
@@ -85,8 +85,9 @@ if(!dir.exists("Results/JAGS")) dir.create("Results/JAGS", recursive = TRUE)
 saveRDS(out2, "Results/JAGS/all_site_reg.rds")
 
 ########## Quick checks ###########
-plot(out2[ , c("N[1]", "density[1]", "sigma_ind[1]", "alpha2[1,1]", "alpha0[1,1]")])
+plot(out2[ , c("density[1]", "alpha2[1,1]", "alpha0[1]", "beta1", "alpha1[2,1]", "alpha1[2,2]")])
 plot(out2[ , c("N[2]", "density[2]", "sigma_ind[2]", "alpha2[2,1]", "alpha0[2,1]")])
+
 
 
 

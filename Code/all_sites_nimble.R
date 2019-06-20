@@ -117,7 +117,7 @@ jags_data_site <- list(y = EM_array,
                        n_sites = G) #, n_ind = n_ind)
 # "initial values for the observed data have to be specified as NA"
 inits <- function() {
-  list(alpha0 = rnorm(n_sites * 2, -2, 0.5), 
+  list(alpha0 = rnorm(n_sites, -2, 0.5), 
        alpha1 = matrix(abs(rnorm(n_sites * 2, 1, 2)), n_sites, 2),
        alpha2 = matrix(rnorm(n_sites * 2, 1, 2), n_sites, M),
        s = t(sst), 
@@ -133,6 +133,6 @@ samples <- nimbleMCMC(
   constants = jags_data_site, ## provide the combined data & constants as constants
   inits = inits,
   monitors = parameters,
-  niter = 20,
-  nburnin = 10,
+  niter = 300,
+  nburnin = 200,
   thin = 1)

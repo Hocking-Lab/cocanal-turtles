@@ -14,7 +14,15 @@ library(utils)
 # library(reshape)
 # library(plyr)
 
+testing <- FALSE
+
 n_traps <- 14
+
+# number of possible individuals per site
+M <- 700 
+if(testing) {
+  M <- 200
+}
 
 Sites <- read.csv(file = "Data/trapids_sites.csv", header = TRUE)
 
@@ -376,7 +384,6 @@ G <- num_sites
 ###############
 #19_4_19
 
-M <- 700 # look for this earlier
 EM_array <- array(NA, dim = c(M, (max(max_trap) + 1), K, G))
 
 # make 4D array: individual (M) x trap (n_traps) x day (K) x site (G)
@@ -397,7 +404,7 @@ for(k in 1:K) {
 
 foob <- EM_array[ , -1, , ]
 
-target <- c(1:700)
+target <- c(1:M)
 
   for (k in 1:K) {
     for (g in 1:G) {
@@ -512,7 +519,7 @@ colnames(traplocsE) <- NULL
 unif_array <- array(NA, dim = c(M, G))
 
 for (g in 1:G){
-x <- runif(700, min = xlim[g, ], max = xlim[g, ])
+x <- runif(M, min = xlim[g, ], max = xlim[g, ])
 unif_array[ , g] <- as.matrix(x)
 }
 
@@ -565,7 +572,7 @@ EM_CPIC_sex <- EDF_CPIC %>%
 
 ######
 EM_array2 <- matrix(NA_integer_, M, G)
-target <- c(1:700)
+target <- c(1:M)
 
 # make 4D array: individual (M) x trap (n_traps) x day (K) x site (G)
 # split by day
@@ -584,7 +591,7 @@ for(k in 1:K) {
     # df_aug <- df_aug[ , c(ncol(df_aug), 1:(ncol(df_aug)-1))]
     colnames(df_aug) <- colnames(foo_less)
     foo_augment <- bind_rows(foo_less, df_aug)
-    target <- as.data.frame(1:700)
+    target <- as.data.frame(1:M)
     colnames(target) <- "id"
     foo_augment <- left_join(target, foo_augment, by = "id")
     foo_augment <- select(foo_augment, -id)
@@ -655,7 +662,7 @@ for (i in 1:M){
 
 foob <- array(NA, dim = c(M, K, G))
 
-target <- c(1:700)
+target <- c(1:M)
 
 for (k in 1:K) {
   for (g in 1:G) {
@@ -684,200 +691,200 @@ save(z, sst, n_sites, EM_array, Sex, trap_locs, K, M, xlim, max_trap, C, G, file
 #########
 
 ##### separate into separate model scripts
-
-cat ("
-     model {
-
-     mu_a1 ~ dnorm(0, 1 / (25^2))I(0, ) ## half normal
-     sd_a1 ~ dunif(0, 5)
-     mu_a2 ~ dnorm(0, 0.01)
-     # sd_a2 ~ dt(0, pow(5, -2), 1)T(0, ) # half cauchy prior with scale = 5 (25?)
-     sd_a2 ~ dunif(0, 5)
-
-    for(g in 1:n_sites) {
-
-for(i in 1:M) {
-     Sex[g, i] ~ dbern(psi.sex[g])
-     Sex2[g, i] <- Sex[g, i] + 1
-}
-
-     for(t in 1:2){
-      alpha1[g, t] ~ dnorm(0, 1 / (25^2))I(0, ) ## half normal independent across sites and sexes
-     # alpha1[g, t] ~ dnorm(mu_a1, 1 / sd_a1 / sd_a1 )I(0, ) # BUGS I(,) notation is only allowed if all parameters are fixed
-      sigma[g, t] <- pow(1 / (2*alpha1[g, t]), 0.5) # sd of half normal
-     } # t
-
-     psi[g] ~ dunif(0, 1) # prob of individual being in the population (for augmentation since N unknown)
-# logit(psi[g]) ~ dnorm(mu_psi, 1 / sd_psi / sd_psi) # consider drawing from a normal distribution across sites
-# mu_psi ~ dnorm(0, 0.01)
-# sd_psi ~ dunif(0, 10)
-     psi.sex[g] ~ dunif(0, 1)
-     
-     
-     sigma_ind[g] ~ dt(0, 1 / (25^2), 1)I(0, ) 	## implies half-cauchy with scale of 25 - maybe reduce to something more reasonable
-     
-    for(i in 1:M) {
-     for(k in 1:K) {
-     eta[g,i,k] ~ dnorm(0, 1 / (sigma_ind[g] * sigma_ind[g]))
-     } # i
-     } # k
-     
-     for(t in 1:2) {
-     alpha0[g, t] ~ dnorm(0, 0.04) # sd = 5 - could constrain more potentially
-     } # t
-     
-     
-     for(i in 1:M) {
-     alpha2[g, i] ~ dnorm(mu_a2, 1 / sd_a2 / sd_a2) # take out g here? Trap behavior universal b/w sites?
-     } # m
-     
-     for(i in 1:M) {
-     z[g, i] ~ dbern(psi[g])
-     s[g, i] ~ dunif(xlim[g, 1], xlim[g, 2]) ##??
-     
-     for(j in 1:max_trap[g]) { 
-     d[g,i,j] <- abs(s[g, i] - trap_locs[g, j])
-     
-     for(k in 1:K) {
-     for(t in 1:2) {
-     logit(p0[g, i, j, k, t]) <- alpha0[g, t] + (alpha2[g, i] * C[i, k, g]) + eta[g, i, k]  # alpha2*C to rep. global behav. response
-     } # t
-     } # k
-     } # j
-     } # i    
-     
-     for(i in 1:M) {
-     for (j in 1:max_trap[g]) {
-     for (k in 1:K) {
-     y[i, j, k, g] ~ dbern(p[g, i, j, k])
-     p[g, i, j, k] <- z[g, i] * p0[g, i, j, k, Sex2[g, i]] * exp(- alpha1[g, Sex2[g, i]] * d[g, i,j] * d[g, i,j])
-     } # i
-     } # j
-     } # k
-     
-     # Derived parameters
-    N[g] <- sum(z[g , ])
-     # N[g] <- inprod(z[1:M_allsites], sitedummy[ , t]) ## see panel 9.2
-     density[g] <- N[g] / (xlim[g, 2] - xlim[g, 1]) # divided distances by 100 so calculates turtles per 100 m of canal
-
-    } # g
-}
-     ", file = "Code/JAGS/SCR_Allsites.txt")
-
-
-jags_data_site <- list(y = EM_array, 
-                     Sex = Sex, 
-                     trap_locs = trap_locs, 
-                     K=K, 
-                     M=M, 
-                     xlim=xlim, 
-                     max_trap = max_trap, 
-                     C = C, 
-                     n_sites = G) #, n_ind = n_ind)
-# "initial values for the observed data have to be specified as NA"
-inits <- function() {
-  list(alpha0 = matrix(rnorm(n_sites * 2, -2, 0.5), n_sites, 2), 
-       alpha1 = matrix(abs(rnorm(n_sites * 2, 1, 2)), n_sites, 2),
-       alpha2 = matrix(rnorm(n_sites * 2, 1, 2), n_sites, M),
-       s = t(sst), 
-       z = z, 
-       psi = runif(n_sites), 
-       psi.sex = runif(n_sites)) #, Sex = c(rep(NA, n_ind))) ## Error = "Invalid parameters for chain 1: non-numeric intial values supplied for variable(s) Sex"   #### ALPHA2????
-}
-
-parameters <- c("sigma", "N", "density", "s", "sigma_ind", "alpha2", "alpha0", "alpha1", "sigma") # "C", maybe C or a summary stat
-
-testing <- TRUE
-if(testing) {
-  na = 500
-  ni = 100
-  nt = 1
-  nc = 2
-} else {
-  na = 100000
-  ni = 600000
-  nt = 60
-  nc = 4
-}
-
-cl <- makeCluster(nc)                        # Request # cores
-clusterExport(cl, c("jags_data_site", "inits", "parameters", "n_ind", "z", "sst", "Sex", "ni", "na", "nt", "K", "C", "M", "n_sites")) # Make these available
-clusterSetRNGStream(cl = cl, 54354354)
-
-system.time({ # no status bar (% complete) when run in parallel
-  out <- clusterEvalQ(cl, {
-    library(rjags)
-    jm <- jags.model("Code/JAGS/SCR_Allsites.txt", jags_data_site, inits = inits, n.adapt = na, n.chains = 1) # Compile model and run burnin
-    out <- coda.samples(jm, parameters, n.iter = ni, thin = nt) # Sample from posterior distribution
-    return(as.mcmc(out))
-  })
-}) #
-
-
-
-stopCluster(cl)
-
-out2 <- mcmc.list(out)
-plot(out2[ , c("N[1]", "density[1]", "sigma_ind[1]", "alpha2[1,1]", "alpha0[1,1]")])
-plot(out2[ , c("N[2]", "density[2]", "sigma_ind[2]", "alpha2[2,1]", "alpha0[2,1]")])
-
-
-########## Behavioral model but without individual responses #############
-# Complicated model doesn't look like it will converge based on very short test (non-identifiabilies)
-
-jags_data_site <- list(y = EM_array, 
-                       Sex = Sex, 
-                       trap_locs = trap_locs, 
-                       K=K, 
-                       M=M, 
-                       xlim=xlim, 
-                       max_trap = max_trap, 
-                       C = C, 
-                       n_sites = G) #, n_ind = n_ind)
-# "initial values for the observed data have to be specified as NA"
-inits <- function() {
-  list(alpha0 = rnorm(n_sites, -2, 0.5), 
-       alpha1 = matrix(abs(rnorm(n_sites * 2, 1, 2)), n_sites, 2),
-       alpha2 = matrix(rnorm(n_sites * 2, 1, 2), n_sites, M),
-       s = t(sst), 
-       z = z, 
-       psi = runif(n_sites), 
-       psi.sex = runif(n_sites)) #, Sex = c(rep(NA, n_ind))) ## Error = "Invalid parameters for chain 1: non-numeric intial values supplied for variable(s) Sex"   #### ALPHA2????
-}
-
-parameters <- c("sigma", "density", "s", "alpha2", "alpha0", "mu0", "sigma0", "mu_a2") # "C", maybe C or a summary stat
-
-testing <- TRUE
-if(testing) {
-  na = 500
-  ni = 500
-  nt = 1
-  nc = 2
-} else {
-  na = 100000
-  ni = 600000
-  nt = 60
-  nc = 4
-}
-
-cl <- makeCluster(nc)                        # Request # cores
-clusterExport(cl, c("jags_data_site", "inits", "parameters", "n_ind", "z", "sst", "Sex", "ni", "na", "nt", "K", "C", "M", "n_sites")) # Make these available
-clusterSetRNGStream(cl = cl, 54354354)
-
-system.time({ # no status bar (% complete) when run in parallel
-  out <- clusterEvalQ(cl, {
-    library(rjags)
-    jm <- jags.model("Code/JAGS/scr_all_sites_simple.txt", jags_data_site, inits = inits, n.adapt = na, n.chains = 1) # Compile model and run burnin
-    out <- coda.samples(jm, parameters, n.iter = ni, thin = nt) # Sample from posterior distribution
-    return(as.mcmc(out))
-  })
-}) #
-
-
-
-stopCluster(cl)
-
-scr_simple <- mcmc.list(out)
-plot(scr_simple[ , c("N[1]", "density[1]", "sigma_ind[1]", "alpha2[1,1]", "alpha0[1,1]")])
-plot(scr_simple[ , c("N[2]", "density[2]", "sigma_ind[2]", "alpha2[2,1]", "alpha0[2,1]")])
-
+# 
+# cat ("
+#      model {
+# 
+#      mu_a1 ~ dnorm(0, 1 / (25^2))I(0, ) ## half normal
+#      sd_a1 ~ dunif(0, 5)
+#      mu_a2 ~ dnorm(0, 0.01)
+#      # sd_a2 ~ dt(0, pow(5, -2), 1)T(0, ) # half cauchy prior with scale = 5 (25?)
+#      sd_a2 ~ dunif(0, 5)
+# 
+#     for(g in 1:n_sites) {
+# 
+# for(i in 1:M) {
+#      Sex[g, i] ~ dbern(psi.sex[g])
+#      Sex2[g, i] <- Sex[g, i] + 1
+# }
+# 
+#      for(t in 1:2){
+#       alpha1[g, t] ~ dnorm(0, 1 / (25^2))I(0, ) ## half normal independent across sites and sexes
+#      # alpha1[g, t] ~ dnorm(mu_a1, 1 / sd_a1 / sd_a1 )I(0, ) # BUGS I(,) notation is only allowed if all parameters are fixed
+#       sigma[g, t] <- pow(1 / (2*alpha1[g, t]), 0.5) # sd of half normal
+#      } # t
+# 
+#      psi[g] ~ dunif(0, 1) # prob of individual being in the population (for augmentation since N unknown)
+# # logit(psi[g]) ~ dnorm(mu_psi, 1 / sd_psi / sd_psi) # consider drawing from a normal distribution across sites
+# # mu_psi ~ dnorm(0, 0.01)
+# # sd_psi ~ dunif(0, 10)
+#      psi.sex[g] ~ dunif(0, 1)
+#      
+#      
+#      sigma_ind[g] ~ dt(0, 1 / (25^2), 1)I(0, ) 	## implies half-cauchy with scale of 25 - maybe reduce to something more reasonable
+#      
+#     for(i in 1:M) {
+#      for(k in 1:K) {
+#      eta[g,i,k] ~ dnorm(0, 1 / (sigma_ind[g] * sigma_ind[g]))
+#      } # i
+#      } # k
+#      
+#      for(t in 1:2) {
+#      alpha0[g, t] ~ dnorm(0, 0.04) # sd = 5 - could constrain more potentially
+#      } # t
+#      
+#      
+#      for(i in 1:M) {
+#      alpha2[g, i] ~ dnorm(mu_a2, 1 / sd_a2 / sd_a2) # take out g here? Trap behavior universal b/w sites?
+#      } # m
+#      
+#      for(i in 1:M) {
+#      z[g, i] ~ dbern(psi[g])
+#      s[g, i] ~ dunif(xlim[g, 1], xlim[g, 2]) ##??
+#      
+#      for(j in 1:max_trap[g]) { 
+#      d[g,i,j] <- abs(s[g, i] - trap_locs[g, j])
+#      
+#      for(k in 1:K) {
+#      for(t in 1:2) {
+#      logit(p0[g, i, j, k, t]) <- alpha0[g, t] + (alpha2[g, i] * C[i, k, g]) + eta[g, i, k]  # alpha2*C to rep. global behav. response
+#      } # t
+#      } # k
+#      } # j
+#      } # i    
+#      
+#      for(i in 1:M) {
+#      for (j in 1:max_trap[g]) {
+#      for (k in 1:K) {
+#      y[i, j, k, g] ~ dbern(p[g, i, j, k])
+#      p[g, i, j, k] <- z[g, i] * p0[g, i, j, k, Sex2[g, i]] * exp(- alpha1[g, Sex2[g, i]] * d[g, i,j] * d[g, i,j])
+#      } # i
+#      } # j
+#      } # k
+#      
+#      # Derived parameters
+#     N[g] <- sum(z[g , ])
+#      # N[g] <- inprod(z[1:M_allsites], sitedummy[ , t]) ## see panel 9.2
+#      density[g] <- N[g] / (xlim[g, 2] - xlim[g, 1]) # divided distances by 100 so calculates turtles per 100 m of canal
+# 
+#     } # g
+# }
+#      ", file = "Code/JAGS/SCR_Allsites.txt")
+# 
+# 
+# jags_data_site <- list(y = EM_array, 
+#                      Sex = Sex, 
+#                      trap_locs = trap_locs, 
+#                      K=K, 
+#                      M=M, 
+#                      xlim=xlim, 
+#                      max_trap = max_trap, 
+#                      C = C, 
+#                      n_sites = G) #, n_ind = n_ind)
+# # "initial values for the observed data have to be specified as NA"
+# inits <- function() {
+#   list(alpha0 = matrix(rnorm(n_sites * 2, -2, 0.5), n_sites, 2), 
+#        alpha1 = matrix(abs(rnorm(n_sites * 2, 1, 2)), n_sites, 2),
+#        alpha2 = matrix(rnorm(n_sites * 2, 1, 2), n_sites, M),
+#        s = t(sst), 
+#        z = z, 
+#        psi = runif(n_sites), 
+#        psi.sex = runif(n_sites)) #, Sex = c(rep(NA, n_ind))) ## Error = "Invalid parameters for chain 1: non-numeric intial values supplied for variable(s) Sex"   #### ALPHA2????
+# }
+# 
+# parameters <- c("sigma", "N", "density", "s", "sigma_ind", "alpha2", "alpha0", "alpha1", "sigma") # "C", maybe C or a summary stat
+# 
+# testing <- TRUE
+# if(testing) {
+#   na = 500
+#   ni = 100
+#   nt = 1
+#   nc = 2
+# } else {
+#   na = 100000
+#   ni = 600000
+#   nt = 60
+#   nc = 4
+# }
+# 
+# cl <- makeCluster(nc)                        # Request # cores
+# clusterExport(cl, c("jags_data_site", "inits", "parameters", "n_ind", "z", "sst", "Sex", "ni", "na", "nt", "K", "C", "M", "n_sites")) # Make these available
+# clusterSetRNGStream(cl = cl, 54354354)
+# 
+# system.time({ # no status bar (% complete) when run in parallel
+#   out <- clusterEvalQ(cl, {
+#     library(rjags)
+#     jm <- jags.model("Code/JAGS/SCR_Allsites.txt", jags_data_site, inits = inits, n.adapt = na, n.chains = 1) # Compile model and run burnin
+#     out <- coda.samples(jm, parameters, n.iter = ni, thin = nt) # Sample from posterior distribution
+#     return(as.mcmc(out))
+#   })
+# }) #
+# 
+# 
+# 
+# stopCluster(cl)
+# 
+# out2 <- mcmc.list(out)
+# plot(out2[ , c("N[1]", "density[1]", "sigma_ind[1]", "alpha2[1,1]", "alpha0[1,1]")])
+# plot(out2[ , c("N[2]", "density[2]", "sigma_ind[2]", "alpha2[2,1]", "alpha0[2,1]")])
+# 
+# 
+# ########## Behavioral model but without individual responses #############
+# # Complicated model doesn't look like it will converge based on very short test (non-identifiabilies)
+# 
+# jags_data_site <- list(y = EM_array, 
+#                        Sex = Sex, 
+#                        trap_locs = trap_locs, 
+#                        K=K, 
+#                        M=M, 
+#                        xlim=xlim, 
+#                        max_trap = max_trap, 
+#                        C = C, 
+#                        n_sites = G) #, n_ind = n_ind)
+# # "initial values for the observed data have to be specified as NA"
+# inits <- function() {
+#   list(alpha0 = rnorm(n_sites, -2, 0.5), 
+#        alpha1 = matrix(abs(rnorm(n_sites * 2, 1, 2)), n_sites, 2),
+#        alpha2 = matrix(rnorm(n_sites * 2, 1, 2), n_sites, M),
+#        s = t(sst), 
+#        z = z, 
+#        psi = runif(n_sites), 
+#        psi.sex = runif(n_sites)) #, Sex = c(rep(NA, n_ind))) ## Error = "Invalid parameters for chain 1: non-numeric intial values supplied for variable(s) Sex"   #### ALPHA2????
+# }
+# 
+# parameters <- c("sigma", "density", "s", "alpha2", "alpha0", "mu0", "sigma0", "mu_a2") # "C", maybe C or a summary stat
+# 
+# testing <- TRUE
+# if(testing) {
+#   na = 500
+#   ni = 500
+#   nt = 1
+#   nc = 2
+# } else {
+#   na = 100000
+#   ni = 600000
+#   nt = 60
+#   nc = 4
+# }
+# 
+# cl <- makeCluster(nc)                        # Request # cores
+# clusterExport(cl, c("jags_data_site", "inits", "parameters", "n_ind", "z", "sst", "Sex", "ni", "na", "nt", "K", "C", "M", "n_sites")) # Make these available
+# clusterSetRNGStream(cl = cl, 54354354)
+# 
+# system.time({ # no status bar (% complete) when run in parallel
+#   out <- clusterEvalQ(cl, {
+#     library(rjags)
+#     jm <- jags.model("Code/JAGS/scr_all_sites_simple.txt", jags_data_site, inits = inits, n.adapt = na, n.chains = 1) # Compile model and run burnin
+#     out <- coda.samples(jm, parameters, n.iter = ni, thin = nt) # Sample from posterior distribution
+#     return(as.mcmc(out))
+#   })
+# }) #
+# 
+# 
+# 
+# stopCluster(cl)
+# 
+# scr_simple <- mcmc.list(out)
+# plot(scr_simple[ , c("N[1]", "density[1]", "sigma_ind[1]", "alpha2[1,1]", "alpha0[1,1]")])
+# plot(scr_simple[ , c("N[2]", "density[2]", "sigma_ind[2]", "alpha2[2,1]", "alpha0[2,1]")])
+# 
