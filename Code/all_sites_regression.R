@@ -86,6 +86,8 @@ saveRDS(out2, "Results/JAGS/all_site_reg.rds")
 
 ########## Quick checks ###########
 plot(out2[ , c("density[1]", "alpha2[1,1]", "alpha0[1]", "beta1", "alpha1[2,1]", "alpha1[2,2]")])
+plot(out2[ , c("density[1]", "density[2]", "density[3]", "density[4]", "density[5]", "density[6]", "density[7]", "density[8]", "density[9]", "density[10]", "density[11]", "density[12]")])
+
 plot(out2[ , c("N[2]", "density[2]", "sigma_ind[2]", "alpha2[2,1]", "alpha0[2,1]")])
 
 
