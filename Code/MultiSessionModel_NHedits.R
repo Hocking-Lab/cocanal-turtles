@@ -1,4 +1,5 @@
 ##### Multi-Session SCR Model Creation JAGS ####
+##
 
 ## Also dubbed stratified population model
 
