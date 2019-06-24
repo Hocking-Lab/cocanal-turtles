@@ -20,9 +20,9 @@ testing <- FALSE
 n_traps <- 14
 
 # number of possible individuals per site
-M <- 700 
+M <- 1000 
 if(testing) {
-  M <- 200
+  M <- 700
 }
 
 Sites <- read.csv(file = "Data/trapids_sites.csv", header = TRUE)
@@ -74,47 +74,47 @@ colnames(trap_locs) = c("trap_id", "easting", "northing")
 # trap_locs as single vector with distance between
 
 
-## Full distance matrix with all sites combined ##
-dist_mat <- dist(as.data.frame(coords_utm))
-str(dist_mat)
-summary(dist_mat)
-
-summary(log(dist_mat))
-head(dist_mat)
-
-dist_mat <- as.matrix(dist_mat)
-str(dist_mat)
-
-log_dist_mat <- log(dist_mat)
-
-## trap number and row number match... thus row numbers in matrix represent trap numbers --
-
-# Separating distance matrices per site ##
-dist_mat_A <- dist(as.data.frame(coords_utm[1:8, ]))
-#str(dist_mat_A)
-dist_mat_C <- dist(as.data.frame(coords_utm[9:18, ]))
-dist_mat_D <- dist(as.data.frame(coords_utm[19:26, ]))
-dist_mat_E <- dist(as.data.frame(coords_utm[27:40, ]))
-dist_mat_F <- dist(as.data.frame(coords_utm[41:47, ]))
-dist_mat_G <- dist(as.data.frame(coords_utm[48:54, ]))
-dist_mat_J <- dist(as.data.frame(coords_utm[61:70, ]))
-dist_mat_K <- dist(as.data.frame(coords_utm[71:80, ]))
-dist_mat_L <- dist(as.data.frame(coords_utm[81:90, ]))
-dist_mat_M <- dist(as.data.frame(coords_utm[91:102, ]))
-dist_mat_N <- dist(as.data.frame(coords_utm[103:112, ]))
-dist_mat_O <- dist(as.data.frame(coords_utm[113:122, ]))
-
-# List of separated distance matrices ##
-dist_mat_list <- list(dist_mat_A, dist_mat_C, dist_mat_D,
-                      dist_mat_E, dist_mat_F, dist_mat_G,
-                      dist_mat_J, dist_mat_K, dist_mat_L,
-                      dist_mat_M, dist_mat_N, dist_mat_O)
-
-dist_mat <- dist_mat_list
-
-for (i in 1:length(dist_mat_list)) {
-  dist_mat[[i]] <- log(dist_mat_list[[i]])
-}
+# ## Full distance matrix with all sites combined ##
+# dist_mat <- dist(as.data.frame(coords_utm))
+# str(dist_mat)
+# summary(dist_mat)
+# 
+# summary(log(dist_mat))
+# head(dist_mat)
+# 
+# dist_mat <- as.matrix(dist_mat)
+# str(dist_mat)
+# 
+# log_dist_mat <- log(dist_mat)
+# 
+# ## trap number and row number match... thus row numbers in matrix represent trap numbers --
+# 
+# # Separating distance matrices per site ##
+# dist_mat_A <- dist(as.data.frame(coords_utm[1:8, ]))
+# #str(dist_mat_A)
+# dist_mat_C <- dist(as.data.frame(coords_utm[9:18, ]))
+# dist_mat_D <- dist(as.data.frame(coords_utm[19:26, ]))
+# dist_mat_E <- dist(as.data.frame(coords_utm[27:40, ]))
+# dist_mat_F <- dist(as.data.frame(coords_utm[41:47, ]))
+# dist_mat_G <- dist(as.data.frame(coords_utm[48:54, ]))
+# dist_mat_J <- dist(as.data.frame(coords_utm[61:70, ]))
+# dist_mat_K <- dist(as.data.frame(coords_utm[71:80, ]))
+# dist_mat_L <- dist(as.data.frame(coords_utm[81:90, ]))
+# dist_mat_M <- dist(as.data.frame(coords_utm[91:102, ]))
+# dist_mat_N <- dist(as.data.frame(coords_utm[103:112, ]))
+# dist_mat_O <- dist(as.data.frame(coords_utm[113:122, ]))
+# 
+# # List of separated distance matrices ##
+# dist_mat_list <- list(dist_mat_A, dist_mat_C, dist_mat_D,
+#                       dist_mat_E, dist_mat_F, dist_mat_G,
+#                       dist_mat_J, dist_mat_K, dist_mat_L,
+#                       dist_mat_M, dist_mat_N, dist_mat_O)
+# 
+# dist_mat <- dist_mat_list
+# 
+# for (i in 1:length(dist_mat_list)) {
+#   dist_mat[[i]] <- log(dist_mat_list[[i]])
+# }
 
 
 
@@ -164,7 +164,7 @@ for(i in 1:12){
 
 ####### EDF FILE ########
 
-EDF <- read.csv(file = "Data/EDF.csv", stringsAsFactors = FALSE)
+EDF <- read.csv(file = "Data/EDF.csv", stringsAsFactors = FALSE, fileEncoding = "UTF-8-BOM")
 head(EDF)
 summary(EDF)
 
@@ -392,7 +392,7 @@ EM_array <- array(NA, dim = c(M, (max(max_trap) + 1), K, G))
 for(k in 1:K) {
   for(g in 1:G) {
   foo <- EM[(which(EM[]$day == k & EM$site_num == g)), ]
-  foo_less <- select(foo, -c(site_num, ind, day, trap_id_edited, max_traps))
+  foo_less <- select(foo, -c(site_num, ind, day, trap_id_edited, max_trap))
   df_aug <- as.data.frame(matrix(0, nrow = (M - nrow(foo_less)), ncol = (max(max_trap) + 1)), stringsAsFactors = FALSE)
   # df_aug$site_num <- g
   # df_aug <- df_aug[ , c(ncol(df_aug), 1:(ncol(df_aug)-1))]
