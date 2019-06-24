@@ -25,9 +25,9 @@ if(testing) {
   M <- 700
 }
 
-Sites <- read.csv(file = "Data/trapids_sites.csv", header = TRUE)
+Sites <- read.csv(file = "Data/trapids_sites.csv", header = TRUE, fileEncoding = "UTF-8-BOM")
 
-max_trap_csv <- read.csv(file = "Data/Max_Traps_Site.csv")
+max_trap_csv <- read.csv(file = "Data/Max_Traps_Site.csv", fileEncoding = "UTF-8-BOM")
 max_trap <- max_trap_csv$max_traps
 
 coords <- read.csv(file = "Data/coords.csv")
@@ -158,7 +158,7 @@ trap_locs[i, 1:max_trap[i]] <- trap_dist_list[[i]] / 100
 
 xlim <- matrix(NA, 12, 2)
 for(i in 1:12){
-  xlim[i, 1:2] <- c(min(trap_dist_list[[i]]) - 300, max(trap_dist_list[[i]]) + 300) / 100 # need to have buffer on each side without being negative. Just added 50 to the end for testing but will have to think through
+  xlim[i, 1:2] <- c(min(trap_dist_list[[i]]) - 150, max(trap_dist_list[[i]]) + 150) / 100 # need to have buffer on each side without being negative. Just added 50 to the end for testing but will have to think through
 }
 
 
@@ -210,7 +210,7 @@ summary(EDF_CPIC)
 # traplocsA <- traplocsA / 100
 # matrixA <- matrixA / 100 # scale for computational purposes
 # 
-n_traps_site <- read.csv(file = "Data/Max_Traps_Site.csv") # number of traps per site
+n_traps_site <- read.csv(file = "Data/Max_Traps_Site.csv", fileEncoding = "UTF-8-BOM") # number of traps per site
 n_traps <- n_traps_site$max_traps
 
 ########
@@ -234,7 +234,7 @@ K <- max(EDF_CPIC$day) # trap nights per session
 ##n_ind <- length(unique(EDF_CPIC$ind)) ## Needs to match up with N? 3 off...
 ## should't use unique as does not count those that were b/w sites; why counting? Codes are different...
 
-traps_per_site <- read.csv(file = "Data/trapids_sites.csv")
+traps_per_site <- read.csv(file = "Data/trapids_sites.csv", fileEncoding ="UTF-8-BOM")
 
 
 # Make encounter histories with number of times each individual is captured in each trap
