@@ -687,7 +687,7 @@ n_sites <- G
 
 if(!dir.exists("Data/Derived")) dir.create("Data/Derived", recursive = TRUE)
 
-save(z, sst, n_sites, EM_array, Sex, trap_locs, K, M, xlim, max_trap, C, G, file = "Data/Derived/all_site.RData") # other objects needed?
+save(n_ind, z, sst, n_sites, EM_array, Sex, trap_locs, K, M, xlim, max_trap, C, G, file = "Data/Derived/all_site.RData") # other objects needed?
 
 #########
 
