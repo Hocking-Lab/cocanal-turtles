@@ -12,10 +12,12 @@ load(file = "Data/Derived/all_site.RData")
 
 ############ TEMP #################
 # Fake covariate data for testing
-forest_std <- rnorm(12, 0, 2)
-depth_std <- rnorm(12, 0, 2)
+#forest_std <- rnorm(12, 0, 2)
+#depth_std <- rnorm(12, 0, 2)
 #############################
-
+# Real covariate data
+forest <- read.csv(file = "Data/Forest_Cover_SingleColumn.csv", header = FALSE)
+depth <- read.csv(file = "Data/Avg_Depth_SingleColumn.csv", header = FALSE)
 
 jags_data_site <- list(y = EM_array, 
                        Sex = Sex, 
@@ -24,8 +26,8 @@ jags_data_site <- list(y = EM_array,
                        M=M, 
                        xlim=xlim, 
                        max_trap = max_trap, 
-                       forest = forest_std,
-                       depth = depth_std,
+                       forest = forest,
+                       depth = depth,
                        C = C, 
                        n_sites = G) #, n_ind = n_ind)
 # "initial values for the observed data have to be specified as NA"
