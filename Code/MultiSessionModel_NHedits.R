@@ -392,7 +392,7 @@ EM_array <- array(NA, dim = c(M, (max(max_trap) + 1), K, G))
 for(k in 1:K) {
   for(g in 1:G) {
   foo <- EM[(which(EM[]$day == k & EM$site_num == g)), ]
-  foo_less <- select(foo, -c(site_num, ind, day, trap_id_edited, max_trap))
+  foo_less <- select(foo, -c(site_num, ind, day, trap_id_edited, max_traps))
   df_aug <- as.data.frame(matrix(0, nrow = (M - nrow(foo_less)), ncol = (max(max_trap) + 1)), stringsAsFactors = FALSE)
   # df_aug$site_num <- g
   # df_aug <- df_aug[ , c(ncol(df_aug), 1:(ncol(df_aug)-1))]
@@ -420,7 +420,7 @@ target <- c(1:M)
     }
   }
 
-EM_array <- foob
+EM_array <- foob ## WHY 8's in first column??
 
 ## Need to divide M by 4, thus change ids?
 #### 500 per day per site? or 500 per site (500/4 per day?), also it does not keep the same id for the same indiiduals between days... so recap calc will not work?
@@ -520,7 +520,7 @@ colnames(traplocsE) <- NULL
 unif_array <- array(NA, dim = c(M, G))
 
 for (g in 1:G){
-x <- runif(M, min = xlim[g, ], max = xlim[g, ])
+x <- runif(M, min = xlim[g, ][1], max = xlim[g, ][2])
 unif_array[ , g] <- as.matrix(x)
 }
 
@@ -620,7 +620,7 @@ str(BM)
 BM
 
 BM <- as.data.frame(BM, stringsAsFactors = FALSE)
-BM$behav <- ifelse(BM$recap == "R", 1, 0)
+BM$behav <- ifelse(BM$recap == "R", 1, 0) # Switch? if N = 0, 1?
 BM_less <- select(BM, -recap)
 
 
@@ -687,7 +687,7 @@ n_sites <- G
 
 if(!dir.exists("Data/Derived")) dir.create("Data/Derived", recursive = TRUE)
 
-save(n_ind, z, sst, n_sites, EM_array, Sex, trap_locs, K, M, xlim, max_trap, C, G, file = "Data/Derived/all_site.RData") # other objects needed?
+save(z, sst, n_sites, EM_array, Sex, trap_locs, K, M, xlim, max_trap, C, G, file = "Data/Derived/all_site.RData") # other objects needed?
 
 #########
 
