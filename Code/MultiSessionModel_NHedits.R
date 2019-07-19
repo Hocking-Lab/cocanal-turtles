@@ -620,7 +620,7 @@ str(BM)
 BM
 
 BM <- as.data.frame(BM, stringsAsFactors = FALSE)
-BM$behav <- ifelse(BM$recap == "R", 1, 0) # Switch? if N = 0, 1?
+BM$behav <- ifelse(BM$recap == "R", 1, 3)
 BM_less <- select(BM, -recap)
 
 
@@ -679,6 +679,65 @@ for (k in 1:K) {
 }
 
 B_array <- foob
+
+# for(g in 1:G){
+#   for(m in 1:M){
+# fool <- ifelse(test = B_array[m ,1, g] == 3, yes = B_array[m ,2, g] == 1 & B_array[m ,3, g] == 1 & B_array[m ,4, g] == 1, no =  B_array[m ,2, g] == B_array[m ,2, g] & B_array[m ,3, g] == B_array[m ,3, g] & B_array[m ,4, g] == B_array[m ,4, g])
+#   }
+# }
+
+# B_array_2 <- array(NA_integer_, dim = c(M, K, G))
+# 
+#  #for(g in 1:G){
+#    B_array_G <- B_array[ , , g]
+#      B_array_df <- as.data.frame(B_array_G) %>%
+#   mutate(B_array_df, B_array_df2 = ifelse (B_array_df$V1 == 3, (B_array_df$V2 == 1 & B_array_df$V3 == 1 & B_array_df$V4 == 1),
+#   ifelse(B_array_df$V2 == 3, (B_array_df$V3 == 1 & B_array_df$V4 == 1),
+#   ifelse(B_array_df$V3 == 3, B_array_df$V4 == 1, (B_array_df$V2 == 0 & B_array_df$V3 == 0 & B_array_df$V4 == 0)))))
+#                                             
+# }
+#     else if (V2 == 3){V3 == 1 & V4 == 1}
+#     else if(V3 == 3) {V4 == 1}
+#     else {V1 == 0 & V2 == 0 & V3 == 0}) %>%
+#   B_array_2[ , ,g] <- as.matrix(B_array_G)
+# }
+# 
+# g = 1
+
+# for(g in 1:G){
+#   for(m in 1:M){
+#     B_array_G <- B_array[ , , g]
+#     B_array_df <- as.data.frame(B_array_G) %>%
+#       mutate_if(B_array_df[m, ], B_array_df$V1[m, ] == 3, B_array_df$V2[m, ] == 1 & B_array_df$V3[m, ] == 1 & B_array_df$V4[m, ] == 1, B_array_df[m, ])
+#   }
+# }
+
+# 
+# for(g in 1:G){
+#   for(m in 1:M){
+#     B_array_G <- B_array[ , , g]
+#     B_array_df <- as.data.frame(B_array_G) %>%
+#       mutate_if(B_array_df[m, 1] == 3, B_array_df[m, 2] == 1)
+#   }
+# }
+
+#     else if (V2 == 3){V3 == 1 & V4 == 1}
+#     else if(V3 == 3) {V4 == 1}
+#     else {V1 == 0 & V2 == 0 & V3 == 0}) %>%
+#   B_array_2[ , ,g] <- as.matrix(B_array_G)
+# }
+
+# mutate(sex = ifelse(sex == "U", NA, sex),
+#              sex = ifelse(sex == "M", 0, sex),
+#              sex = ifelse(sex == "F", 1, sex)) %>%
+#       mutate(sex = as.integer(sex))
+
+#fool <- ifelse(B_array[ , , ] = 2
+
+
+  # fool <- ifelse(fool[ , 2] = 3, fool[ , 3] = 1 & fool [ , 4] = 1, fool = fool[ , ] = fool[ , ])
+  # fool <- ifelse(fool[ , 3] = 3, fool[ , 4] = 1, fool[ , ] = fool[ , ])
+
 C <- B_array
 
 n_sites <- G

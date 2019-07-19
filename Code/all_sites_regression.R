@@ -16,8 +16,8 @@ load(file = "Data/Derived/all_site.RData")
 #depth_std <- rnorm(12, 0, 2)
 #############################
 # Real covariate data
-forest <- read.csv(file = "Data/Forest_Cover_SingleColumn.csv", header = FALSE)
-depth <- read.csv(file = "Data/Avg_Depth_SingleColumn.csv", header = FALSE)
+forest <- read.csv(file = "Data/LandUse/Forest_Cover_SingleColumn.csv", header = FALSE)
+depth <- read.csv(file = "Data/LandUse/Avg_Depth_m.csv", header = FALSE)
 
 jags_data_site <- list(y = EM_array, 
                        Sex = Sex, 
