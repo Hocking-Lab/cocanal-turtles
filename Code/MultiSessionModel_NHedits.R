@@ -19,7 +19,7 @@ testing <- FALSE
 n_traps <- 14
 
 # number of possible individuals per site
-M <- 700 
+M <- 2000 
 if(testing) {
   M <- 200
 }
@@ -519,7 +519,7 @@ colnames(traplocsE) <- NULL
 unif_array <- array(NA, dim = c(M, G))
 
 for (g in 1:G){
-x <- runif(M, min = xlim[g, ], max = xlim[g, ])
+x <- runif(M, min = xlim[g, ][1], max = xlim[g, ][2])
 unif_array[ , g] <- as.matrix(x)
 }
 
@@ -619,30 +619,8 @@ str(BM)
 BM
 
 BM <- as.data.frame(BM, stringsAsFactors = FALSE)
-BM$behav <- ifelse(BM$recap == "R", 1, 0)
+BM$behav <- ifelse(BM$recap == "N", 1, 0)
 BM_less <- select(BM, -recap)
-
-
-# make Cgik with 1 if a recap and 0 otherwise
-# C_obs <- BM_less %>%
-#   tidyr::expand(site_num, ind, day) %>%
-#   left_join(BM_less) %>%
-#   group_by(site_num) %>%
-#   mutate(behav = ifelse(is.na(behav), 0, behav),
-#          cumu = cumsum(behav)) %>%
-#   mutate(cgij = ifelse(cumu > 0, 1, 0)) %>% # if you stop it here you can see what it's doing 
-#   select(site_num, ind, day, cgij) %>%
-#   spread(key = site_num, value = cgij, sep = "_") %>% # stop here if you want to see individual ID before dropping it
-#   ungroup %>%
-#   select(-ind)
-# 
-# # augment unobserved individuals
-# C_unobs <- as.data.frame(matrix(0, nrow = M-nrow(C_obs), ncol = 4))
-# colnames(C_unobs) <- colnames(C_obs)
-# C <- bind_rows(C_obs, C_unobs)
-
-## Error: couldn't find arguments (site_num, ind, day)
-## Fixed error
 
 B_array <- array(NA, dim = c(M, 2, K, G))
 
@@ -677,8 +655,17 @@ for (k in 1:K) {
   }
 }
 
-B_array <- foob
-C <- B_array
+# make all after first capture = 1
+for(g in 1:G) {
+  for(m in 1:M) {
+    for(k in 2:K) {
+      foob[m, k, g] <- ifelse(foob[m, k-1, g] >= 1, 2, foob[m, k, g])
+    }
+  }
+}
+
+foob <- ifelse(foob == 1, 0, foob)
+C <- ifelse(foob == 2, 1, foob)
 
 n_sites <- G
 
