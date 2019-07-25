@@ -11,20 +11,15 @@ load(file = "Data/Derived/all_site.RData")
 
 ######### Set data and MCMC Conditions ########
 
-############ TEMP #################
-# Fake covariate data for testing
+############ Covariate Data #################
+forest <- read.csv("Data/Final_Covariates/Forest_Cover_SingleColumn.csv", header = FALSE, stringsAsFactors = FALSE)
+depth <- read.csv("Data/Final_Covariates/Avg_Depth_m.csv", header = TRUE, stringsAsFactors = FALSE)
 
-forest_std <- rnorm(12, 0, 2)
-depth_std <- rnorm(12, 0, 2)
+# standardize
+forest_std <- as.numeric(scale(forest))
+depth_std <- as.numeric(scale(depth))
 
-forest <- read.csv()
-
-
-#############################
-# Real covariate data
-forest <- read.csv(file = "Data/LandUse/Forest_Cover_SingleColumn.csv", header = FALSE)
-depth <- read.csv(file = "Data/LandUse/Avg_Depth_m.csv", header = FALSE)
-
+############## JAGS ###############
 jags_data_site <- list(y = EM_array, 
                        Sex = Sex, 
                        trap_locs = trap_locs, 
@@ -32,11 +27,12 @@ jags_data_site <- list(y = EM_array,
                        M=M, 
                        xlim=xlim, 
                        max_trap = max_trap, 
-                       forest = forest,
-                       depth = depth,
+                       forest = forest_std,
+                       depth = depth_std,
                        C = C, 
                        n_sites = G) #, n_ind = n_ind)
 # "initial values for the observed data have to be specified as NA"
+
 inits <- function() {
   list(alpha0 = rnorm(n_sites, -2, 0.5), 
        # alpha1 = matrix(abs(rnorm(n_sites * 2, 1, 2)), n_sites, 2),
@@ -50,7 +46,7 @@ inits <- function() {
 
 parameters <- c("sigma", "N", "density", "alpha2", "mu_a0", "sd_a0", "mu_a1", "sd_a1", "alpha0", "alpha1", "beta1", "beta2") # "C", maybe C or a summary stat, might blow up if saving each activity center "s". 
 
-testing <- TRUE
+testing <- FALSE
 if(testing) {
   na = 500
   ni = 100
@@ -68,7 +64,7 @@ if(testing) {
 
 # testing single chain not in parallel
 if(FALSE) {
-  jm <- jags.model("Code/JAGS/scr_all_sites_simple_regression.txt", jags_data_site, inits = inits, n.adapt = 100, n.chains = 1)
+  jm <- jags.model("Code/JAGS/scr_all_sites_simple_regression.txt", jags_data_site, inits = inits, n.adapt = 10, n.chains = 1)
   out <- coda.samples(jm, parameters, n.iter = 100, thin = 1) 
 }
 #
