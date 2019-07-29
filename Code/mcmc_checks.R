@@ -12,15 +12,23 @@ samples <- readRDS("Results/JAGS/all_site_reg.rds")
 ######### Check MCMC ########
 
 color_scheme_set("mix-blue-pink")
-p <- mcmc_trace(samples,  pars = c("N[2]"), regexpr("mu"), # n_warmup = 300,
+p <- mcmc_trace(samples, regex_pars = c("mu", "sigma"))
+p + facet_text(size = 15)
+
+p <- mcmc_trace(samples, regex_pars = c("beta"))
+p + facet_text(size = 15)
+
+p <- mcmc_trace(samples, regex_pars = c("sd"), # n_warmup = 300,
                 facet_args = list(nrow = 2, labeller = label_parsed))
 p + facet_text(size = 15)
 
-p <- mcmc_trace(samples, regexpr("sd"), # n_warmup = 300,
-                facet_args = list(nrow = 2, labeller = label_parsed))
+p <- mcmc_trace(samples, regex_pars = c("density"))
 p + facet_text(size = 15)
 
-p <- mcmc_trace(samples, regexpr("density"))
+p <- mcmc_trace(samples, regex_pars = c("alpha"))
+p + facet_text(size = 15)
+
+p <- mcmc_trace(samples, regex_pars = c("N"))
 p + facet_text(size = 15)
 
 
