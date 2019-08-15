@@ -21,7 +21,7 @@ n_traps <- 14
 
 # number of possible individuals per site
 
-M <- 2000 
+M <- 3000 
 
 if(testing) {
   M <- 700
@@ -678,7 +678,11 @@ n_sites <- G
 
 if(!dir.exists("Data/Derived")) dir.create("Data/Derived", recursive = TRUE)
 
-save(z, sst, n_sites, EM_array, Sex, trap_locs, K, M, xlim, max_trap, C, G, file = "Data/Derived/all_site.RData") # other objects needed?
+if(testing) {
+  save(z, sst, n_sites, EM_array, Sex, trap_locs, K, M, xlim, max_trap, C, G, file = "Data/Derived/all_site_testing.RData")
+} else {
+  save(z, sst, n_sites, EM_array, Sex, trap_locs, K, M, xlim, max_trap, C, G, file = "Data/Derived/all_site.RData") # other objects needed?
+}
 
 #########
 

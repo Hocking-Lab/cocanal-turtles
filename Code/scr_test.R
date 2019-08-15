@@ -21,7 +21,7 @@ depth_std <- rnorm(12, 0, 2)
 #############################
 # Real covariate data
 forest <- read.csv(file = "Data/LandUse/Forest_Cover_SingleColumn.csv", header = FALSE)
-depth <- read.csv(file = "Data/LandUse/Avg_Depth_m.csv", header = FALSE)
+depth <- read.csv(file = "Data/LandUse/Avg_Depth_m.csv", header = TRUE)
 
 forest_std <- as.numeric(scale(forest))
 depth_std <- as.numeric(scale(depth))
@@ -39,7 +39,7 @@ jags_data_site <- list(y = EM_array,
                        n_sites = G) #, n_ind = n_ind)
 # "initial values for the observed data have to be specified as NA"
 inits <- function() {
-  list(alpha0 = rnorm(n_sites, -2, 0.5), 
+  list(# alpha0 = rnorm(n_sites, -2, 0.5), 
        # alpha1 = matrix(abs(rnorm(n_sites * 2, 1, 2)), n_sites, 2),
        # alpha2 = matrix(rnorm(n_sites * M, 1, 2), n_sites, M),
        alpha2 = rnorm(1, -1, 1),
@@ -49,7 +49,7 @@ inits <- function() {
        psi.sex = runif(n_sites)) #, Sex = c(rep(NA, n_ind))) ## Error = "Invalid parameters for chain 1: non-numeric intial values supplied for variable(s) Sex"   #### ALPHA2????
 }
 
-parameters <- c("sigma", "N", "density", "alpha2", "mu_a0", "sd_a0", "mu_a1", "sd_a1", "alpha0", "alpha1", "beta1", "beta2", "mu_psi", "sd_psi") # "C", maybe C or a summary stat, might blow up if saving each activity center "s". 
+parameters <- c("N", "density", "alpha2", "mu_a0", "sd_a0", "mu_a1", "sd_a1", "alpha0", "alpha1", "alpha3", "beta1", "beta2", "psi.sex", "p_cap_day", "p_cap_sex", "mu_psi", "sd_psi", "sigma_mean", "sigma_site", "sigma_sex") # "sigma", # "C", maybe C or a summary stat, might blow up if saving each activity center "s". 
 
 testing <- TRUE
 if(testing) {
