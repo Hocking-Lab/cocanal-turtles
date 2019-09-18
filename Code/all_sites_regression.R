@@ -63,6 +63,11 @@ if(FALSE) {
 }
 #
 
+library(jagsUI)
+samples <- jags(data = jags_data_site, inits = inits, parameters.to.save = parameters, model.file = "Code/JAGS/scr_all_sites_simple_regression.txt", n.chains = 1, n.adapt = 100, n.burnin = 110, n.iter = 300, modules = "glm")
+
+
+
 
 cl <- makeCluster(nc)                        # Request # cores
 clusterExport(cl, c("jags_data_site", "inits", "parameters", "n_ind", "z", "sst", "Sex", "ni", "na", "nt", "K", "C", "M", "n_sites")) # Make these available
@@ -94,3 +99,23 @@ plot(out2[ , c("N[2]", "density[2]", "sigma_ind[2]", "alpha2[2,1]", "alpha0[2,1]
 
 
 #---------- crazy slow in JAGS - try NIMBLE to see if get faster mixing ------------
+
+library(nimble)
+
+nim_mod <- readBUGSmodel("Code/JAGS/scr_all_sites_simple_regression.txt", data = jags_data_site)
+
+parameters <- c("sigma", "density", "alpha2", "alpha0", "alpha1", "beta1", "alpha1_mean") 
+
+nim_out <- nimbleMCMC(
+  code = nim_mod,
+  constants = jags_data_site, ## provide the combined data & constants as constants
+  inits = inits,
+  monitors = parameters,
+  niter = 200,
+  nburnin = 100,
+  thin = 1)
+
+library(coda)
+out2 <- mcmc.list(as.mcmc(nim_out))
+
+plot(out2[ , c("density[1]", "density[2]", "density[3]", "density[4]", "density[5]", "density[6]", "density[7]", "density[8]", "density[9]", "density[10]", "density[11]", "density[12]")])
