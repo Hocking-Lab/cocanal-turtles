@@ -5,9 +5,16 @@ library(dplyr)
 library(rjags)
 library(parallel)
 
+testing <- TRUE
+run_date <- "2019-09-19"
+
 ######### Load Data from Previous script #########
 
-load(file = "Data/Derived/all_site.RData")
+if(testing) {
+  load(file = paste0("Data/Derived/all_site_testing_", run_date, ".RData"))
+} else {
+  load(file = "Data/Derived/all_site.RData")
+}
 
 ######### Set data and MCMC Conditions ########
 
@@ -51,7 +58,6 @@ inits <- function() {
 
 parameters <- c("N", "density", "alpha2", "mu_a0", "sd_a0", "mu_a1", "sd_a1", "alpha0", "alpha1", "alpha3", "beta1", "beta2", "psi.sex", "p_cap_day", "p_cap_sex", "mu_psi", "sd_psi", "sigma_mean", "sigma_site", "sigma_sex") # "sigma", # "C", maybe C or a summary stat, might blow up if saving each activity center "s". 
 
-testing <- TRUE
 if(testing) {
   na = 500
   ni = 100
@@ -60,8 +66,8 @@ if(testing) {
 } else {
   na = 50000
   ni = 60000
-  nt = 6*4
-  nc = 4
+  nt = 6*3
+  nc = 3
 }
 
 
@@ -82,7 +88,7 @@ clusterSetRNGStream(cl = cl, 54354354)
 system.time({ # no status bar (% complete) when run in parallel
   out <- clusterEvalQ(cl, {
     library(rjags)
-    jm <- jags.model("Code/JAGS/scr_test.txt", jags_data_site, inits = inits, n.adapt = na, n.chains = 1) # Compile model and run burnin
+    jm <- jags.model("Code/JAGS/scr_test.txt", jags_data_site, inits = inits, n.adapt = na, n.chains = 1) # Compile model and run burnin - consider settingburnin vs adapt
     out <- coda.samples(jm, parameters, n.iter = ni, thin = nt) # Sample from posterior distribution
     return(as.mcmc(out))
   })
@@ -94,6 +100,7 @@ samples <- mcmc.list(out)
 
 if(!dir.exists("Results/JAGS")) dir.create("Results/JAGS", recursive = TRUE)
 saveRDS(samples, "Results/JAGS/all_site_reg_test.rds")
+saveRDS(samples, "Results/JAGS/all_site_reg_final.rds")
 
 ########## Quick checks ###########
 plot(samples[ , c("density[1]", "alpha2[1,1]", "alpha0[1]", "beta1", "alpha1[2,1]", "alpha1[2,2]")])

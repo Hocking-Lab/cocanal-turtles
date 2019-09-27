@@ -21,6 +21,9 @@ p + facet_text(size = 15)
 p <- mcmc_trace(samples, regex_pars = c("alpha2"))
 p + facet_text(size = 15)
 
+p <- mcmc_trace(samples, regex_pars = c("alpha3"))
+p + facet_text(size = 15)
+
 p <- mcmc_trace(samples, regex_pars = c("sigma"))
 p + facet_text(size = 15)
 
@@ -33,14 +36,20 @@ p + facet_text(size = 15)
 p <- mcmc_trace(samples, regex_pars = c("density"))
 p + facet_text(size = 15)
 
+p <- mcmc_trace(samples, regex_pars = c("N"))
+p + facet_text(size = 15)
+
+p <- mcmc_trace(samples, regex_pars = c("mu_psi_site"))
+p + facet_text(size = 15)
+
+p <- mcmc_trace(samples, regex_pars = c("p_cap"))
+p + facet_text(size = 15)
+
 # Detection intercept 
 p <- mcmc_trace(samples, regex_pars = c("alpha0"))
 p + facet_text(size = 15)
 
 p <- mcmc_trace(samples, regex_pars = c("alpha3"))
-p + facet_text(size = 15)
-
-p <- mcmc_trace(samples, regex_pars = c("N"))
 p + facet_text(size = 15)
 
 p <- mcmc_trace(samples, regex_pars = c("p_cap"))
