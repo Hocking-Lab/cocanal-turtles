@@ -1,0 +1,85 @@
+﻿species,family,id,site,date,smear,quality,comments,total,rbc,thromb,heterophil,eosinophil,basophil,lymphocyte,monocyte,parasite,smudge,unidentified,FOV,comments
+CPIC,em,222,D,15-06-2018,1,NA,,3428,3240,69,5,42,17,39,0,0,16,0,Full Tiff,80 grid cells
+CPIC,em,18,A,06-10-2018,1,good,edges are clumped,2222,2015,28,6,36,31,69,6,0,16,15,Part Tiff,
+CPIC,em,23,A,06-10-2018,1,fair,clumping throughout,1674,1368,34,0,73,33,154,4,3,NA,8,Full Tiff,"Very difficult to differentiate lymphs vs thrombs; Cells with clear cytoplasm, slight blue, yet see normal basos so counted as unknown"
+CPIC,em,42,A,06-09-2018,2,decent,"Scrapes, light",2288,2150,37,3,27,12,58,1,0,NA,NA,Part Tiff,"Very light, diff to tell if large purple cells are large lymphs or monos"
+CPIC,em,57,C,06-12-2018,2,decent,"RBCs bit shriveled, scrape in center",2118,2005,35,2,16,24,36,0,2,NA,NA,Full Tiff,
+CPIC,em,60,C,15-06-2018,1,NA,,2126,2007,49,1,34,15,14,0,0,0,6,Part Tiff,"Dense, 3 unidentified possibly hets or eosins?"
+CPIC,em,63,C,15-06-2018,1,NA,,2436,2286,17,2,28,20,75,0,1,2,6,Full Tiff,"Unidentified = fuzzy, purple blobs - precursor RBCs?"
+CPIC,em,93,F,26-06-2018,1,decent,Scrapes,2192,2021,43,9,39,23,57,0,0,NA,NA,Part Tiff,
+CPIC,em,121,C,06-12-2018,1,decent,"Short, scrapes",2107,2002,5,3,18,6,62,4,0,5,2,Part Tiff,"Monos = small, azurophilic?"
+CPIC,em,142,D,16-06-2018,2,fair,"density changes, scrapes",2180,2101,24,8,16,9,21,1,0,NA,NA,Part Tiff,
+CPIC,em,171,F,26-06-2018,1,decent,"scrapes, see parasites",2190,2060,29,7,25,15,54,0,0,NA,NA,Part Tiff,
+CPIC,em,182,F,28-06-2018,1,fair,RBCs very shriveled,2089,2000,21,1,27,4,35,1,0,NA,NA,Part Tiff,
+CPIC,em,193,F,29-06-2018,1,good,,2294,2060,20,3,57,20,117,0,0,15,2,Part Tiff,A couple thrombocytes seem acidophilic
+CPIC,em,194,F,29-06-2018,1,fair,"scrapes, very dense at start of slide",2265,2004,81,13,52,25,90,0,2,NA,NA,Part Tiff,
+CPIC,em,201,C,06-12-2018,1,good,,1791,1747,0,1,7,4,25,0,0,7,0,Full Tiff,Low number of WBCs and many early RBCs
+CPIC,em,202,C,06-12-2018,2,decent,Scrapes,718,661,7,0,12,8,30,0,0,NA,NA,Full Tiff,
+CPIC,em,204,C,06-12-2018,1,decent,Changing density,2227,2101,25,1,21,18,61,0,2,NA,NA,Part Tiff,
+CPIC,em,205,F,28-06-2018,1,fair,RBCs very shriveled,701,654,NA,1,6,10,NA,0,0,1,29,Full Tiff,Cannot tell apart thrombs and lymphs
+CPIC,em,207,C,06-12-2018,1,good,,1666,1523,23,1,23,19,75,2,0,NA,NA,Full Tiff,
+CPIC,em,222,D,NA,1,NA,,2115,2002,29,3,29,12,40,0,0,NA,NA,Part Tiff,
+CPIC,em,224,D,15-06-2018,1,decent,"RBCs bit shriveled, scrape in center",1426,1316,4,6,43,8,40,0,0,4,5,Full Tiff,Much of smear scraped off; Potential RBC precursors in unidentified
+CPIC,em,225,F,29-06-2018,2,good,RBCs bit shriveled,1660,1554,17,2,13,18,56,0,0,NA,NA,Part Tiff,
+CPIC,em,241,D,15-06-2018,1,decent,"light smear, light scrapes",1948,1728,45,12,26,22,108,0,3,3,4,Full Tiff,Began focusing every 2 FOV (not 3); good parasite pics; Unidentified = light eosin? or tiny monos?
+CPIC,em,244,D,15-06-2018,1,decent,RBCs bit shriveled,1652,1601,0,2,15,13,21,0,1,NA,NA,Full Tiff,
+CPIC,em,247,E,21-06-2018,2,fair,"Short smear, light stain",2114,2006,5,3,38,7,44,2,2,8,1,Part Tiff,Unidentified = RBC precursor or small mono?
+CPIC,em,260,C,14-06-2018,1,fair,Scrapes,1879,1799,0,2,29,6,42,0,0,0,1,Full Tiff,Unidentified = large lymph w/pink particles? or small mono?
+CPIC,em,400,C,06-12-2018,2,fair,Changing density,1277,1227,3,4,13,12,18,0,0,NA,NA,Full Tiff,
+CPIC,em,420,C,15-06-2018,1,good,,2124,2010,29,8,20,8,47,0,0,1,1,Part Tiff,Unidentified = free nucleus of RBC precursor?
+CPIC,em,430,C,15-06-2018,2,good,Medium smear,1889,1725,31,5,47,13,60,2,0,NA,6,Full Tiff,"Clear, mostly easy to ID"
+CPIC,em,440,C,14-06-2018,2,fair,"RBCs very shriveled, very scraped",1019,956,14,1,9,10,29,0,0,NA,NA,Full Tiff,
+CPIC,em,442,C,15-06-2018,1,NA,,692,636,1,5,13,5,31,0,0,NA,1,Full Tiff,Low number of cells
+CPIC,em,444,D,15-06-2018,1,NA,,2145,2056,1,6,29,8,44,0,1,NA,NA,Part Tiff,
+CPIC,em,460,C,14-06-2018,2,decent,RBCs shriveled,2262,2066,60,8,35,35,57,0,0,NA,1,Part Tiff,Unidentified possible eosinophil
+CPIC,em,510,G,07-04-2018,2,good,,2196,2054,37,8,41,14,42,0,1,NA,NA,Part Tiff,
+CPIC,em,592,O,18-08-2018,2,fair,changing densities; light,2071,2002,15,1,19,9,24,1,0,0,0,Part Tiff,
+CPIC,em,609,O,17-08-2018,2,fair,RBCs shriveled,2135,2002,36,1,21,15,59,0,0,0,1,Full Tiff,
+CPIC,em,713,O,18-08-2018,2,decent,changing densities; dense; light,2580,2420,26,2,27,15,90,0,0,NA,NA,Part Tiff,
+CPIC,em,715,O,19-08-2018,1,decent,light at edges,2091,1976,21,6,31,9,47,1,0,NA,0,Full Tiff,Clear and easy to ID
+CPIC,em,743,O,18-08-2018,1,fair,RBC membranes difficult to see; light,1734,1670,23,9,14,4,10,1,0,0,3,Full Tiff,
+CPIC,em,746,O,18-08-2018,1,decent,density changes a bit,1959,1858,25,8,24,11,31,0,2,2,0,Full Tiff,
+CPIC,em,841,O,17-08-2018,2,decent,"light smear, small scratch in middle",1197,1122,4,5,10,10,46,0,0,NA,NA,Full Tiff,
+CPIC,em,850,O,17-08-2018,2,fair,"RBCs shriveled, horizontal scratches",1485,1400,29,3,12,4,37,0,0,NA,NA,Full Tiff,
+CPIC,em,911,O,17-08-2018,3,good,,2238,2014,43,4,37,24,116,0,0,0,0,Part Tiff,
+CPIC,em,914,O,17-08-2018,2,fair,"Changing density, scratches",2093,2000,28,0,17,11,33,0,0,2,2,Full Tiff,
+CPIC,em,917,O,17-08-2018,2,decent, Large scrape in center,570,513,11,8,8,5,25,0,0,NA,NA,Full Tiff,
+CPIC,em,3700,F,28-06-2018,1,fair,RBCs very shriveled,2104,1943,49,5,26,11,56,1,0,2,11,Full Tiff,Most unidentified likely early RBCs
+CPIC,em,NOID3,J,09-05-2018,2,decent,RBCs shriveled,2235,1989,59,4,40,21,114,5,0,0,3,Full Tiff,2 unidentified might be early RBC precursors
+CPIC,em,NOID4,J,09-05-2018,1,good,Beginning of smear too light,2045,1760,50,18,11,29,172,5,4,NA,NA,Full Tiff,
+CPIC,em,NOID5,J,09-05-2018,2,fair,"Changing density, bottom middle decent cells",3488,3285,8,14,37,25,115,4,0,NA,2,Full Tiff,
+CSER,ch,130,C,06-12-2018,1,good,Lots of basophils/ azuorphilic monocytes/toxic heterophils?,2197,2062,36,8,22,27,37,2,3,2,1,Part Tiff,Difficult to differentiate lymphs and thrombs; Very dense
+CSER,ch,160,C,15-06-2018,2,decent,Dense,2196,2017,106,17,4,23,25,3,3,0,1,Part Tiff,
+CSER,ch,210,C,15-06-2018,1,NA,,2159,2014,44,13,10,8,50,2,0,17,1,Part Tiff,"Some clumping; Heterophils with pink specs, unidentified possible light eosinophil?"
+CSER,ch,220,A,06-10-2018,1,decent,RBCs bit shriveled,3446,3303,4,34,13,15,54,23,4,NA,NA,Full Tiff,
+CSER,ch,240,D,13-06-2018,1,decent,"Cells lysed on one half of slide, other side is fine, lots of parasites",2311,2013,1,15,24,77,14,35,13,87,45,Part Tiff,41 Unidentified = potentially precursors/or lymphs/monos? Have someone look at?
+CSER,ch,250,F,26-06-2018,1,fair,"Changing density, vertical section on left with decent cells",1362,1213,47,4,11,3,49,2,0,21,12,Full Tiff,8 Unidentified potential extracellular parasites? 3 Unidentified unstained eosins or hets?
+CSER,ch,350,F,20-06-2018,2,good,"Cells shriveled a bit, lots of parasites",2236,2009,128,17,10,11,51,6,104,1,3,Part Tiff,A TON OF PARASITES!!
+CSER,ch,410,E,19-06-2018,2,decent,Bit clumped,2282,2001,82,32,27,7,119,6,0,4,4,Part Tiff,Unidentified unstained eosins or hets?
+CSER,ch,420,C,15-06-2018,1,NA,,2106,1838,103,7,8,109,38,1,1,1,1,Full Tiff,Smudge on edge of smear pic; Somewhat difficult to differentiate thrombs and lymphs
+CSER,ch,470,E,19-06-2018,2,good,Lots of basophils/ azuorphilic monocytes/toxic heterophils? lighter than 220,2389,2005,110,35,32,72,109,12,0,12,2,Part Tiff,Unidentified unstained eosins?
+CSER,ch,520,F,28-06-2018,2,good,Medium smear,2172,2013,46,21,9,7,60,4,2,11,1,Part Tiff,
+CSER,ch,700,A,06-10-2018,1,decent,"Changing density, see difs b/w azuro monos and basos well/look at boundary?",2234,2002,98,28,23,9,59,8,3,7,0,Part Tiff,Difficult to differentiate lymphs and thrombs
+CSER,ch,880,O,19-08-2018,1,decent,good cells at right lower quadrant (not edge),2120,2002,57,16,14,11,15,3,4,0,2,Part Tiff,
+CSER,ch,NOID1,J,09-04-2018,1,good,,2173,2002,42,8,31,13,57,3,2,16,1,Part Tiff,
+SODO,ki,1,A,06-10-2018,1,fair,Changing density,2380,2279,1,2,22,13,50,1,0,7,5,Part Tiff,Clump of 22 more thrombs? - See X
+SODO,ki,2,A,06-10-2018,1,fair,Changing density,1780,1702,8,5,5,6,39,0,11,12,3,Full Tiff,Lots of smudges
+SODO,ki,3,F,26-06-2018,1,decent,Spread out,794,749,0,1,1,1,22,0,5,1,19,Full Tiff,Unidentified potentially basos or early RBCs?
+SODO,ki,21,F,28-06-2018,1,fair,"Changing density, right end cells very shriveled, Parasites",2143,2004,49,6,11,13,53,2,20,3,2,Part Tiff,"1 unidentified looks like mono, but no cytoplasm?"
+SODO,ki,29,O,19-08-2018,1,good,,2075,2000,16,8,7,9,35,0,0,0,0,Part Tiff,
+SODO,ki,32,F,28-06-2018,1,fair,"RBCs very shriveled, dense",2118,2001,31,4,6,2,24,0,0,49,1,Part Tiff,1 Unknown - Potential Extracellular parasite?
+SODO,ki,49,O,17-08-2018,1,decent,Short smear,2146,2002,27,6,16,8,84,2,3,1,0,Part Tiff,Difficult to differentiate thrombs and lymphs
+SODO,ki,90,E,21-06-2018,1,fair,RBCs very shriveled,667,620,0,2,3,5,33,0,2,0,4,Full Tiff,
+SODO,ki,94,O,18-08-2018,1,decent,"""holes"" -- circular scratches",2122,2004,67,5,6,15,21,0,12,4,0,Part Tiff,
+SODO,ki,103,O,18-08-2018,1,decent,Scratches,2084,2007,34,2,4,3,33,1,12,0,0,Part Tiff,
+SODO,ki,108,O,19-08-2018,2,decent,"Scrapes, bood cells lower half, Parasites",2202,2115,24,3,6,3,49,0,16,2,0,Part Tiff,Some lymphs seem activated
+SODO,ki,410,D,14-06-2018,2,good,,2103,2001,40,16,12,4,24,5,7,1,0,Part Tiff,Somewhat difficult to differentiate thrombs and lymphs
+PRUB,em,2,F,26-06-2018,1,fair,"RBCs shriveled, low density",488,457,NA,0,4,4,NA,0,0,0,23,Full Tiff,"Lymphs and thrombs look like nucs of RBCs, diff to ID"
+PRUB,em,4,F,26-06-2018,1,fair,"RBCs shriveled, low density",501,469,0,1,1,5,21,0,8,1,3,Full Tiff,Low number of cells
+PRUB,em,70,F,26-06-2018,2,decent,Top of smear is good; bottom is bad,1648,1598,0,7,4,0,32,1,4,6,0,Full Tiff,
+PRUB,em,113,O,17-08-2018,3,decent,RBCs shriveled,2209,2001,82,10,19,11,81,1,0,2,2,Full Tiff,Difficult to differentiate thrombs and lymphs
+PRUB,em,340,O,18-08-2018,1,fair,RBCs shriveled,2091,2000,26,10,4,16,34,0,2,0,1,Full Tiff,Somwhat difficult to differentiate thrombs and lymphs
+PRUB,em,NOID1,J,09-04-2018,1,good,RBCs slightly shriveled,1549,1460,37,3,14,3,25,1,1,2,4,Full Tiff,
+GINS,em,10,C,15-06-2018,1,NA,,2065,2001,38,5,0,1,15,1,10,0,4,Part Tiff,"Thrombs easy to ID, lymphs not as easy"
+TSCR,em,NOID1,J,09-04-2018,1,good,,1795,1730,32,1,5,12,14,1,2,0,0,Full Tiff,
+TSCR,em,NOID2,J,09-05-2018,4,decent,Scratch in horizontal center,2074,2002,4,3,13,6,35,2,0,5,4,Part Tiff,"Many lymphs seem activate, unidentified = eosins or hets?"

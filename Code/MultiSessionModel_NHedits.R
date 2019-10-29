@@ -15,8 +15,12 @@ library(utils)
 # library(reshape)
 # library(plyr)
 
+<<<<<<< HEAD
 testing <- FALSE
 run_date <- Sys.Date()
+=======
+testing <- TRUE
+>>>>>>> b24396f7034025e5fa34fe7088a9021649ae18a1
 
 n_traps <- 14
 

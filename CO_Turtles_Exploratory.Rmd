@@ -80,6 +80,7 @@ scr_gins <- subset(scr.data, species == "GINS")
 scr_tscr <- subset(scr.data, species == "TSCR")
 ```
 
+
 ```{r, species summaries}
 summary(scr_cpic)
 summary(scr_sodo)
